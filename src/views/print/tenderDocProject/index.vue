@@ -1,59 +1,60 @@
 <template>
-	<el-main>
-		<el-card shadow="never" header="单张">
-			<el-form
-				ref="form"
-				:model="form"
-				:rules="rules"
-				label-width="100px"
-				status-icon
-			>
-				<el-form-item
-					v-for="item in formConfig"
-					:key="item.prop"
-					:label="item.label"
-					:prop="item.prop"
+	<div class="print-page">
+		<el-main>
+			<el-card shadow="never">
+				<el-form
+					ref="form"
+					:model="form"
+					:rules="rules"
+					label-width="100px"
+					status-icon
 				>
-					<el-input-number
-						v-if="item.type === 'input-number'"
-						v-model="form[item.prop]"
-						:min="1"
-						controls-position="right"
-					/>
-					<el-radio-group v-else v-model="form[item.prop]">
-						<el-radio
-							v-for="option in item.options"
-							:key="option.value"
-							:label="option.value"
-							border
-						>
-							{{ option.label }}
-						</el-radio>
-					</el-radio-group>
-				</el-form-item>
-				<el-form-item label="补充说明" prop="remarks">
-					<el-input
-						v-model="form.remarks"
-						type="textarea"
-						placeholder="其他对商品要求的描述或补充说明"
-					></el-input>
-				</el-form-item>
-				<el-form-item label="文件上传" prop="files">
-					<el-upload
-						class="upload-demo"
-						drag
-						action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-						multiple
-						style="flex: 1"
+					<el-form-item
+						v-for="item in formConfig"
+						:key="item.prop"
+						:label="item.label"
+						:prop="item.prop"
 					>
-						<el-icon class="el-icon--upload"
-							><upload-filled
-						/></el-icon>
-						<div class="el-upload__text">
-							请将文件拖到此处或 <em>点击上传</em>
-						</div>
-					</el-upload>
-					<el-table
+						<el-input-number
+							v-if="item.type === 'input-number'"
+							v-model="form[item.prop]"
+							:min="1"
+							controls-position="right"
+						/>
+						<el-radio-group v-else v-model="form[item.prop]">
+							<el-radio
+								v-for="option in item.options"
+								:key="option.value"
+								:label="option.value"
+								border
+							>
+								{{ option.label }}
+							</el-radio>
+						</el-radio-group>
+					</el-form-item>
+					<el-form-item label="补充说明" prop="remarks">
+						<el-input
+							v-model="form.remarks"
+							type="textarea"
+							placeholder="其他对商品要求的描述或补充说明"
+						></el-input>
+					</el-form-item>
+					<el-form-item label="文件上传" prop="files">
+						<el-upload
+							class="upload-demo"
+							drag
+							action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+							multiple
+							style="flex: 1"
+						>
+							<el-icon size="80" color="#ffaf58"
+								><upload-filled
+							/></el-icon>
+							<div class="el-upload__text">
+								请将文件拖到此处或 <em>点击上传</em>
+							</div>
+						</el-upload>
+						<!-- <el-table
 						:data="[]"
 						style="flex: 2; height: 100%; padding-left: 10px"
 						border
@@ -84,28 +85,39 @@
 								</el-button>
 							</template>
 						</el-table-column>
-					</el-table>
-				</el-form-item>
-				<el-form-item>
-					<el-button type="primary" plain style="margin-right: 10px"
-						>计算价格</el-button
-					>
-					<el-button-group>
-						<el-button type="danger" @click="submit">
-							加入购物车
-						</el-button>
-						<el-button type="success" @click="resetForm('form')"
-							>立即购买</el-button
-						>
-					</el-button-group>
-				</el-form-item>
-			</el-form>
-		</el-card>
-	</el-main>
+					</el-table> -->
+					</el-form-item>
+				</el-form>
+			</el-card>
+		</el-main>
+		<div class="bottom-shop">
+			<div class="order-content">
+				<span class="price"> 官网下单￥ </span>
+				<span>预计生产时间， 预计净重</span>
+			</div>
+			<el-button
+				type="primary"
+				size="large"
+				plain
+				style="margin-right: 10px"
+				>计算价格</el-button
+			>
+			<el-button-group>
+				<el-button type="danger" size="large" @click="submit">
+					加入购物车
+				</el-button>
+				<el-button
+					type="success"
+					size="large"
+					@click="resetForm('form')"
+					>立即购买</el-button
+				>
+			</el-button-group>
+		</div>
+	</div>
 </template>
 
 <script>
-import { verifyPhone, verifyCars } from "@/utils/verificate";
 import { UploadFilled } from "@element-plus/icons-vue";
 export default {
 	name: "tenderDocProject",
@@ -115,14 +127,18 @@ export default {
 	data() {
 		return {
 			form: {
-				printColor: 1,
-				printArea: 1,
-				size: 1,
-				materials: 1,
-				gramWeight: 1,
-				amount: 1,
-				sheets: 1,
-				payment: 1,
+				spec: 1,
+				workflow: 1,
+				originalCopies: 1,
+				copyCopies: 1,
+				needScan: 1,
+				scanOption: 1,
+				originalPrintColor: 1,
+				copyPrintColor: 1,
+				coverColor: 1,
+				bindingMethod: 1,
+				deliveryTime: 1,
+				paymentMethod: 1,
 			},
 			rules: {
 				required: [{ required: true, message: "请填写" }],
@@ -298,31 +314,12 @@ export default {
 					],
 				},
 			],
-			form2: {},
-			rules2: {
-				phone: [
-					{ required: true, message: "请输入姓名" },
-					{ validator: verifyPhone, trigger: "blur" },
-				],
-				cars: [
-					{ required: true, validator: verifyCars, trigger: "blur" },
-				],
-			},
 		};
 	},
 	mounted() {},
 	methods: {
 		submit() {
 			this.$refs.form.validate(async (valid) => {
-				if (valid) {
-					this.$message.success("全部验证通过");
-				} else {
-					return false;
-				}
-			});
-		},
-		submit2() {
-			this.$refs.form2.validate(async (valid) => {
 				if (valid) {
 					this.$message.success("全部验证通过");
 				} else {
@@ -337,8 +334,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.el-radio {
-	margin-right: 10px;
-}
-</style>
+<style scoped lang="scss"></style>

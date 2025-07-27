@@ -1,14 +1,14 @@
 <template>
 	<div class="user-bar">
-		<div class="panel-item hidden-sm-and-down" @click="search">
+		<!-- <div class="panel-item hidden-sm-and-down" @click="search">
 			<el-icon><el-icon-search /></el-icon>
-		</div>
+		</div> -->
 		<div class="screen panel-item hidden-sm-and-down" @click="screen">
 			<el-icon><el-icon-full-screen /></el-icon>
 		</div>
-		<div class="tasks panel-item" @click="tasks">
+		<!-- <div class="tasks panel-item" @click="tasks">
 			<el-icon><el-icon-sort /></el-icon>
-		</div>
+		</div> -->
 		<div class="msg panel-item" @click="showMsg">
 			<el-badge :hidden="msgList.length==0" :value="msgList.length" class="badge" type="danger">
 				<el-icon><el-icon-chat-dot-round /></el-icon>

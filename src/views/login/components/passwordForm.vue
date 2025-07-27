@@ -177,14 +177,13 @@ export default {
 								component: "home",
 							},
 							{
-								name: "userCenter",
-								path: "/userCenter",
+								name: "userManage",
+								path: "/userManage",
 								meta: {
-									title: "帐号信息",
+									title: "用户管理",
 									icon: "el-icon-user",
-									tag: "NEW",
 								},
-								component: "userCenter",
+								component: "userManage",
 							},
 						],
 					},

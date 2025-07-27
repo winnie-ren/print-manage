@@ -36,7 +36,7 @@
 			</div>
 			<Side-m v-if="ismobile"></Side-m>
 			<div class="aminui-body el-container">
-				<Topbar v-if="!ismobile"></Topbar>
+				<!-- <Topbar v-if="!ismobile"></Topbar> -->
 				<Tags v-if="!ismobile && layoutTags"></Tags>
 				<div class="adminui-main" id="adminui-main">
 					<router-view v-slot="{ Component }">
@@ -81,7 +81,7 @@
 			</div>
 			<Side-m v-if="ismobile"></Side-m>
 			<div class="aminui-body el-container">
-				<Topbar v-if="!ismobile"></Topbar>
+				<!-- <Topbar v-if="!ismobile"></Topbar> -->
 				<Tags v-if="!ismobile && layoutTags"></Tags>
 				<div class="adminui-main" id="adminui-main">
 					<router-view v-slot="{ Component }">
