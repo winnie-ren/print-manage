@@ -3,13 +3,13 @@ const DEFAULT_CONFIG = {
 	APP_NAME: process.env.VUE_APP_TITLE,
 
 	//首页地址
-	DASHBOARD_URL: "/dashboard",
+	DASHBOARD_URL: "/menuManage",
 
 	//版本号
-	APP_VER: "1.6.9",
+	APP_VER: "1.0",
 
 	//内核版本号
-	CORE_VER: "1.6.9",
+	CORE_VER: "1.0",
 
 	//接口地址
 	API_URL: process.env.NODE_ENV === 'development' && process.env.VUE_APP_PROXY === 'true' ? "/api" : process.env.VUE_APP_API_BASEURL,

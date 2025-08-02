@@ -161,20 +161,29 @@ export default {
 						name: "home",
 						path: "/home",
 						meta: {
-							title: "首页",
-							icon: "el-icon-eleme-filled",
+							title: "系统管理",
+							icon: "el-icon-menu",
 							type: "menu",
 						},
 						children: [
 							{
-								name: "dashboard",
-								path: "/dashboard",
+								name: "menuManage",
+								path: "/menuManage",
 								meta: {
-									title: "控制台",
+									title: "菜单管理",
 									icon: "el-icon-menu",
 									affix: true,
 								},
-								component: "home",
+								component: "menuManage",
+							},
+							{
+								name: "roleManage",
+								path: "/roleManage",
+								meta: {
+									title: "角色管理",
+									icon: "el-icon-Postcard",
+								},
+								component: "roleManage",
 							},
 							{
 								name: "userManage",

@@ -2,7 +2,7 @@
 	<div class="login_bg">
 		<div class="login_adv" style="background-image: url(img/auth_banner.jpg);">
 			<div class="login_adv__title">
-				<h2>SCUI</h2>
+				<!-- <h2>打印平台</h2>
 				<h4>{{ $t('login.slogan') }}</h4>
 				<p>{{ $t('login.describe') }}</p>
 				<div>
@@ -15,7 +15,7 @@
 					<span>
 						<el-icon><el-icon-eleme-filled /></el-icon>
 					</span>
-				</div>
+				</div> -->
 			</div>
 			<div class="login_adv__mask"></div>
 			<div class="login_adv__bottom">
