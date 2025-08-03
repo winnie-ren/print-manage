@@ -123,6 +123,7 @@ export default {
 				styleCount: 1,
 				sheetCount: 1,
 				deliveryMethod: 1,
+				payType: 'ALIPAY'
 			},
 			formConfig: [
 				{
@@ -199,21 +200,32 @@ export default {
 					type: "radio",
 					options: [
 						{ label: "1", value: 1 },
-						{ label: "100", value: 2 },
-						{ label: "500", value: 3 },
-						{ label: "1000", value: 4 },
+						{ label: "100", value: 100 },
+						{ label: "500", value: 500 },
+						{ label: "1000", value: 1000 },
 						{ label: "自定义", value: 0 },
 					],
 				},
 				{
-					label: "支付方式",
+					label: "交付方式",
 					prop: "deliveryMethod",
 					type: "radio",
 					options: [
-						{ label: "自取", value: 1 },
-						{ label: "送货上门", value: 2 },
-						{ label: "快递到付", value: 3 },
-						{ label: "快递寄付", value: 4 },
+						{ label: "微信", value: "WXPAY" },
+						{ label: "支付宝", value: "ALIPAY" },
+						// { label: "自取", value: 1 },
+						// { label: "送货上门", value: 2 },
+						// { label: "快递到付", value: 3 },
+						// { label: "快递寄付", value: 4 },
+					],
+				},
+				{
+					label: "支付方式",
+					prop: "payType",
+					type: "radio",
+					options: [
+						{ label: "微信", value: "WXPAY" },
+						{ label: "支付宝", value: "ALIPAY" },
 					],
 				},
 			],
@@ -222,7 +234,7 @@ export default {
 	mounted() {},
 	methods: {
 		async buyNow() {
-			this.$API.print.singleSave.post(this.form)
+			this.$API.print.singleSave.post(this.form);
 		},
 	},
 };

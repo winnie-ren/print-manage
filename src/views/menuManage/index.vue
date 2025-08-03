@@ -30,14 +30,26 @@
 			</div>
 		</el-header>
 		<el-main class="nopadding">
-			<scTable ref="table" :apiObj="list.apiObj" row-key="id" stripe>
+			<scTable
+				ref="table"
+				:apiObj="list.apiObj"
+				row-key="id"
+				stripe
+				@selectionChange="selectionChange"
+			>
 				<el-table-column type="selection" width="50"></el-table-column>
-				<el-table-column
-					v-for="item in tableHeader"
-					:label="item.label"
-					:prop="item.name"
-					:key="item.name"
-				></el-table-column>
+				<template v-for="item in tableHeader" :key="item.name">
+					<el-table-column
+						v-if="item.table !== false"
+						:label="item.label"
+						:prop="item.name"
+						:width="item.width"
+						:formatter="
+							item.format ? (row) => formatter(row, item) : ''
+						"
+					>
+					</el-table-column>
+				</template>
 				<el-table-column
 					label="操作"
 					fixed="right"
@@ -77,49 +89,55 @@
 		</el-main>
 	</el-container>
 	<el-dialog v-model="dialogVisible" title="添加" width="500">
-		<scForm v-model="form" :config="formConfig"></scForm>
+		<scForm v-model="form" :config="formConfig" @submit="onSubmit"></scForm>
 	</el-dialog>
 </template>
 
 <script>
-import saveDialog from "./save";
+import { ElMessage } from "element-plus";
 const tableHeader = [
 	{
 		label: "菜单编码",
 		name: "gco",
 		component: "input",
+		form: true,
 		options: { placeholder: "请输入" },
 	},
 	{
 		label: "菜单名称",
 		name: "gna",
 		component: "input",
+		form: true,
 		options: { placeholder: "请输入" },
 	},
 	{
 		label: "父级编码",
 		name: "pgco",
 		component: "input",
+		form: true,
 		options: { placeholder: "请输入" },
 	},
 	{
 		label: "访问url",
 		name: "url",
 		component: "input",
+		form: true,
 		options: { placeholder: "请输入" },
 	},
 	{
 		label: "图标",
 		name: "icon",
 		component: "input",
+		form: true,
 		options: { placeholder: "请输入" },
 	},
-	{ label: "显示排序", name: "sorts", component: "number" },
+	{ label: "显示排序", name: "sorts", form: true, component: "number" },
 	{
 		label: "菜单类型",
 		name: "menuType",
 		format: "dir:文件夹/node:菜单",
 		component: "radio",
+		form: true,
 		options: {
 			items: [
 				{ value: "dir", label: "文件夹" },
@@ -132,6 +150,7 @@ const tableHeader = [
 		name: "target",
 		format: "0:本系统窗口/1:浏览器新标签页",
 		component: "radio",
+		form: true,
 		options: {
 			items: [
 				{ value: 0, label: "本系统窗口" },
@@ -154,13 +173,10 @@ const tableHeader = [
 ];
 export default {
 	name: "menuManage",
-	components: {
-		saveDialog,
-	},
 	data() {
 		return {
 			list: {
-				apiObj: this.$API.demo.list,
+				apiObj: this.$API.menu.userPage,
 			},
 			tableHeader,
 			page: {
@@ -177,28 +193,26 @@ export default {
 			formConfig: {
 				labelWidth: 80,
 				labelPosition: "left",
-				formItems: tableHeader,
+				formItems: tableHeader.filter((item) => item.form),
 			},
 		};
-	},
-	mounted() {
-		// this.getTableList();
 	},
 	methods: {
 		//添加
 		add() {
+			console.log(this.$refs.table);
 			this.dialogVisible = true;
 		},
 		//编辑
 		table_edit(row) {
-			this.dialog.save = true;
+			this.dialogVisible = true;
 			this.$nextTick(() => {
 				this.$refs.saveDialog.open("edit").setData(row);
 			});
 		},
 		//查看
 		table_show(row) {
-			this.dialog.save = true;
+			this.dialogVisible = true;
 			this.$nextTick(() => {
 				this.$refs.saveDialog.open("show").setData(row);
 			});
@@ -224,17 +238,14 @@ export default {
 					type: "warning",
 				}
 			)
-				.then(() => {
+				.then(async () => {
 					const loading = this.$loading();
-					this.selection.forEach((item) => {
-						this.$refs.table.tableData.forEach((itemI, indexI) => {
-							if (item.id === itemI.id) {
-								this.$refs.table.tableData.splice(indexI, 1);
-							}
-						});
-					});
-					loading.close();
-					this.$message.success("操作成功");
+					const ids = this.selection.map((item) => item.id);
+					const res = await this.$API.menu.userDelete.delete(ids);
+					if (res.code === 0) {
+						loading.close();
+						this.$message.success("删除成功");
+					}
 				})
 				.catch(() => {});
 		},
@@ -246,8 +257,22 @@ export default {
 		upsearch() {
 			this.$refs.table.upData(this.search);
 		},
-		getTableList() {
-			this.$API.user.userPage.post();
+		formatter(row, item) {
+			// 表格字段格式化
+			const map = item.format.split("/").reduce((acc, item) => {
+				const [key, label] = item.split(":");
+				acc[key.trim()] = label.trim();
+				return acc;
+			}, {});
+			return map[String(row[item.name])] || "";
+		},
+		async onSubmit(form) {
+			const res = await this.$API.menu.userSave.post(form);
+			if (res.code === 0) {
+				this.dialogVisible = false;
+				this.$refs.table.getData();
+				ElMessage.success("操作成功");
+			}
 		},
 	},
 };

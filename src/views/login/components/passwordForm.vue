@@ -7,9 +7,9 @@
 		size="large"
 		@keyup.enter="login"
 	>
-		<el-form-item prop="user">
+		<el-form-item prop="usid">
 			<el-input
-				v-model="form.user"
+				v-model="form.usid"
 				prefix-icon="el-icon-user"
 				clearable
 				:placeholder="$t('login.userPlaceholder')"
@@ -28,9 +28,9 @@
 				</template>
 			</el-input>
 		</el-form-item>
-		<el-form-item prop="password">
+		<el-form-item prop="pwd">
 			<el-input
-				v-model="form.password"
+				v-model="form.pwd"
 				prefix-icon="el-icon-lock"
 				clearable
 				show-password
@@ -75,19 +75,19 @@ export default {
 		return {
 			userType: "admin",
 			form: {
-				user: "admin",
-				password: "admin",
+				usid: "px",
+				pwd: "1",
 				autologin: false,
 			},
 			rules: {
-				user: [
+				usid: [
 					{
 						required: true,
 						message: this.$t("login.userError"),
 						trigger: "blur",
 					},
 				],
-				password: [
+				pwd: [
 					{
 						required: true,
 						message: this.$t("login.PWError"),
@@ -101,11 +101,11 @@ export default {
 	watch: {
 		userType(val) {
 			if (val == "admin") {
-				this.form.user = "admin";
-				this.form.password = "admin";
+				this.form.usid = "admin";
+				this.form.pwd = "admin";
 			} else if (val == "user") {
-				this.form.user = "user";
-				this.form.password = "user";
+				this.form.usid = "user";
+				this.form.pwd = "user";
 			}
 		},
 	},
@@ -121,41 +121,38 @@ export default {
 
 			this.islogin = true;
 			var data = {
-				username: this.form.user,
-				password: this.$TOOL.crypto.MD5(this.form.password),
+				usid: this.form.usid,
+				pwd: this.form.pwd,
 			};
 			//获取token
-			var user = await this.$API.auth.token.post(data);
-			if (user.code == 200) {
+			var user = await this.$API.auth.dologin.post(data);
+			if (user.code === 0) {
 				this.$TOOL.cookie.set("TOKEN", user.data.token, {
 					expires: this.form.autologin ? 24 * 60 * 60 : 0,
 				});
-				this.$TOOL.data.set("USER_INFO", user.data.userInfo);
+				// 获取用户信息
+				var res = await this.$API.auth.info.get();
+				this.$TOOL.data.set("USER_INFO", res.data);
 			} else {
 				this.islogin = false;
-				this.$message.warning(user.message);
+				this.$message.warning(user.msg);
 				return false;
 			}
 			//获取菜单
-			var menu = null;
-			if (this.form.user == "admin") {
-				menu = await this.$API.system.menu.myMenus.get();
-			} else {
-				menu = await this.$API.demo.menu.get();
-			}
-			if (menu.code == 200) {
-				if (menu.data.menu.length == 0) {
-					this.islogin = false;
-					this.$alert(
-						"当前用户无任何菜单权限，请联系系统管理员",
-						"无权限访问",
-						{
-							type: "error",
-							center: true,
-						}
-					);
-					return false;
-				}
+			// var menu = await this.$API.auth.getMenuTree.post();
+			// if (menu.code == 200) {
+			// 	if (menu.data.menu.length == 0) {
+			// 		this.islogin = false;
+			// 		this.$alert(
+			// 			"当前用户无任何菜单权限，请联系系统管理员",
+			// 			"无权限访问",
+			// 			{
+			// 				type: "error",
+			// 				center: true,
+			// 			}
+			// 		);
+			// 		return false;
+			// 	}
 				const menuList = [
 					{
 						name: "home",
@@ -249,13 +246,13 @@ export default {
 					},
 				];
 				this.$TOOL.data.set("MENU", menuList);
-				this.$TOOL.data.set("PERMISSIONS", menu.data.permissions);
-				this.$TOOL.data.set("DASHBOARDGRID", menu.data.dashboardGrid);
-			} else {
-				this.islogin = false;
-				this.$message.warning(menu.message);
-				return false;
-			}
+				this.$TOOL.data.set("PERMISSIONS", '');
+				this.$TOOL.data.set("DASHBOARDGRID", '');
+			// } else {
+			// 	this.islogin = false;
+			// 	this.$message.warning(menu.message);
+			// 	return false;
+			// }
 
 			this.$router.replace({
 				path: "/",

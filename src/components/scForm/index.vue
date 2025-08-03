@@ -24,7 +24,7 @@
 						</template>
 						<!-- input -->
 						<template v-if="item.component=='input'" >
-							<el-input v-model="form[item.name]" :placeholder="item.options.placeholder" clearable :maxlength="item.options.maxlength" show-word-limit></el-input>
+							<el-input v-model="form[item.name]" :placeholder="item.options.placeholder" clearable :maxlength="item.options.maxlength" :show-password="item.options.password" show-word-limit></el-input>
 						</template>
 						<!-- checkbox -->
 						<template v-else-if="item.component=='checkbox'" >

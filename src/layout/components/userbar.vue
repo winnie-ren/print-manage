@@ -45,12 +45,12 @@
 				</el-container>
 			</el-drawer>
 		</div>
-		<el-dropdown class="user panel-item" trigger="click" @command="handleUser">
-			<div class="user-avatar">
+		<div class="user-avatar">
 				<el-avatar :size="30">{{ userNameF }}</el-avatar>
 				<label>{{ userName }}</label>
-				<el-icon class="el-icon--right"><el-icon-arrow-down /></el-icon>
+				<!-- <el-icon class="el-icon--right"><el-icon-arrow-down /></el-icon> -->
 			</div>
+		<!-- <el-dropdown class="user panel-item" trigger="click" @command="handleUser">
 			<template #dropdown>
 				<el-dropdown-menu>
 					<el-dropdown-item command="uc">帐号信息</el-dropdown-item>
@@ -58,9 +58,9 @@
 					<el-dropdown-item divided command="outLogin">退出登录</el-dropdown-item>
 				</el-dropdown-menu>
 			</template>
-		</el-dropdown>
+		</el-dropdown> -->
+		<el-button @click="handleUser('outLogin')">退出登录</el-button>
 	</div>
-
 	<el-dialog v-model="searchVisible" :width="700"  title="搜索" center destroy-on-close>
 		<search @success="searchVisible=false"></search>
 	</el-dialog>
@@ -102,7 +102,7 @@
 		},
 		created() {
 			var userInfo = this.$TOOL.data.get("USER_INFO");
-			this.userName = userInfo.userName;
+			this.userName = userInfo.usna;
 			this.userNameF = this.userName.substring(0,1);
 		},
 		methods: {
@@ -167,11 +167,11 @@
 </script>
 
 <style scoped>
-	.user-bar {display: flex;align-items: center;height: 100%;}
+	.user-bar {display: flex;align-items: center;height: 100%;padding-right:5px}
 	.user-bar .panel-item {padding: 0 10px;cursor: pointer;height: 100%;display: flex;align-items: center;}
 	.user-bar .panel-item i {font-size: 16px;}
 	.user-bar .panel-item:hover {background: rgba(0, 0, 0, 0.1);}
-	.user-bar .user-avatar {height:49px;display: flex;align-items: center;}
+	.user-bar .user-avatar {height:49px;display: flex;align-items: center;padding-right: 5px}
 	.user-bar .user-avatar label {display: inline-block;margin-left:5px;font-size: 12px;cursor:pointer;}
 
 	.msg-list li {border-top:1px solid #eee;}

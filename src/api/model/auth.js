@@ -16,11 +16,18 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	getMenuTree: {
+		url: `${config.API_URL}/v1/sys/menus/getTree`,
+		name: "获取菜单树结构",
+		post: async function () {
+			return await http.post(this.url);
+		}
+	},
 	info: {
 		url: `${config.API_URL}/info`,
 		name: "用户信息",
-		get: async function (data = {}) {
-			return await http.get(this.url, data);
+		get: async function () {
+			return await http.get(this.url);
 		}
 	},
 	loginout: {

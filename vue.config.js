@@ -11,16 +11,17 @@ module.exports = defineConfig({
 
 	//开发服务,build后的生产模式还需nginx代理
 	devServer: {
-        allowedHosts: 'all',
+  allowedHosts: 'all',
 		open: false, //运行后自动打开浏览器
 		port: process.env.VUE_APP_PORT, //挂载端口
 		proxy: {
 			'/api': {
-				target: process.env.VUE_APP_API_BASEURL,
+				// target: process.env.VUE_APP_API_BASEURL,
+				target: 'http://localhost:9099/wenyin/',
 				ws: true,
 				pathRewrite: {
 					'^/api': '/'
-				}
+				},
 			}
 		}
 	},
