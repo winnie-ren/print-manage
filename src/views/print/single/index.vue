@@ -115,15 +115,15 @@ export default {
 	data() {
 		return {
 			form: {
-				printColor: 1,
-				printSide: 1,
-				size: 1,
-				material: 1,
-				weight: 1,
+				printColor: "黑白",
+				printSide: "单面",
+				size: "148*210",
+				material: "铜版纸",
+				weight: "157g",
 				styleCount: 1,
 				sheetCount: 1,
-				deliveryMethod: 1,
-				payType: 'ALIPAY'
+				deliveryMethod: "自取",
+				payType: "ALIPAY",
 			},
 			formConfig: [
 				{
@@ -131,8 +131,8 @@ export default {
 					prop: "printColor",
 					type: "radio",
 					options: [
-						{ label: "黑白", value: 1 },
-						{ label: "彩色", value: 2 },
+						{ label: "黑白", value: "黑白" },
+						{ label: "彩色", value: "彩色" },
 					],
 				},
 				{
@@ -140,8 +140,8 @@ export default {
 					prop: "printSide",
 					type: "radio",
 					options: [
-						{ label: "单面", value: 1 },
-						{ label: "双面", value: 2 },
+						{ label: "单面", value: "单面" },
+						{ label: "双面", value: "双面" },
 					],
 				},
 				{
@@ -149,10 +149,10 @@ export default {
 					prop: "size",
 					type: "radio",
 					options: [
-						{ label: "148*210", value: 1 },
-						{ label: "176*250", value: 2 },
-						{ label: "210*297", value: 3 },
-						{ label: "297*420", value: 4 },
+						{ label: "148*210", value: "148*210" },
+						{ label: "176*250", value: "176*250" },
+						{ label: "210*297", value: "210*297" },
+						{ label: "297*420", value: "297*420" },
 						{ label: "自定义", value: 0 },
 					],
 				},
@@ -161,9 +161,9 @@ export default {
 					prop: "material",
 					type: "radio",
 					options: [
-						{ label: "铜版纸", value: 1 },
-						{ label: "哑粉纸", value: 2 },
-						{ label: "双胶纸", value: 3 },
+						{ label: "铜版纸", value: "铜版纸" },
+						{ label: "哑粉纸", value: "哑粉纸" },
+						{ label: "双胶纸", value: "双胶纸" },
 					],
 				},
 				{
@@ -171,14 +171,14 @@ export default {
 					prop: "weight",
 					type: "radio",
 					options: [
-						{ label: "157g", value: 1 },
-						{ label: "200g", value: 2 },
-						{ label: "250g", value: 3 },
-						{ label: "300g", value: 4 },
-						{ label: "157g", value: 5 },
-						{ label: "80g", value: 6 },
-						{ label: "100g", value: 7 },
-						{ label: "120g", value: 8 },
+						{ label: "157g", value: "157g" },
+						{ label: "200g", value: "200g" },
+						{ label: "250g", value: "250g" },
+						{ label: "300g", value: "300g" },
+						{ label: "157g", value: "157g" },
+						{ label: "80g", value: "80g" },
+						{ label: "100g", value: "100g" },
+						{ label: "120g", value: "120g" },
 						{ label: "自定义", value: 0 },
 					],
 				},
@@ -211,12 +211,10 @@ export default {
 					prop: "deliveryMethod",
 					type: "radio",
 					options: [
-						{ label: "微信", value: "WXPAY" },
-						{ label: "支付宝", value: "ALIPAY" },
-						// { label: "自取", value: 1 },
-						// { label: "送货上门", value: 2 },
-						// { label: "快递到付", value: 3 },
-						// { label: "快递寄付", value: 4 },
+						{ label: "自取", value: "自取" },
+						{ label: "送货上门", value: "送货上门" },
+						{ label: "快递到付", value: "快递到付" },
+						{ label: "快递寄付", value: "快递寄付" },
 					],
 				},
 				{
@@ -234,7 +232,14 @@ export default {
 	mounted() {},
 	methods: {
 		async buyNow() {
-			this.$API.print.singleSave.post(this.form);
+			const res = await this.$API.print.singleSave.post(this.form);
+			if (res.code === 0 && res.data) {
+				if (this.form.payType === "ALIPAY") {
+					//调用支付宝统一收单下单并支付页面接口
+					//将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
+					document.write(res.data);
+				}
+			}
 		},
 	},
 };

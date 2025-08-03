@@ -106,10 +106,7 @@
 				<el-button type="danger" size="large" @click="submit">
 					加入购物车
 				</el-button>
-				<el-button
-					type="success"
-					size="large"
-					@click="resetForm('form')"
+				<el-button type="success" size="large" @click="buyNow"
 					>立即购买</el-button
 				>
 			</el-button-group>
@@ -127,9 +124,9 @@ export default {
 	data() {
 		return {
 			form: {
-				spec: 1,
-				workflow: 1,
-				originalCopies: 1,
+				spec: "A4",
+				workflow: "先印正本",
+				originalCount: 1,
 				copyCopies: 1,
 				needScan: 1,
 				scanOption: 1,
@@ -195,7 +192,7 @@ export default {
 					label: "规格",
 					prop: "spec",
 					type: "radio",
-					options: [{ label: "A4", value: 1 }],
+					options: [{ label: "A4", value: "A4" }],
 				},
 				// 工作流程
 				{
@@ -203,14 +200,14 @@ export default {
 					prop: "workflow",
 					type: "radio",
 					options: [
-						{ label: "先印正本", value: 1 },
-						{ label: "直接打印胶装", value: 2 },
+						{ label: "先印正本", value: "先印正本" },
+						{ label: "直接打印胶装", value: "直接打印胶装" },
 					],
 				},
 				// 正本份数
 				{
 					label: "正本份数",
-					prop: "originalCopies",
+					prop: "originalCount",
 					type: "input-number",
 				},
 				// 副本份数
@@ -225,8 +222,8 @@ export default {
 					prop: "needScan",
 					type: "radio",
 					options: [
-						{ label: "是", value: 1 },
-						{ label: "否", value: 2 },
+						{ label: "是", value: "是" },
+						{ label: "否", value: "否" },
 					],
 				},
 				// 扫描文件
@@ -235,9 +232,9 @@ export default {
 					prop: "scanOption",
 					type: "radio",
 					options: [
-						{ label: "发送", value: 1 },
-						{ label: "立即", value: 2 },
-						{ label: "刻录光盘", value: 3 },
+						{ label: "发送", value: "发送" },
+						{ label: "立即", value: "立即" },
+						{ label: "刻录光盘", value: "刻录光盘" },
 					],
 				},
 				// 正本印色
@@ -246,10 +243,10 @@ export default {
 					prop: "originalPrintColor",
 					type: "radio",
 					options: [
-						{ label: "黑白", value: 1 },
-						{ label: "彩色", value: 2 },
-						{ label: "单面", value: 3 },
-						{ label: "双面", value: 4 },
+						{ label: "黑白", value: "黑白" },
+						{ label: "彩色", value: "彩色" },
+						{ label: "单面", value: "单面" },
+						{ label: "双面", value: "双面" },
 					],
 				},
 				// 副本印色
@@ -258,10 +255,10 @@ export default {
 					prop: "copyPrintColor",
 					type: "radio",
 					options: [
-						{ label: "黑白", value: 1 },
-						{ label: "彩色", value: 2 },
-						{ label: "单面", value: 3 },
-						{ label: "双面", value: 4 },
+						{ label: "黑白", value: "黑白" },
+						{ label: "彩色", value: "彩色" },
+						{ label: "单面", value: "单面" },
+						{ label: "双面", value: "双面" },
 					],
 				},
 				// 封面颜色
@@ -270,13 +267,13 @@ export default {
 					prop: "coverColor",
 					type: "radio",
 					options: [
-						{ label: "白色", value: 1 },
-						{ label: "大兰", value: 2 },
-						{ label: "深蓝", value: 3 },
-						{ label: "浅绿", value: 4 },
-						{ label: "浅黄", value: 5 },
-						{ label: "大红", value: 6 },
-						{ label: "透明封面", value: 7 },
+						{ label: "白色", value: "白色" },
+						{ label: "大兰", value: "大兰" },
+						{ label: "深蓝", value: "深蓝" },
+						{ label: "浅绿", value: "浅绿" },
+						{ label: "浅黄", value: "浅黄" },
+						{ label: "大红", value: "大红" },
+						{ label: "透明封面", value: "透明封面" },
 					],
 				},
 				// 装订方式
@@ -285,9 +282,9 @@ export default {
 					prop: "bindingMethod",
 					type: "radio",
 					options: [
-						{ label: "胶装", value: 1 },
-						{ label: "夹条装", value: 2 },
-						{ label: "铁圈装", value: 3 },
+						{ label: "胶装", value: "胶装" },
+						{ label: "夹条装", value: "夹条装" },
+						{ label: "铁圈装", value: "铁圈装" },
 					],
 				},
 				// 出货时效
@@ -296,9 +293,9 @@ export default {
 					prop: "deliveryTime",
 					type: "radio",
 					options: [
-						{ label: "1小时", value: 1 },
-						{ label: "2小时", value: 2 },
-						{ label: "4小时", value: 3 },
+						{ label: "1小时", value: "1小时" },
+						{ label: "2小时", value: "2小时" },
+						{ label: "4小时", value: "4小时" },
 					],
 				},
 				// 支付方式
@@ -307,10 +304,10 @@ export default {
 					prop: "paymentMethod",
 					type: "radio",
 					options: [
-						{ label: "自取", value: 1 },
-						{ label: "送货上门", value: 2 },
-						{ label: "快递到付", value: 3 },
-						{ label: "快递寄付", value: 4 },
+						{ label: "自取", value: "自取" },
+						{ label: "送货上门", value: "送货上门" },
+						{ label: "快递到付", value: "快递到付" },
+						{ label: "快递寄付", value: "快递寄付" },
 					],
 				},
 			],
@@ -318,17 +315,15 @@ export default {
 	},
 	mounted() {},
 	methods: {
-		submit() {
-			this.$refs.form.validate(async (valid) => {
-				if (valid) {
-					this.$message.success("全部验证通过");
-				} else {
-					return false;
+		async buyNow() {
+			const res = await this.$API.print.singleSave.post(this.form);
+			if (res.code === 0 && res.data) {
+				if (this.form.payType === "ALIPAY") {
+					//调用支付宝统一收单下单并支付页面接口
+					//将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
+					document.write(res.data);
 				}
-			});
-		},
-		resetForm(ref) {
-			this.$refs[ref].resetFields();
+			}
 		},
 	},
 };

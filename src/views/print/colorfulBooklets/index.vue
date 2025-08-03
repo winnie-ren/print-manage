@@ -103,7 +103,7 @@
 				<el-button
 					type="success"
 					size="large"
-					@click="resetForm('form')"
+					@click="buyNow"
 					>立即购买</el-button
 				>
 			</el-button-group>
@@ -287,17 +287,15 @@ export default {
 	},
 	mounted() {},
 	methods: {
-		submit() {
-			this.$refs.form.validate(async (valid) => {
-				if (valid) {
-					this.$message.success("全部验证通过");
-				} else {
-					return false;
+		async buyNow() {
+			const res = await this.$API.print.singleSave.post(this.form);
+			if (res.code === 0 && res.data) {
+				if (this.form.payType === "ALIPAY") {
+					//调用支付宝统一收单下单并支付页面接口
+					//将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
+					document.write(res.data);
 				}
-			});
-		},
-		resetForm(ref) {
-			this.$refs[ref].resetFields();
+			}
 		},
 	},
 };
