@@ -244,6 +244,48 @@ export default {
 							},
 						],
 					},
+					{
+						name: "订单管理",
+						path: "/order",
+						meta: {
+							title: "订单",
+							icon: "el-icon-files",
+							type: "menu",
+						},
+						children: [
+							{
+								path: "/order/orderList",
+								name: "orderList",
+								meta: {
+									title: "订单列表",
+									icon: "el-icon-tickets",
+									type: "menu",
+								},
+								component: "order/orderList",
+							},
+						],
+					},
+					{
+						name: "价格设置",
+						path: "/price",
+						meta: {
+							title: "价格",
+							icon: "el-icon-files",
+							type: "menu",
+						},
+						children: [
+							{
+								path: "/price/mobile",
+								name: "mobile",
+								meta: {
+									title: "手机打印价格",
+									icon: "el-icon-tickets",
+									type: "menu",
+								},
+								component: "price/mobile",
+							},
+						],
+					},
 				];
 				this.$TOOL.data.set("MENU", menuList);
 				this.$TOOL.data.set("PERMISSIONS", '');
