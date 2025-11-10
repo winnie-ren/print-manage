@@ -1,40 +1,37 @@
 <template>
 	<el-container>
 		<el-header>
-			<div>
-				<scForm
-					v-model="form"
-					:config="searchConfig"
-					@submit="onSubmit"
-				></scForm>
-				<!-- <div class="left-panel">
-				<el-button type="primary" icon="el-icon-plus" @click="add"
-					>新增</el-button
-				>
-				<el-button
-					type="danger"
-					plain
-					icon="el-icon-delete"
-					:disabled="selection.length == 0"
-					@click="batch_del"
-					>删除</el-button
-				>
-			</div>
-			<div class="right-panel">
-				<div class="right-panel-search">
-					<el-input
-						v-model="search.keyword"
-						placeholder="关键词"
-						clearable
-					></el-input>
-					<el-button
-						type="primary"
-						icon="el-icon-search"
-						@click="upsearch"
-					></el-button>
-				</div>
-			</div> -->
-			</div>
+			<el-form
+				:inline="true"
+				label-position="left"
+				label-width="80px"
+				:model="form"
+				class="demo-form-inline"
+			>
+				<el-row :gutter="10">
+					<template v-for="item in tableHeader" :key="item.name">
+						<el-col :span="item.span || 24">
+							<el-form-item
+								:label="item.label"
+								style="width: 100%"
+							>
+								<el-input
+									v-model="form[item.name]"
+									placeholder="请输入"
+									v-if="item.component === 'input'"
+								></el-input>
+							</el-form-item>
+						</el-col>
+					</template>
+					<el-col :span="6">
+						<el-form-item>
+							<el-button type="primary" @click="upsearch">
+								查询
+							</el-button>
+						</el-form-item>
+					</el-col>
+				</el-row>
+			</el-form>
 		</el-header>
 		<el-main class="nopadding">
 			<scTable
@@ -166,9 +163,6 @@ export default {
 				pageNum: 1,
 				total: 0,
 			},
-			search: {
-				keyword: "",
-			},
 			selection: [],
 			dialogVisible: false,
 			dialogTitle: "添加",
@@ -246,7 +240,7 @@ export default {
 		},
 		//搜索
 		upsearch() {
-			this.$refs.table.upData(this.search);
+			this.$refs.table.upData(this.form);
 		},
 		formatter(row, item) {
 			// 表格字段格式化
@@ -270,7 +264,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.el-header{
-	height: 160px;
+.el-header {
+	height: 125px;
 }
 </style>

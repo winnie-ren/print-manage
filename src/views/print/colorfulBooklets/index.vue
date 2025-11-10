@@ -25,6 +25,7 @@
 								{{ option.label }}
 							</el-radio>
 						</el-radio-group>
+						<el-input v-if="item.prop === 'productSize' && form[item.prop] === 0" v-model="form['customSize']" clearable style="width: 120px;" placeholder="请输入"></el-input>
 					</el-form-item>
 					<el-form-item label="补充说明" prop="remarks">
 						<el-input
@@ -48,38 +49,6 @@
 								请将文件拖到此处或 <em>点击上传</em>
 							</div>
 						</el-upload>
-						<!-- <el-table
-						:data="[]"
-						style="flex: 2; height: 100%; padding-left: 10px"
-						border
-					>
-						<el-table-column type="index" label="#" width="50" />
-						<el-table-column prop="fileName" label="文件名称" />
-						<el-table-column
-							prop="size"
-							label="大小M"
-							width="100"
-						/>
-						<el-table-column prop="size" label="尺寸" width="100" />
-						<el-table-column prop="size" label="DPI" width="100" />
-						<el-table-column prop="size" label="页数" width="100" />
-						<el-table-column
-							prop="status"
-							label="状态"
-							width="100"
-						/>
-						<el-table-column
-							prop="operate"
-							label="操作"
-							width="100"
-						>
-							<template #default>
-								<el-button link type="danger" size="small">
-									删除
-								</el-button>
-							</template>
-						</el-table-column>
-					</el-table> -->
 					</el-form-item>
 				</el-form>
 			</el-card>
@@ -131,6 +100,7 @@ export default {
 				coverProcess: 1,
 				bindingMethod: 1,
 				deliveryMethod: 1,
+				customSize: ''
 			},
 			rules: {
 				required: [{ required: true, message: "请填写" }],
@@ -188,7 +158,14 @@ export default {
 					type: "radio",
 					options: [
 						{ label: "A4", value: 1 },
-						{ label: "B5", value: 2 },
+						{ label: "A3", value: 2 },
+						{ label: "A5", value: 3 },
+						{ label: "B4", value: 4 },
+						{ label: "16K", value: 5 },
+						{ label: "A2", value: 6 },
+						{ label: "A1", value: 7 },
+						{ label: "A0", value: 8 },
+						{ label: "8K", value: 9 },
 						{ label: "自定义尺寸", value: 0 },
 					],
 				},
