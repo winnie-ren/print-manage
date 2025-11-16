@@ -286,6 +286,17 @@ export default {
 							},
 						],
 					},
+					{
+						name: "积分设置",
+						path: "/pointsSetting",
+						component: "pointsSetting",
+						meta: {
+							title: "积分设置",
+							icon: "el-icon-files",
+							type: "menu",
+							isHide: true
+						},
+					},
 				];
 				this.$TOOL.data.set("MENU", menuList);
 				this.$TOOL.data.set("PERMISSIONS", '');

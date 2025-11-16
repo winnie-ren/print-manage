@@ -9,6 +9,9 @@
 		<!-- <div class="tasks panel-item" @click="tasks">
 			<el-icon><el-icon-sort /></el-icon>
 		</div> -->
+		<div class="panel-item" @click="pointsSetting">
+			<el-icon><el-icon-medal /></el-icon>
+		</div>
 		<div class="msg panel-item" @click="showMsg">
 			<el-badge :hidden="msgList.length==0" :value="msgList.length" class="badge" type="danger">
 				<el-icon><el-icon-chat-dot-round /></el-icon>
@@ -87,17 +90,7 @@
 				searchVisible: false,
 				tasksVisible: false,
 				msg: false,
-				msgList: [
-					// {
-					// 	id: 1,
-					// 	type: 'user',
-					// 	avatar: "img/avatar.jpg",
-					// 	title: "Skuya",
-					// 	describe: "如果喜欢就点个星星支持一下哦",
-					// 	link: "https://gitee.com/lolicode/scui",
-					// 	time: "5分钟前"
-					// },
-				]
+				msgList: []
 			}
 		},
 		created() {
@@ -160,7 +153,11 @@
 			},
 			//任务
 			tasks(){
-				this.tasksVisible = true
+				this.$router.push({path: '/pointsSetting'})
+			},
+			//积分设置
+			pointsSetting(){
+				this.$router.push({path: '/pointsSetting'})
 			}
 		}
 	}
