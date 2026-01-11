@@ -177,7 +177,10 @@
 .common-main .link:hover {
 	color: var(--el-color-primary-light-3);
 }
-
+.el-container {
+ width: 100%;
+ overflow: hidden;
+}
 .print-page {
 	position: relative;
 	height: calc(100vh - 93px);

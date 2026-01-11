@@ -4,40 +4,82 @@
 			<el-icon><el-icon-search /></el-icon>
 		</div> -->
 		<div class="screen panel-item hidden-sm-and-down" @click="screen">
-			<el-icon><el-icon-full-screen /></el-icon>
+			<el-tooltip
+				class="box-item"
+				effect="dark"
+				content="全屏"
+				placement="bottom"
+			>
+				<el-icon><el-icon-full-screen /></el-icon>
+			</el-tooltip>
 		</div>
 		<!-- <div class="tasks panel-item" @click="tasks">
 			<el-icon><el-icon-sort /></el-icon>
 		</div> -->
 		<div class="panel-item" @click="pointsSetting">
-			<el-icon><el-icon-medal /></el-icon>
+			<el-tooltip
+				class="box-item"
+				effect="dark"
+				content="积分设置"
+				placement="bottom"
+			>
+				<el-icon><el-icon-Discount /></el-icon>
+			</el-tooltip>
 		</div>
 		<div class="msg panel-item" @click="showMsg">
-			<el-badge :hidden="msgList.length==0" :value="msgList.length" class="badge" type="danger">
-				<el-icon><el-icon-chat-dot-round /></el-icon>
+			<el-badge
+				:hidden="msgList.length == 0"
+				:value="msgList.length"
+				class="badge"
+				type="danger"
+			>
+				<el-tooltip
+					class="box-item"
+					effect="dark"
+					content="新消息"
+					placement="bottom"
+				>
+					<el-icon><el-icon-chat-dot-round /></el-icon>
+				</el-tooltip>
 			</el-badge>
-			<el-drawer title="新消息" v-model="msg" :size="400" append-to-body destroy-on-close>
+			<el-drawer
+				title="新消息"
+				v-model="msg"
+				:size="400"
+				append-to-body
+				destroy-on-close
+			>
 				<el-container>
 					<el-main class="nopadding">
 						<el-scrollbar>
 							<ul class="msg-list">
-								<li v-for="item in msgList" v-bind:key="item.id">
+								<li
+									v-for="item in msgList"
+									v-bind:key="item.id"
+								>
 									<a :href="item.link" target="_blank">
 										<div class="msg-list__icon">
 											<el-badge is-dot type="danger">
-												<el-avatar :size="40" :src="item.avatar"></el-avatar>
+												<el-avatar
+													:size="40"
+													:src="item.avatar"
+												></el-avatar>
 											</el-badge>
 										</div>
 										<div class="msg-list__main">
-											<h2>{{item.title}}</h2>
-											<p>{{item.describe}}</p>
+											<h2>{{ item.title }}</h2>
+											<p>{{ item.describe }}</p>
 										</div>
 										<div class="msg-list__time">
-											<p>{{item.time}}</p>
+											<p>{{ item.time }}</p>
 										</div>
 									</a>
 								</li>
-								<el-empty v-if="msgList.length==0" description="暂无新消息" :image-size="100"></el-empty>
+								<el-empty
+									v-if="msgList.length == 0"
+									description="暂无新消息"
+									:image-size="100"
+								></el-empty>
 							</ul>
 						</el-scrollbar>
 					</el-main>
@@ -49,10 +91,10 @@
 			</el-drawer>
 		</div>
 		<div class="user-avatar">
-				<el-avatar :size="30">{{ userNameF }}</el-avatar>
-				<label>{{ userName }}</label>
-				<!-- <el-icon class="el-icon--right"><el-icon-arrow-down /></el-icon> -->
-			</div>
+			<el-avatar :size="30">{{ userNameF }}</el-avatar>
+			<label>{{ userName }}</label>
+			<!-- <el-icon class="el-icon--right"><el-icon-arrow-down /></el-icon> -->
+		</div>
 		<!-- <el-dropdown class="user panel-item" trigger="click" @command="handleUser">
 			<template #dropdown>
 				<el-dropdown-menu>
@@ -64,123 +106,197 @@
 		</el-dropdown> -->
 		<el-button @click="handleUser('outLogin')">退出登录</el-button>
 	</div>
-	<el-dialog v-model="searchVisible" :width="700"  title="搜索" center destroy-on-close>
-		<search @success="searchVisible=false"></search>
+	<el-dialog
+		v-model="searchVisible"
+		:width="700"
+		title="搜索"
+		center
+		destroy-on-close
+	>
+		<search @success="searchVisible = false"></search>
 	</el-dialog>
 
-	<el-drawer v-model="tasksVisible" :size="450"  title="任务中心" destroy-on-close>
+	<el-drawer
+		v-model="tasksVisible"
+		:size="450"
+		title="任务中心"
+		destroy-on-close
+	>
 		<tasks></tasks>
 	</el-drawer>
-
 </template>
 
 <script>
-	import search from './search.vue'
-	import tasks from './tasks.vue'
+import search from "./search.vue";
+import tasks from "./tasks.vue";
 
-	export default {
-		components: {
-			search,
-			tasks
-		},
-		data(){
-			return {
-				userName: "",
-				userNameF: "",
-				searchVisible: false,
-				tasksVisible: false,
-				msg: false,
-				msgList: []
+export default {
+	components: {
+		search,
+		tasks,
+	},
+	data() {
+		return {
+			userName: "",
+			userNameF: "",
+			searchVisible: false,
+			tasksVisible: false,
+			msg: false,
+			msgList: [],
+		};
+	},
+	created() {
+		var userInfo = this.$TOOL.data.get("USER_INFO");
+		this.userName = userInfo.usna;
+		this.userNameF = this.userName.substring(0, 1);
+	},
+	methods: {
+		//个人信息
+		handleUser(command) {
+			if (command == "uc") {
+				this.$router.push({ path: "/usercenter" });
 			}
-		},
-		created() {
-			var userInfo = this.$TOOL.data.get("USER_INFO");
-			this.userName = userInfo.usna;
-			this.userNameF = this.userName.substring(0,1);
-		},
-		methods: {
-			//个人信息
-			handleUser(command) {
-				if(command == "uc"){
-					this.$router.push({path: '/usercenter'});
-				}
-				if(command == "cmd"){
-					this.$router.push({path: '/cmd'});
-				}
-				if(command == "clearCache"){
-					this.$confirm('清除缓存会将系统初始化，包括登录状态、主题、语言设置等，是否继续？','提示', {
-						type: 'info',
-					}).then(() => {
-						const loading = this.$loading()
-						this.$TOOL.data.clear()
-						this.$router.replace({path: '/login'})
-						setTimeout(()=>{
-							loading.close()
-							location.reload()
-						},1000)
-					}).catch(() => {
+			if (command == "cmd") {
+				this.$router.push({ path: "/cmd" });
+			}
+			if (command == "clearCache") {
+				this.$confirm(
+					"清除缓存会将系统初始化，包括登录状态、主题、语言设置等，是否继续？",
+					"提示",
+					{
+						type: "info",
+					}
+				)
+					.then(() => {
+						const loading = this.$loading();
+						this.$TOOL.data.clear();
+						this.$router.replace({ path: "/login" });
+						setTimeout(() => {
+							loading.close();
+							location.reload();
+						}, 1000);
+					})
+					.catch(() => {
 						//取消
-					})
-				}
-				if(command == "outLogin"){
-					this.$confirm('确认是否退出当前用户？','提示', {
-						type: 'warning',
-						confirmButtonText: '退出',
-						confirmButtonClass: 'el-button--danger'
-					}).then(() => {
-						this.$router.replace({path: '/login'});
-					}).catch(() => {
-						//取消退出
-					})
-				}
-			},
-			//全屏
-			screen(){
-				var element = document.documentElement;
-				this.$TOOL.screen(element)
-			},
-			//显示短消息
-			showMsg(){
-				this.msg = true
-			},
-			//标记已读
-			markRead(){
-				this.msgList = []
-			},
-			//搜索
-			search(){
-				this.searchVisible = true
-			},
-			//任务
-			tasks(){
-				this.$router.push({path: '/pointsSetting'})
-			},
-			//积分设置
-			pointsSetting(){
-				this.$router.push({path: '/pointsSetting'})
+					});
 			}
-		}
-	}
+			if (command == "outLogin") {
+				this.$confirm("确认是否退出当前用户？", "提示", {
+					type: "warning",
+					confirmButtonText: "退出",
+					confirmButtonClass: "el-button--danger",
+				})
+					.then(() => {
+						this.$router.replace({ path: "/login" });
+					})
+					.catch(() => {
+						//取消退出
+					});
+			}
+		},
+		//全屏
+		screen() {
+			var element = document.documentElement;
+			this.$TOOL.screen(element);
+		},
+		//显示短消息
+		showMsg() {
+			this.msg = true;
+		},
+		//标记已读
+		markRead() {
+			this.msgList = [];
+		},
+		//搜索
+		search() {
+			this.searchVisible = true;
+		},
+		//任务
+		tasks() {
+			this.$router.push({ path: "/pointsSetting" });
+		},
+		//积分设置
+		pointsSetting() {
+			this.$router.push({ path: "/pointsSetting" });
+		},
+	},
+};
 </script>
 
 <style scoped>
-	.user-bar {display: flex;align-items: center;height: 100%;padding-right:5px}
-	.user-bar .panel-item {padding: 0 10px;cursor: pointer;height: 100%;display: flex;align-items: center;}
-	.user-bar .panel-item i {font-size: 16px;}
-	.user-bar .panel-item:hover {background: rgba(0, 0, 0, 0.1);}
-	.user-bar .user-avatar {height:49px;display: flex;align-items: center;padding-right: 5px}
-	.user-bar .user-avatar label {display: inline-block;margin-left:5px;font-size: 12px;cursor:pointer;}
+.user-bar {
+	display: flex;
+	align-items: center;
+	height: 100%;
+	padding-right: 5px;
+}
+.user-bar .panel-item {
+	padding: 0 10px;
+	cursor: pointer;
+	height: 100%;
+	display: flex;
+	align-items: center;
+}
+.user-bar .panel-item i {
+	font-size: 16px;
+}
+.user-bar .panel-item:hover {
+	background: rgba(0, 0, 0, 0.1);
+}
+.user-bar .user-avatar {
+	height: 49px;
+	display: flex;
+	align-items: center;
+	padding-right: 5px;
+}
+.user-bar .user-avatar label {
+	display: inline-block;
+	margin-left: 5px;
+	font-size: 12px;
+	cursor: pointer;
+}
 
-	.msg-list li {border-top:1px solid #eee;}
-	.msg-list li a {display: flex;padding:20px;}
-	.msg-list li a:hover {background: #ecf5ff;}
-	.msg-list__icon {width: 40px;margin-right: 15px;}
-	.msg-list__main {flex: 1;}
-	.msg-list__main h2 {font-size: 15px;font-weight: normal;color: #333;}
-	.msg-list__main p {font-size: 12px;color: #999;line-height: 1.8;margin-top: 5px;}
-	.msg-list__time {width: 100px;text-align: right;color: #999;}
+.msg-list li {
+	border-top: 1px solid #eee;
+}
+.msg-list li a {
+	display: flex;
+	padding: 20px;
+}
+.msg-list li a:hover {
+	background: #ecf5ff;
+}
+.msg-list__icon {
+	width: 40px;
+	margin-right: 15px;
+}
+.msg-list__main {
+	flex: 1;
+}
+.msg-list__main h2 {
+	font-size: 15px;
+	font-weight: normal;
+	color: #333;
+}
+.msg-list__main p {
+	font-size: 12px;
+	color: #999;
+	line-height: 1.8;
+	margin-top: 5px;
+}
+.msg-list__time {
+	width: 100px;
+	text-align: right;
+	color: #999;
+}
 
-	.dark .msg-list__main h2 {color: #d0d0d0;}
-	.dark .msg-list li {border-top:1px solid #363636;}
-	.dark .msg-list li a:hover {background: #383838;}
+.dark .msg-list__main h2 {
+	color: #d0d0d0;
+}
+.dark .msg-list li {
+	border-top: 1px solid #363636;
+}
+.dark .msg-list li a:hover {
+	background: #383838;
+}
 </style>
