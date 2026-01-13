@@ -231,6 +231,13 @@ const formConfigOptions = [
 // 定义表格头部配置
 const tableHeader = [
 	{
+		label: "打印单号",
+		name: "printNo",
+		component: "input", // 保留输入框因为有自定义值
+		table: true,
+		span: 6,
+	},
+	{
 		label: "规格",
 		name: "spec",
 		component: "select",
@@ -254,7 +261,7 @@ const tableHeader = [
 	},
 	{
 		label: "是否扫描",
-		name: "needScan",
+		name: "isScan",
 		component: "select",
 		table: true,
 		span: 6,
@@ -291,8 +298,7 @@ export default {
 	data() {
 		return {
 			list: {
-				// 暂时使用用户API，实际项目中需要创建相应的打印列表API
-				apiObj: this.$API.user.userPage,
+				apiObj: this.$API.print.biddingPage,
 			},
 			tableHeader,
 			page: {
@@ -309,8 +315,8 @@ export default {
 				workflow: "先印正本",
 				originalCount: 1,
 				copyCopies: 1,
-				needScan: 1,
-				scanOption: 1,
+				isScan: "否",
+				scanFile: 1,
 				originalPrintColor: 1,
 				copyPrintColor: 1,
 				coverColor: 1,
@@ -400,7 +406,7 @@ export default {
 				// 是否扫描
 				{
 					label: "是否扫描",
-					prop: "needScan",
+					prop: "isScan",
 					type: "radio",
 					options: [
 						{ label: "是", value: "是" },
@@ -410,7 +416,7 @@ export default {
 				// 扫描文件
 				{
 					label: "扫描文件",
-					prop: "scanOption",
+					prop: "scanFile",
 					type: "radio",
 					options: [
 						{ label: "发送", value: "发送" },
@@ -583,8 +589,8 @@ export default {
 				workflow: "先印正本",
 				originalCount: 1,
 				copyCopies: 1,
-				needScan: 1,
-				scanOption: 1,
+				isScan: "否",
+				scanFile: 1,
 				originalPrintColor: 1,
 				copyPrintColor: 1,
 				coverColor: 1,
@@ -595,7 +601,7 @@ export default {
 			};
 		},
 		async buyNow() {
-			const res = await this.$API.print.singleSave.post(this.formDetail);
+			const res = await this.$API.print.biddingSave.post(this.formDetail);
 			if (res.code === 0 && res.data) {
 				if (this.formDetail.payType === "ALIPAY") {
 					// 调用支付宝统一收单下单并支付页面接口

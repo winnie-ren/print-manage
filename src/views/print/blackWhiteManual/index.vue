@@ -247,6 +247,13 @@ const formConfigOptions = [
 // 定义表格头部配置
 const tableHeader = [
 	{
+		label: "打印单号",
+		name: "printNo",
+		component: "input", // 保留输入框因为有自定义值
+		table: true,
+		span: 6,
+	},
+	{
 		label: "成品规格",
 		name: "printColor",
 		component: "select",
@@ -263,16 +270,16 @@ const tableHeader = [
 	},
 	{
 		label: "份数",
-		name: "copies",
+		name: "quantity",
 		component: "number",
 		table: true,
 		span: 6,
 	},
 	{
 		label: "纸张",
-		name: "paper",
+		name: "paperType",
 		component: "select",
-		options: formConfigOptions.find(item => item.prop === "paper")?.options || [],
+		options: formConfigOptions.find(item => item.prop === "paperType")?.options || [],
 		table: true,
 		span: 6,
 	},
@@ -308,8 +315,7 @@ export default {
 	data() {
 		return {
 			list: {
-				// 暂时使用用户API，实际项目中需要创建相应的打印列表API
-				apiObj: this.$API.user.userPage,
+				apiObj: this.$API.print.blackPage,
 			},
 			tableHeader,
 			page: {
@@ -324,8 +330,8 @@ export default {
 			formDetail: {
 				printColor: 1,
 				printArea: 1,
-				copies: 1,
-				paper: 1,
+				quantity: 1,
+				paperType: 1,
 				coverColor: 1,
 				innerColor: 1,
 				coverMaterial: 1,
@@ -410,7 +416,7 @@ export default {
 				},
 				{
 					label: "份数",
-					prop: "copies",
+					prop: "quantity",
 					type: "radio",
 					options: [
 						{ label: "1", value: 1 },
@@ -421,7 +427,7 @@ export default {
 				},
 				{
 					label: "纸张",
-					prop: "paper",
+					prop: "paperType",
 					type: "radio",
 					options: [
 						{ label: "80克双胶纸", value: 1 },
@@ -582,8 +588,8 @@ export default {
 			this.formDetail = {
 				printColor: 1,
 				printArea: 1,
-				copies: 1,
-				paper: 1,
+				quantity: 1,
+				paperType: 1,
 				coverColor: 1,
 				innerColor: 1,
 				coverMaterial: 1,
@@ -595,7 +601,7 @@ export default {
 			};
 		},
 		async buyNow() {
-			const res = await this.$API.print.singleSave.post(this.formDetail);
+			const res = await this.$API.print.blackSave.post(this.formDetail);
 			if (res.code === 0 && res.data) {
 				if (this.formDetail.payType === "ALIPAY") {
 					// 调用支付宝统一收单下单并支付页面接口

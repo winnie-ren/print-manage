@@ -253,10 +253,16 @@ const formConfigOptions = [
 // 定义表格头部配置
 const tableHeader = [
 	{
-		label: "印色",
-		name: "printColor",
-		component: "select",
-		options: formConfigOptions.find(item => item.prop === "printColor")?.options || [],
+		label: "打印单号",
+		name: "printNo",
+		component: "input", // 保留输入框因为有自定义值
+		table: true,
+		span: 6,
+	},
+	{
+		label: "张数",
+		name: "sheetCount",
+		component: "number", // 保留输入框因为有自定义值
 		table: true,
 		span: 6,
 	},
@@ -297,13 +303,6 @@ const tableHeader = [
 		table: true,
 		span: 6,
 	},
-	{
-		label: "张数",
-		name: "sheetCount",
-		component: "number", // 保留输入框因为有自定义值
-		table: true,
-		span: 6,
-	},
 ];
 
 export default {
@@ -314,8 +313,7 @@ export default {
 	data() {
 		return {
 			list: {
-				// 暂时使用用户API，实际项目中需要创建相应的打印列表API
-				apiObj: this.$API.user.userPage,
+				apiObj: this.$API.print.singlePage,
 			},
 			tableHeader,
 			page: {
