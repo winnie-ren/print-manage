@@ -1,119 +1,142 @@
 <template>
 	<el-container>
-		<el-header>
-			<el-form
-				:inline="true"
-				label-position="left"
-				label-width="80px"
-				:model="form"
-				class="demo-form-inline"
-			>
-				<el-row :gutter="10">
-					<template v-for="item in tableHeader" :key="item.name">
-						<el-col :span="item.span || 24">
-							<el-form-item
-								:label="item.label"
-								style="width: 100%"
-							>
-								<el-input
-									v-model="form[item.name]"
-									placeholder="请输入"
-									v-if="item.component === 'input'"
-								></el-input>
-								<el-select
-									v-model="form[item.name]"
-									placeholder="请选择"
-									v-if="item.component === 'select'"
-									style="width: 100%"
-								>
-									<el-option
-										v-for="option in item.options"
-										:key="option.value"
-										:label="option.label"
-										:value="option.value"
-									></el-option>
-								</el-select>
-								<el-input-number
-									v-model="form[item.name]"
-									:min="1"
-									controls-position="right"
-									v-if="item.component === 'number'"
-									style="width: 100%"
-								/>
-							</el-form-item>
-						</el-col>
-					</template>
-					<el-col :span="6">
-						<el-form-item>
-							<el-button type="primary" @click="upsearch">
-								查询
-							</el-button>
-							<el-button type="primary" @click="add">
-								新增
-							</el-button>
-						</el-form-item>
-					</el-col>
-				</el-row>
-			</el-form>
-		</el-header>
-		<el-main class="nopadding">
-			<scTable
-				ref="table"
-				:apiObj="list.apiObj"
-				row-key="id"
-				stripe
-				@selectionChange="selectionChange"
-			>
-				<el-table-column type="selection" width="50"></el-table-column>
-				<template v-for="item in tableHeader" :key="item.name">
-					<el-table-column
-						v-if="item.table !== false"
-						:label="item.label"
-						:prop="item.name"
-						:width="item.width"
-						:formatter="
-							item.format ? (row) => formatter(row, item) : ''
-						"
-					>
-					</el-table-column>
+		<el-aside width="250px">
+			<el-form label-position="top" size="small">
+				<template v-for="item in searchConfig" :key="item.name">
+					<el-form-item :label="item.label">
+						<el-input
+							v-if="item.component === 'input'"
+							v-model="search[item.name]"
+							:placeholder="item.options?.placeholder || '请输入'"
+							clearable
+						></el-input>
+						<el-select
+							v-else-if="item.component === 'select'"
+							v-model="search[item.name]"
+							:placeholder="item.options?.placeholder || '请选择'"
+							clearable
+							style="width: 100%"
+						>
+							<el-option
+								v-for="option in item.options?.items || []"
+								:key="option.value"
+								:label="option.label"
+								:value="option.value"
+							></el-option>
+						</el-select>
+						<el-input-number
+							v-else-if="item.component === 'number'"
+							v-model="search[item.name]"
+							:min="1"
+							controls-position="right"
+							style="width: 100%"
+						/>
+					</el-form-item>
 				</template>
-				<el-table-column
-					label="操作"
-					fixed="right"
-					align="right"
-					width="160"
+				<div class="search-btn">
+					<el-button
+						type="primary"
+						icon="el-icon-search"
+						@click="upsearch"
+					>
+						查询
+					</el-button>
+					<el-button icon="el-icon-refresh" @click="resetSearch">
+						重置
+					</el-button>
+				</div>
+			</el-form>
+		</el-aside>
+		<el-container>
+			<el-header>
+				<div class="left-panel">
+					<el-button
+						type="primary"
+						icon="el-icon-plus"
+						size="small"
+						@click="add"
+					>
+						新增
+					</el-button>
+					<el-button
+						type="danger"
+						plain
+						icon="el-icon-delete"
+						size="small"
+						:disabled="selection.length == 0"
+						@click="batch_del"
+					>
+						删除
+					</el-button>
+				</div>
+			</el-header>
+			<el-main class="nopadding">
+				<scTable
+					ref="table"
+					:apiObj="list.apiObj"
+					row-key="id"
+					stripe
+					@selectionChange="selectionChange"
 				>
-					<template #default="scope">
-						<el-button-group>
-							<el-button
-								text
-								type="primary"
-								size="small"
-								@click="table_show(scope.row, scope.$index)"
-								>查看</el-button
-							>
-							<el-button
-								text
-								type="primary"
-								size="small"
-								@click="table_edit(scope.row, scope.$index)"
-								>编辑</el-button
-							>
-							<el-popconfirm
-								title="确定删除吗？"
-								@confirm="table_del(scope.row, scope.$index)"
-							>
-								<template #reference>
-									<el-button text type="primary" size="small"
-										>删除</el-button
-									>
-								</template>
-							</el-popconfirm>
-						</el-button-group>
+					<el-table-column
+						type="selection"
+						width="50"
+					></el-table-column>
+					<template v-for="item in tableHeader" :key="item.name">
+						<el-table-column
+							v-if="item.table !== false"
+							:label="item.label"
+							:prop="item.name"
+							:width="item.width"
+							:formatter="
+								item.format ? (row) => formatter(row, item) : ''
+							"
+						>
+						</el-table-column>
 					</template>
-				</el-table-column>
-			</scTable>
-		</el-main>
+					<el-table-column
+						label="操作"
+						fixed="right"
+						align="right"
+						width="160"
+					>
+						<template #default="scope">
+							<el-button-group>
+								<el-button
+									text
+									type="primary"
+									size="small"
+									@click="table_show(scope.row, scope.$index)"
+									>查看</el-button
+								>
+								<el-button
+									text
+									type="primary"
+									size="small"
+									@click="table_edit(scope.row, scope.$index)"
+									>编辑</el-button
+								>
+								<el-popconfirm
+									title="确定删除吗？"
+									@confirm="
+										table_del(scope.row, scope.$index)
+									"
+								>
+									<template #reference>
+										<el-button
+											text
+											type="primary"
+											size="small"
+											>删除</el-button
+										>
+									</template>
+								</el-popconfirm>
+							</el-button-group>
+						</template>
+					</el-table-column>
+				</scTable>
+			</el-main>
+		</el-container>
 		<el-dialog
 			class="print-dialog"
 			v-model="dialogVisible"
@@ -123,65 +146,63 @@
 		>
 			<div class="print-page">
 				<el-main>
-						<el-form
-							ref="formRef"
-							:model="formDetail"
-							label-width="100px"
-							status-icon
+					<el-form
+						ref="formRef"
+						:model="formDetail"
+						label-width="100px"
+						status-icon
+					>
+						<el-form-item
+							v-for="item in formConfig"
+							:key="item.prop"
+							:label="item.label"
+							:prop="item.prop"
 						>
-							<el-form-item
-								v-for="item in formConfig"
-								:key="item.prop"
-								:label="item.label"
-								:prop="item.prop"
-							>
-								<el-radio-group v-model="formDetail[item.prop]">
-									<el-radio
-										v-for="option in item.options"
-										:key="option.value"
-										:label="option.value"
-										border
-									>
-										{{ option.label }}
-									</el-radio>
-									<el-input
-										v-if="
-											item.prop === 'printColor' &&
-											formDetail[item.prop] === 0
-										"
-										v-model="
-											formDetail[item.prop + 'Custom']
-										"
-										clearable
-										style="width: 120px"
-										placeholder="请输入"
-									></el-input>
-								</el-radio-group>
-							</el-form-item>
-							<el-form-item label="补充说明" prop="remarks">
-								<el-input
-									v-model="formDetail.remarks"
-									type="textarea"
-									placeholder="其他对商品要求的描述或补充说明"
-								></el-input>
-							</el-form-item>
-							<el-form-item label="文件上传" prop="files">
-								<el-upload
-									class="upload-demo"
-									drag
-									action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-									multiple
-									style="flex: 1"
+							<el-radio-group v-model="formDetail[item.prop]">
+								<el-radio
+									v-for="option in item.options"
+									:key="option.value"
+									:label="option.value"
+									border
 								>
-									<el-icon size="80" color="#ffaf58"
-										><upload-filled
-									/></el-icon>
-									<div class="el-upload__text">
-										请将文件拖到此处或 <em>点击上传</em>
-									</div>
-								</el-upload>
-							</el-form-item>
-						</el-form>
+									{{ option.label }}
+								</el-radio>
+								<el-input
+									v-if="
+										item.prop === 'printColor' &&
+										formDetail[item.prop] === 0
+									"
+									v-model="formDetail[item.prop + 'Custom']"
+									clearable
+									style="width: 120px"
+									placeholder="请输入"
+								></el-input>
+							</el-radio-group>
+						</el-form-item>
+						<el-form-item label="补充说明" prop="remarks">
+							<el-input
+								v-model="formDetail.remarks"
+								type="textarea"
+								placeholder="其他对商品要求的描述或补充说明"
+							></el-input>
+						</el-form-item>
+						<el-form-item label="文件上传" prop="files">
+							<el-upload
+								class="upload-demo"
+								drag
+								action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+								multiple
+								style="flex: 1"
+							>
+								<el-icon size="80" color="#ffaf58"
+									><upload-filled
+								/></el-icon>
+								<div class="el-upload__text">
+									请将文件拖到此处或 <em>点击上传</em>
+								</div>
+							</el-upload>
+						</el-form-item>
+					</el-form>
 				</el-main>
 				<div class="bottom-shop">
 					<div class="order-content">
@@ -213,34 +234,103 @@
 import { UploadFilled } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 // 从表单配置中提取选项数据
-const formConfigOptions = [
+const formConfigOptions = {
+	printColor: [
+		{ label: "A4", value: 1 },
+		{ label: "A3", value: 2 },
+		{ label: "A5", value: 3 },
+		{ label: "B4", value: 4 },
+		{ label: "16K", value: 5 },
+		{ label: "A2", value: 6 },
+		{ label: "A1", value: 7 },
+		{ label: "A0", value: 8 },
+		{ label: "8K", value: 9 },
+		{ label: "自定义尺寸", value: 0 },
+	],
+	deliveryMethod: [
+		{ label: "自取", value: 1 },
+		{ label: "送货上门", value: 2 },
+		{ label: "快递", value: 3 },
+		{ label: "到店取货", value: 4 },
+	],
+	coverColor: [
+		{ label: "黑白", value: 1 },
+		{ label: "彩色", value: 2 },
+		{ label: "单色", value: 3 },
+		{ label: "全彩", value: 4 },
+	],
+	innerColor: [
+		{ label: "黑白", value: 1 },
+		{ label: "彩色", value: 2 },
+		{ label: "单色", value: 3 },
+		{ label: "全彩", value: 4 },
+	],
+	paperType: [
+		{ label: "80克双胶纸", value: 1 },
+		{ label: "100克双胶纸", value: 2 },
+		{ label: "128克铜版纸", value: 3 },
+		{ label: "157克铜板纸", value: 4 },
+	],
+};
+
+// 搜索配置
+const searchConfig = [
+	{
+		label: "打印单号",
+		name: "printNo",
+		component: "input",
+		options: { placeholder: "请输入打印单号" },
+	},
 	{
 		label: "成品规格",
-		prop: "printColor",
-		type: "radio",
-		options: [
-			{ label: "A4", value: 1 },
-			{ label: "A3", value: 2 },
-			{ label: "A5", value: 3 },
-			{ label: "B4", value: 4 },
-			{ label: "16K", value: 5 },
-			{ label: "A2", value: 6 },
-			{ label: "A1", value: 7 },
-			{ label: "A0", value: 8 },
-			{ label: "8K", value: 9 },
-			{ label: "自定义尺寸", value: 0 },
-		],
+		name: "printColor",
+		component: "select",
+		options: {
+			placeholder: "请选择成品规格",
+			items: formConfigOptions["printColor"],
+		},
+	},
+	{
+		label: "份数",
+		name: "quantity",
+		component: "number",
+		options: { placeholder: "请输入份数" },
+	},
+	{
+		label: "纸张",
+		name: "paperType",
+		component: "select",
+		options: {
+			placeholder: "请选择纸张",
+			items: formConfigOptions["paperType"],
+		},
+	},
+	{
+		label: "封面印色",
+		name: "coverColor",
+		component: "select",
+		options: {
+			placeholder: "请选择封面印色",
+			items: formConfigOptions["coverColor"],
+		},
+	},
+	{
+		label: "内页印色",
+		name: "innerColor",
+		component: "select",
+		options: {
+			placeholder: "请选择内页印色",
+			items: formConfigOptions["innerColor"],
+		},
 	},
 	{
 		label: "交付方式",
-		prop: "deliveryMethod",
-		type: "radio",
-		options: [
-			{ label: "自取", value: 1 },
-			{ label: "送货上门", value: 2 },
-			{ label: "快递", value: 3 },
-			{ label: "到店取货", value: 4 },
-		],
+		name: "deliveryMethod",
+		component: "select",
+		options: {
+			placeholder: "请选择交付方式",
+			items: formConfigOptions["deliveryMethod"],
+		},
 	},
 ];
 
@@ -257,14 +347,7 @@ const tableHeader = [
 		label: "成品规格",
 		name: "printColor",
 		component: "select",
-		options: formConfigOptions.find(item => item.prop === "printColor")?.options || [],
-		table: true,
-		span: 6,
-	},
-	{
-		label: "文件页数",
-		name: "printArea",
-		component: "number",
+		options: formConfigOptions["printColor"],
 		table: true,
 		span: 6,
 	},
@@ -279,7 +362,7 @@ const tableHeader = [
 		label: "纸张",
 		name: "paperType",
 		component: "select",
-		options: formConfigOptions.find(item => item.prop === "paperType")?.options || [],
+		options: formConfigOptions["paperType"],
 		table: true,
 		span: 6,
 	},
@@ -287,6 +370,7 @@ const tableHeader = [
 		label: "封面印色",
 		name: "coverColor",
 		component: "select",
+		options: formConfigOptions["coverColor"],
 		table: true,
 		span: 6,
 	},
@@ -294,6 +378,7 @@ const tableHeader = [
 		label: "内页印色",
 		name: "innerColor",
 		component: "select",
+		options: formConfigOptions["innerColor"],
 		table: true,
 		span: 6,
 	},
@@ -301,7 +386,7 @@ const tableHeader = [
 		label: "交付方式",
 		name: "deliveryMethod",
 		component: "select",
-		options: formConfigOptions.find(item => item.prop === "deliveryMethod")?.options || [],
+		options: formConfigOptions["deliveryMethod"],
 		table: true,
 		span: 6,
 	},
@@ -318,6 +403,7 @@ export default {
 				apiObj: this.$API.print.blackPage,
 			},
 			tableHeader,
+			searchConfig,
 			page: {
 				pageSize: 20,
 				pageNum: 1,
@@ -326,7 +412,15 @@ export default {
 			selection: [],
 			dialogVisible: false,
 			dialogTitle: "新增",
-			form: {},
+			search: {
+				printNo: "",
+				printColor: "",
+				quantity: "",
+				paperType: "",
+				coverColor: "",
+				innerColor: "",
+				deliveryMethod: "",
+			},
 			formDetail: {
 				printColor: 1,
 				printArea: 1,
@@ -339,7 +433,7 @@ export default {
 				bindingMethod: 1,
 				deliveryMethod: 1,
 				remarks: "",
-				customSize: ''
+				customSize: "",
 			},
 			rules: {
 				required: [{ required: true, message: "请填写" }],
@@ -429,34 +523,19 @@ export default {
 					label: "纸张",
 					prop: "paperType",
 					type: "radio",
-					options: [
-						{ label: "80克双胶纸", value: 1 },
-						{ label: "100克双胶纸", value: 2 },
-						{ label: "128克铜版纸", value: 3 },
-						{ label: "157克铜板纸", value: 4 },
-					],
+					options: formConfigOptions["paperType"],
 				},
 				{
 					label: "封面印色",
 					prop: "coverColor",
 					type: "radio",
-					options: [
-						{ label: "黑白", value: 1 },
-						{ label: "彩色", value: 2 },
-						{ label: "单色", value: 3 },
-						{ label: "全彩", value: 4 },
-					],
+					options: formConfigOptions["coverColor"],
 				},
 				{
 					label: "内页印色",
 					prop: "innerColor",
 					type: "radio",
-					options: [
-						{ label: "黑白", value: 1 },
-						{ label: "彩色", value: 2 },
-						{ label: "单色", value: 3 },
-						{ label: "全彩", value: 4 },
-					],
+					options: formConfigOptions["innerColor"],
 				},
 				{
 					label: "封面材质",
@@ -491,12 +570,7 @@ export default {
 					label: "交付方式",
 					prop: "deliveryMethod",
 					type: "radio",
-					options: [
-						{ label: "自取", value: 1 },
-						{ label: "送货上门", value: 2 },
-						{ label: "快递", value: 3 },
-						{ label: "到店取货", value: 4 },
-					],
+					options: formConfigOptions["deliveryMethod"],
 				},
 			],
 		};
@@ -562,7 +636,25 @@ export default {
 		},
 		// 搜索
 		upsearch() {
-			this.$refs.table.upData(this.form);
+			// 过滤掉空字符串，只传递有值的参数
+			const filteredSearch = {};
+			for (const key in this.search) {
+				const value = this.search[key];
+				if (value !== "" && value !== null && value !== undefined) {
+					filteredSearch[key] = value;
+				}
+			}
+			this.$refs.table.upData(filteredSearch);
+		},
+		// 重置查询条件
+		resetSearch() {
+			// 根据配置重置搜索条件
+			const resetSearch = {};
+			this.searchConfig.forEach((item) => {
+				resetSearch[item.name] = "";
+			});
+			this.search = resetSearch;
+			this.$refs.table.upData(this.search);
 		},
 		formatter(row, item) {
 			// 表格字段格式化
@@ -597,7 +689,7 @@ export default {
 				bindingMethod: 1,
 				deliveryMethod: 1,
 				remarks: "",
-				customSize: ''
+				customSize: "",
 			};
 		},
 		async buyNow() {
@@ -618,15 +710,29 @@ export default {
 	.el-dialog__body {
 		padding: 0 !important;
 	}
-	.el-dialog__header{
+	.el-dialog__header {
 		border-bottom: 1px solid var(--el-border-color-light);
 	}
 }
 </style>
 <style lang="scss" scoped>
 .el-header {
-	height: 125px;
+	--el-header-height: 40px;
 }
+.el-aside {
+	padding: 10px;
+
+	.search-btn {
+		padding-top: 10px;
+		display: flex;
+		gap: 8px;
+
+		.el-button {
+			flex: 1;
+		}
+	}
+}
+
 .print-dialog {
 	.print-page {
 		height: calc(100vh - 100px);

@@ -1,270 +1,191 @@
 <template>
-	<el-container>
-		<el-header>
-			<el-form
-				:inline="true"
-				label-position="left"
-				label-width="80px"
-				:model="form"
-				class="demo-form-inline"
-			>
-				<el-row :gutter="10">
-					<template v-for="item in tableHeader" :key="item.name">
-						<el-col :span="item.span || 24">
-							<el-form-item
-								:label="item.label"
-								style="width: 100%"
-							>
-								<el-input
-									v-model="form[item.name]"
-									placeholder="请输入"
-									v-if="item.component === 'input'"
-								></el-input>
-							</el-form-item>
-						</el-col>
-					</template>
-					<el-col :span="6">
-						<el-form-item>
-							<el-button type="primary" @click="upsearch">
-								查询
-							</el-button>
-						</el-form-item>
-					</el-col>
-				</el-row>
-			</el-form>
-		</el-header>
-		<el-main class="nopadding">
-			<scTable
-				ref="table"
-				:apiObj="list.apiObj"
-				row-key="id"
-				stripe
-				@selectionChange="selectionChange"
-			>
-				<el-table-column type="selection" width="50"></el-table-column>
-				<template v-for="item in tableHeader" :key="item.name">
-					<el-table-column
-						v-if="item.table !== false"
-						:label="item.label"
-						:prop="item.name"
-						:width="item.width"
-						:formatter="
-							item.format ? (row) => formatter(row, item) : ''
-						"
-					>
-					</el-table-column>
-				</template>
-				<el-table-column
-					label="操作"
-					fixed="right"
-					align="right"
-					width="160"
-				>
-					<template #default="scope">
-						<el-button-group>
-							<el-button
-								text
-								type="primary"
-								size="small"
-								@click="table_show(scope.row, scope.$index)"
-								>查看</el-button
-							>
-							<el-button
-								text
-								type="primary"
-								size="small"
-								@click="table_edit(scope.row, scope.$index)"
-								>编辑</el-button
-							>
-							<el-popconfirm
-								title="确定删除吗？"
-								@confirm="table_del(scope.row, scope.$index)"
-							>
-								<template #reference>
-									<el-button text type="primary" size="small"
-										>删除</el-button
-									>
-								</template>
-							</el-popconfirm>
-						</el-button-group>
-					</template>
-				</el-table-column>
-			</scTable>
-		</el-main>
-	</el-container>
-	<el-dialog v-model="dialogVisible" :title="dialogTitle" width="500">
-		<scForm v-model="form" :config="formConfig" @submit="onSubmit"></scForm>
-	</el-dialog>
+	<common-list-page
+		ref="commonListPage"
+		:api-obj="$API.user.userPage"
+		:search-config="searchConfig"
+		:table-columns="tableColumns"
+		:form-config="formConfig"
+		:delete-api="deleteOrder"
+		:save-api="saveOrder"
+		@add="handleAdd"
+		@edit="handleEdit"
+		@view="handleView"
+		@submit="handleSubmit"
+	/>
 </template>
 
 <script>
-import { ElMessage } from "element-plus";
-const tableHeader = [
-	{
-		label: "文件类型",
-		name: "usid",
-		component: "input",
-		options: { placeholder: "请输入" },
-		form: true,
-		span: 6,
-	},
-	{
-		label: "纸张尺寸",
-		name: "usna",
-		component: "input",
-		options: { placeholder: "请输入" },
-		form: true,
-		span: 6,
-	},
-	{
-		label: "颜色",
-		name: "pwd",
-		component: "input",
-		width: 180,
-		options: { placeholder: "请输入" },
-		form: true,
-		span: 6,
-	},
-	{
-		label: "面数",
-		name: "pwddt",
-		component: "input",
-		width: 140,
-		span: 6,
-		options: { placeholder: "请输入" },
-	},
-	{
-		label: "起步张数",
-		name: "tel",
-		component: "input",
-		span: 6,
-		options: { placeholder: "请输入" },
-		form: true,
-	},
-	{
-		label: "价格",
-		name: "email",
-		component: "input",
-		span: 6,
-		options: { placeholder: "请输入" },
-		form: true,
-	},
-];
+import CommonListPage from "@/components/commonTable/index.vue";
+import { getCurrentInstance } from "vue";
+
 export default {
 	name: "orderList",
-	data() {
-		return {
-			list: {
-				apiObj: this.$API.user.userPage,
-			},
-			tableHeader,
-			page: {
-				pageSize: 20,
-				pageNum: 1,
-				total: 0,
-			},
-			selection: [],
-			dialogVisible: false,
-			dialogTitle: "添加",
-			form: {},
-			formConfig: {
-				labelWidth: 80,
-				labelPosition: "left",
-				formItems: tableHeader.filter((item) => item.form),
-			},
-			searchConfig: {
-				labelWidth: 80,
-				labelPosition: "left",
-				formItems: tableHeader.filter((item) => item.form),
-			},
-		};
+	components: {
+		CommonListPage,
 	},
-	methods: {
-		//添加
-		add() {
-			this.dialogTitle = "添加";
-			this.form = {};
-			this.dialogVisible = true;
-		},
-		//编辑
-		table_edit(row) {
-			this.dialogTitle = "编辑";
-			this.dialogVisible = true;
-			this.$nextTick(() => {
-				this.form = row;
-			});
-		},
-		//查看
-		table_show(row) {
-			this.dialogTitle = "查看";
-			this.dialogVisible = true;
-			this.$nextTick(() => {
-				this.form = row;
-			});
-		},
-		//删除
-		async table_del(row, index) {
-			var reqData = { id: row.id };
-			var res = await this.$API.demo.post.post(reqData);
-			if (res.code == 200) {
-				//这里选择刷新整个表格 OR 插入/编辑现有表格数据
-				this.$refs.table.tableData.splice(index, 1);
-				this.$message.success("删除成功");
-			} else {
-				this.$alert(res.message, "提示", { type: "error" });
-			}
-		},
-		//批量删除
-		async batch_del() {
-			this.$confirm(
-				`确定删除选中的 ${this.selection.length} 项吗？`,
-				"提示",
+	setup() {
+		const instance = getCurrentInstance();
+		const $API = instance.proxy.$API;
+
+		// 搜索配置
+		const searchConfig = [
+			{
+				label: "文件类型",
+				name: "usid",
+				component: "input",
+				options: { placeholder: "请输入文件类型" },
+			},
+			{
+				label: "纸张尺寸",
+				name: "usna",
+				component: "input",
+				options: { placeholder: "请输入纸张尺寸" },
+			},
+			{
+				label: "颜色",
+				name: "pwd",
+				component: "input",
+				options: { placeholder: "请输入颜色" },
+			},
+			{
+				label: "面数",
+				name: "pwddt",
+				component: "input",
+				options: { placeholder: "请输入面数" },
+			},
+			{
+				label: "起步张数",
+				name: "tel",
+				component: "input",
+				options: { placeholder: "请输入起步张数" },
+			},
+			{
+				label: "价格",
+				name: "email",
+				component: "input",
+				options: { placeholder: "请输入价格" },
+			},
+		];
+
+		// 表格列配置
+		const tableColumns = [
+			{
+				label: "文件类型",
+				name: "usid",
+				width: 120,
+			},
+			{
+				label: "纸张尺寸",
+				name: "usna",
+				width: 120,
+			},
+			{
+				label: "颜色",
+				name: "pwd",
+				width: 120,
+			},
+			{
+				label: "面数",
+				name: "pwddt",
+				width: 120,
+			},
+			{
+				label: "起步张数",
+				name: "tel",
+				width: 120,
+			},
+			{
+				label: "价格",
+				name: "email",
+				width: 120,
+			},
+		];
+
+		// 表单配置
+		const formConfig = {
+			labelWidth: 80,
+			labelPosition: "right",
+			formItems: [
 				{
-					type: "warning",
-				}
-			)
-				.then(async () => {
-					const loading = this.$loading();
-					const ids = this.selection.map((item) => item.id);
-					const res = await this.$API.user.userDelete.delete(ids);
-					if (res.code === 0) {
-						loading.close();
-						this.$message.success("删除成功");
-					}
-				})
-				.catch(() => {});
-		},
-		//表格选择后回调事件
-		selectionChange(selection) {
-			this.selection = selection;
-		},
-		//搜索
-		upsearch() {
-			this.$refs.table.upData(this.form);
-		},
-		formatter(row, item) {
-			// 表格字段格式化
-			const map = item.format.split("/").reduce((acc, item) => {
-				const [key, label] = item.split(":");
-				acc[key.trim()] = label.trim();
-				return acc;
-			}, {});
-			return map[String(row[item.name])] || "";
-		},
-		async onSubmit(form) {
-			const res = await this.$API.user.userSave.post(form);
-			if (res.code === 0) {
-				this.dialogVisible = false;
-				this.$refs.table.getData();
-				ElMessage.success("操作成功");
-			}
-		},
+					label: "文件类型",
+					name: "usid",
+					component: "input",
+					options: { placeholder: "请输入" },
+				},
+				{
+					label: "纸张尺寸",
+					name: "usna",
+					component: "input",
+					options: { placeholder: "请输入" },
+				},
+				{
+					label: "颜色",
+					name: "pwd",
+					component: "input",
+					options: { placeholder: "请输入" },
+				},
+				{
+					label: "面数",
+					name: "pwddt",
+					component: "input",
+					options: { placeholder: "请输入" },
+				},
+				{
+					label: "起步张数",
+					name: "tel",
+					component: "input",
+					options: { placeholder: "请输入" },
+				},
+				{
+					label: "价格",
+					name: "email",
+					component: "input",
+					options: { placeholder: "请输入" },
+				},
+			],
+		};
+
+		// API 方法
+		const deleteOrder = async (ids) => {
+			return await $API.order.userDelete.delete(ids);
+		};
+
+		const saveOrder = async (data) => {
+			return await $API.order.userSave.post(data);
+		};
+
+		// 事件处理
+		const handleAdd = () => {
+			console.log("新增订单");
+		};
+
+		const handleEdit = (row) => {
+			console.log("编辑订单", row);
+		};
+
+		const handleView = (row) => {
+			console.log("查看订单", row);
+		};
+
+		const handleSubmit = () => {
+			console.log("提交成功");
+		};
+
+		return {
+			searchConfig,
+			tableColumns,
+			formConfig,
+			deleteOrder,
+			saveOrder,
+			handleAdd,
+			handleEdit,
+			handleView,
+			handleSubmit,
+		};
 	},
 };
 </script>
 
 <style lang="scss" scoped>
-.el-header {
-	height: 125px;
-}
+/* 如果需要样式调整，可在此处添加 */
 </style>
