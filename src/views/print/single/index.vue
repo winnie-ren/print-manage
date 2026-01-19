@@ -480,7 +480,6 @@ export default {
 						{ label: "200g", value: "200g" },
 						{ label: "250g", value: "250g" },
 						{ label: "300g", value: "300g" },
-						{ label: "157g", value: "157g" },
 						{ label: "80g", value: "80g" },
 						{ label: "100g", value: "100g" },
 						{ label: "120g", value: "120g" },

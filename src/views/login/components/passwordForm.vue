@@ -275,6 +275,16 @@ export default {
 						},
 						children: [
 							{
+								path: "/price/setting",
+								name: "priceSetting",
+								meta: {
+									title: "价格设置",
+									icon: "el-icon-tickets",
+									type: "menu",
+								},
+								component: "price/setting",
+							},
+							{
 								path: "/price/mobile",
 								name: "mobile",
 								meta: {

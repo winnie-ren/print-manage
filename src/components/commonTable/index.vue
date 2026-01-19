@@ -111,7 +111,7 @@
 							:formatter="
 								column.format
 									? (row) => formatter(row, column)
-									: ''
+									: null
 							"
 							:show-overflow-tooltip="
 								column.showOverflowTooltip ?? true
@@ -188,10 +188,10 @@
 		</el-container>
 
 		<!-- 表单弹窗 -->
-		<el-dialog
+		<el-drawer
 			v-model="dialogVisible"
 			:title="dialogTitle"
-			:width="dialogWidth"
+			:size="dialogWidth"
 			:top="dialogTop"
 			@close="handleDialogClose"
 		>
@@ -204,42 +204,9 @@
 					@submit="handleSubmit"
 				></scForm>
 			</template>
-			<template v-else>
-				<el-form
-					ref="formRef"
-					:model="formData"
-					:rules="formRules"
-					:label-width="formLabelWidth"
-					:label-position="formLabelPosition"
-				>
-					<template v-for="field in formFields" :key="field.name">
-						<el-form-item
-							v-if="field.visible !== false"
-							:label="field.label"
-							:name="field.name"
-						>
-							<component
-								:is="field.component || 'el-input'"
-								v-model="formData[field.name]"
-								v-bind="getComponentProps(field)"
-								:options="field.options"
-								@change="field.onChange"
-							/>
-						</el-form-item>
-					</template>
-					<el-form-item>
-						<el-button
-							type="primary"
-							@click="handleSubmit"
-							:disabled="dialogMode === 'view'"
-						>
-							提交
-						</el-button>
-						<el-button @click="handleCancel">取消</el-button>
-					</el-form-item>
-				</el-form>
-			</template>
-		</el-dialog>
+			<!-- 自定义表单内容 -->
+			<slot></slot>
+		</el-drawer>
 	</el-container>
 </template>
 
@@ -596,7 +563,7 @@ export default {
 			getComponentProps,
 			refresh,
 			getSelectedRows,
-			formatter
+			formatter,
 		};
 	},
 };

@@ -12,10 +12,10 @@ axios.defaults.timeout = sysConfig.TIMEOUT
 axios.interceptors.request.use(
 	(config) => {
 		let token = tool.cookie.get("TOKEN");
-		if(token){
+		if (token) {
 			config.headers[sysConfig.TOKEN_NAME] = sysConfig.TOKEN_PREFIX + token
 		}
-		if(!sysConfig.REQUEST_CACHE && config.method == 'get'){
+		if (!sysConfig.REQUEST_CACHE && config.method == 'get') {
 			config.params = config.params || {};
 			config.params['_'] = new Date().getTime();
 		}
@@ -33,6 +33,16 @@ let MessageBox_401_show = false
 // HTTP response 拦截器
 axios.interceptors.response.use(
 	(response) => {
+		const { data } = response
+		if (![0, 200].includes(data.code)) {
+			ElNotification.error({
+				title: '请求失败',
+				message: data.msg || `Status:${response.status}，未知错误！`
+			});
+			if ([-100000001].includes(data.code)) {
+				router.replace({ path: '/login' });
+			}
+		}
 		return response;
 	},
 	(error) => {
@@ -48,7 +58,7 @@ axios.interceptors.response.use(
 					message: error.response.data.message || "Status:500，服务器发生错误！"
 				});
 			} else if (error.response.status == 401) {
-				if(!MessageBox_401_show){
+				if (!MessageBox_401_show) {
 					MessageBox_401_show = true
 					ElMessageBox.confirm('当前用户已被登出或无权限访问当前资源，请尝试重新登录后再操作。', '无权限访问', {
 						type: 'error',
@@ -60,8 +70,8 @@ axios.interceptors.response.use(
 							done()
 						}
 					}).then(() => {
-						router.replace({path: '/login'});
-					}).catch(() => {})
+						router.replace({ path: '/login' });
+					}).catch(() => { })
 				}
 			} else {
 				ElNotification.error({
@@ -83,11 +93,11 @@ axios.interceptors.response.use(
 var http = {
 
 	/** get 请求
-	 * @param  {string} url 接口地址
-	 * @param  {object} params 请求参数
-	 * @param  {object} config 参数
-	 */
-	get: function(url, params={}, config={}) {
+		* @param  {string} url 接口地址
+		* @param  {object} params 请求参数
+		* @param  {object} config 参数
+		*/
+	get: function (url, params = {}, config = {}) {
 		return new Promise((resolve, reject) => {
 			axios({
 				method: 'get',
@@ -103,11 +113,11 @@ var http = {
 	},
 
 	/** post 请求
-	 * @param  {string} url 接口地址
-	 * @param  {object} data 请求参数
-	 * @param  {object} config 参数
-	 */
-	post: function(url, data={}, config={}) {
+		* @param  {string} url 接口地址
+		* @param  {object} data 请求参数
+		* @param  {object} config 参数
+		*/
+	post: function (url, data = {}, config = {}) {
 		return new Promise((resolve, reject) => {
 			axios({
 				method: 'post',
@@ -123,11 +133,11 @@ var http = {
 	},
 
 	/** put 请求
-	 * @param  {string} url 接口地址
-	 * @param  {object} data 请求参数
-	 * @param  {object} config 参数
-	 */
-	put: function(url, data={}, config={}) {
+		* @param  {string} url 接口地址
+		* @param  {object} data 请求参数
+		* @param  {object} config 参数
+		*/
+	put: function (url, data = {}, config = {}) {
 		return new Promise((resolve, reject) => {
 			axios({
 				method: 'put',
@@ -143,11 +153,11 @@ var http = {
 	},
 
 	/** patch 请求
-	 * @param  {string} url 接口地址
-	 * @param  {object} data 请求参数
-	 * @param  {object} config 参数
-	 */
-	patch: function(url, data={}, config={}) {
+		* @param  {string} url 接口地址
+		* @param  {object} data 请求参数
+		* @param  {object} config 参数
+		*/
+	patch: function (url, data = {}, config = {}) {
 		return new Promise((resolve, reject) => {
 			axios({
 				method: 'patch',
@@ -163,11 +173,11 @@ var http = {
 	},
 
 	/** delete 请求
-	 * @param  {string} url 接口地址
-	 * @param  {object} data 请求参数
-	 * @param  {object} config 参数
-	 */
-	delete: function(url, data={}, config={}) {
+		* @param  {string} url 接口地址
+		* @param  {object} data 请求参数
+		* @param  {object} config 参数
+		*/
+	delete: function (url, data = {}, config = {}) {
 		return new Promise((resolve, reject) => {
 			axios({
 				method: 'delete',
@@ -183,22 +193,22 @@ var http = {
 	},
 
 	/** jsonp 请求
-	 * @param  {string} url 接口地址
-	 * @param  {string} name JSONP回调函数名称
-	 */
-	jsonp: function(url, name='jsonp'){
+		* @param  {string} url 接口地址
+		* @param  {string} name JSONP回调函数名称
+		*/
+	jsonp: function (url, name = 'jsonp') {
 		return new Promise((resolve) => {
 			var script = document.createElement('script')
 			var _id = `jsonp${Math.ceil(Math.random() * 1000000)}`
 			script.id = _id
 			script.type = 'text/javascript'
 			script.src = url
-			window[name] =(response) => {
+			window[name] = (response) => {
 				resolve(response)
 				document.getElementsByTagName('head')[0].removeChild(script)
 				try {
 					delete window[name];
-				}catch(e){
+				} catch (e) {
 					window[name] = undefined;
 				}
 			}

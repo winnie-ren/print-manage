@@ -102,7 +102,7 @@ export default {
 
 		// 表单配置
 		const formConfig = {
-			labelWidth: 80,
+			labelWidth: 120,
 			labelPosition: "right",
 			formItems: [
 				{
