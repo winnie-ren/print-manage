@@ -181,7 +181,7 @@
 						>
 							<!-- 成品规格 -->
 							<el-form-item label="成品规格">
-								<el-row>
+								<el-row :gutter="20">
 									<el-col
 										v-for="(
 											size, index
@@ -209,7 +209,7 @@
 
 							<!-- 纸张 -->
 							<el-form-item label="纸张">
-								<el-row>
+								<el-row :gutter="20">
 									<el-col
 										v-for="(
 											paper, index
@@ -237,7 +237,7 @@
 
 							<!-- 封面印色 -->
 							<el-form-item label="封面印色">
-								<el-row>
+								<el-row :gutter="20">
 									<el-col
 										v-for="(
 											color, index
@@ -265,7 +265,7 @@
 
 							<!-- 内页印色 -->
 							<el-form-item label="内页印色">
-								<el-row>
+								<el-row :gutter="20">
 									<el-col
 										v-for="(
 											color, index
@@ -293,7 +293,7 @@
 
 							<!-- 封面材质 -->
 							<el-form-item label="封面材质">
-								<el-row>
+								<el-row :gutter="20">
 									<el-col
 										v-for="(
 											material, index
@@ -321,7 +321,7 @@
 
 							<!-- 封面工艺 -->
 							<el-form-item label="封面工艺">
-								<el-row>
+								<el-row :gutter="20">
 									<el-col
 										v-for="(
 											process, index
@@ -349,7 +349,7 @@
 
 							<!-- 装订方式 -->
 							<el-form-item label="装订方式">
-								<el-row>
+								<el-row :gutter="20">
 									<el-col
 										v-for="(
 											bind, index
@@ -377,7 +377,7 @@
 
 							<!-- 交付方式 -->
 							<el-form-item label="交付方式">
-								<el-row>
+								<el-row :gutter="20">
 									<el-col
 										v-for="(
 											del, index
@@ -409,7 +409,293 @@
 					<div>暂未实现</div>
 				</el-tab-pane>
 				<el-tab-pane label="标书专项" name="fourth">
-					<div>暂未实现</div>
+					<div class="book-config-container">
+						<el-form
+							:model="specialConfig"
+							label-width="100px"
+							style="margin: 10px 0"
+						>
+							<!-- 是否扫描 -->
+							<el-form-item label="是否扫描">
+								<el-row :gutter="20">
+									<el-col
+										v-for="(
+											item, index
+										) in specialConfig.scan"
+										:key="index"
+										:span="6"
+									>
+										<el-form-item
+											:label="item.name"
+											style="margin-bottom: 0"
+										>
+											<el-input-number
+												v-model.number="item.price"
+												:min="0"
+												step="0.01"
+												precision="2"
+												controls-position="right"
+												placeholder="请输入"
+												style="width: 100%"
+											/>
+										</el-form-item>
+									</el-col>
+								</el-row>
+							</el-form-item>
+
+							<!-- 扫描文件 -->
+							<el-form-item label="扫描文件">
+								<el-row :gutter="20">
+									<el-col
+										v-for="(
+											item, index
+										) in specialConfig.scanFile"
+										:key="index"
+										:span="6"
+									>
+										<el-form-item
+											:label="item.name"
+											style="margin-bottom: 0"
+										>
+											<el-input-number
+												v-model.number="item.price"
+												:min="0"
+												step="0.01"
+												precision="2"
+												controls-position="right"
+												placeholder="请输入"
+												style="width: 100%"
+											/>
+										</el-form-item>
+									</el-col>
+								</el-row>
+							</el-form-item>
+
+							<!-- 正本印色 -->
+							<el-form-item label="正本印色">
+								<el-row :gutter="20">
+									<el-col
+										v-for="(
+											item, index
+										) in specialConfig.originalColor"
+										:key="index"
+										:span="6"
+									>
+										<el-form-item
+											:label="item.name"
+											style="margin-bottom: 0"
+										>
+											<el-input-number
+												v-model.number="item.price"
+												:min="0"
+												step="0.01"
+												precision="2"
+												controls-position="right"
+												placeholder="请输入"
+												style="width: 100%"
+											/>
+										</el-form-item>
+									</el-col>
+								</el-row>
+							</el-form-item>
+
+							<!-- 正本印面 -->
+							<el-form-item label="正本印面">
+								<el-row :gutter="20">
+									<el-col
+										v-for="(
+											item, index
+										) in specialConfig.originalSide"
+										:key="index"
+										:span="6"
+									>
+										<el-form-item
+											:label="item.name"
+											style="margin-bottom: 0"
+										>
+											<el-input-number
+												v-model.number="item.price"
+												:min="0"
+												step="0.01"
+												precision="2"
+												controls-position="right"
+												placeholder="请输入"
+												style="width: 100%"
+											/>
+										</el-form-item>
+									</el-col>
+								</el-row>
+							</el-form-item>
+
+							<!-- 副本印色 -->
+							<el-form-item label="副本印色">
+								<el-row :gutter="20">
+									<el-col
+										v-for="(
+											item, index
+										) in specialConfig.copyColor"
+										:key="index"
+										:span="6"
+									>
+										<el-form-item
+											:label="item.name"
+											style="margin-bottom: 0"
+										>
+											<el-input-number
+												v-model.number="item.price"
+												:min="0"
+												step="0.01"
+												precision="2"
+												controls-position="right"
+												placeholder="请输入"
+												style="width: 100%"
+											/>
+										</el-form-item>
+									</el-col>
+								</el-row>
+							</el-form-item>
+
+							<!-- 副本印面 -->
+							<el-form-item label="副本印面">
+								<el-row :gutter="20">
+									<el-col
+										v-for="(
+											item, index
+										) in specialConfig.copySide"
+										:key="index"
+										:span="6"
+									>
+										<el-form-item
+											:label="item.name"
+											style="margin-bottom: 0"
+										>
+											<el-input-number
+												v-model.number="item.price"
+												:min="0"
+												step="0.01"
+												precision="2"
+												controls-position="right"
+												placeholder="请输入"
+												style="width: 100%"
+											/>
+										</el-form-item>
+									</el-col>
+								</el-row>
+							</el-form-item>
+
+							<!-- 封面颜色 -->
+							<el-form-item label="封面颜色">
+								<el-row :gutter="20">
+									<el-col
+										v-for="(
+											item, index
+										) in specialConfig.coverColor"
+										:key="index"
+										:span="6"
+									>
+										<el-form-item
+											:label="item.name"
+											style="margin-bottom: 0"
+										>
+											<el-input-number
+												v-model.number="item.price"
+												:min="0"
+												step="0.01"
+												precision="2"
+												controls-position="right"
+												placeholder="请输入"
+												style="width: 100%"
+											/>
+										</el-form-item>
+									</el-col>
+								</el-row>
+							</el-form-item>
+
+							<!-- 装订方式 -->
+							<el-form-item label="装订方式">
+								<el-row :gutter="20">
+									<el-col
+										v-for="(
+											item, index
+										) in specialConfig.binding"
+										:key="index"
+										:span="6"
+									>
+										<el-form-item
+											:label="item.name"
+											style="margin-bottom: 0"
+										>
+											<el-input-number
+												v-model.number="item.price"
+												:min="0"
+												step="0.01"
+												precision="2"
+												controls-position="right"
+												placeholder="请输入"
+												style="width: 100%"
+											/>
+										</el-form-item>
+									</el-col>
+								</el-row>
+							</el-form-item>
+
+							<!-- 出货时效 -->
+							<el-form-item label="出货时效">
+								<el-row :gutter="20">
+									<el-col
+										v-for="(
+											item, index
+										) in specialConfig.deliveryTime"
+										:key="index"
+										:span="6"
+									>
+										<el-form-item
+											:label="item.name"
+											style="margin-bottom: 0"
+										>
+											<el-input-number
+												v-model.number="item.price"
+												:min="0"
+												step="0.01"
+												precision="2"
+												controls-position="right"
+												placeholder="请输入"
+												style="width: 100%"
+											/>
+										</el-form-item>
+									</el-col>
+								</el-row>
+							</el-form-item>
+
+							<!-- 交付方式 -->
+							<el-form-item label="交付方式">
+								<el-row :gutter="20">
+									<el-col
+										v-for="(
+											item, index
+										) in specialConfig.delivery"
+										:key="index"
+										:span="6"
+									>
+										<el-form-item
+											:label="item.name"
+											style="margin-bottom: 0"
+										>
+											<el-input-number
+												v-model.number="item.price"
+												:min="0"
+												step="0.01"
+												precision="2"
+												controls-position="right"
+												placeholder="请输入"
+												style="width: 100%"
+											/>
+										</el-form-item>
+									</el-col>
+								</el-row>
+							</el-form-item>
+						</el-form>
+					</div>
 				</el-tab-pane>
 			</el-tabs>
 		</div>
@@ -620,6 +906,59 @@ export default {
 			},
 		});
 
+		// 标书专项
+		const specialConfig = ref({
+			scan: [
+				{ name: "是", price: 1 },
+				{ name: "否", price: 0 },
+			],
+			scanFile: [
+				{ name: "发送", price: 0 },
+				{ name: "U盘", price: 25 },
+				{ name: "刻录光盘", price: 7 },
+			],
+			originalColor: [
+				{ name: "黑白", price: 0.1 },
+				{ name: "彩色", price: 0.3 },
+			],
+			originalSide: [
+				{ name: "单面", price: 1 },
+				{ name: "双面", price: 0.9 },
+			],
+			copyColor: [
+				{ name: "黑白", price: 0.1 },
+				{ name: "彩色", price: 0.3 },
+			],
+			copySide: [
+				{ name: "单面", price: 1 },
+				{ name: "双面", price: 0.9 },
+			],
+			coverColor: [
+				{ name: "白色", price: 6 },
+				{ name: "天兰", price: 6 },
+				{ name: "深蓝", price: 6 },
+				{ name: "浅绿", price: 6 },
+				{ name: "浅黄", price: 6 },
+				{ name: "大红", price: 6 },
+				{ name: "透明封面", price: 8 },
+			],
+			binding: [
+				{ name: "胶装", price: 2 },
+				{ name: "夹条装", price: 4 },
+				{ name: "铁圈装", price: 4 },
+			],
+			deliveryTime: [
+				{ name: "1小时", price: 1 },
+				{ name: "2小时", price: 2 },
+				{ name: "4小时", price: 4 },
+			],
+			delivery: [
+				{ name: "自取", price: 0 },
+				{ name: "送货上门", price: 10 },
+				{ name: "快递到付", price: 0 },
+				{ name: "快递寄付", price: 0 },
+			],
+		});
 		function handleClick(tab, event) {
 			console.log(tab, event);
 		}
@@ -671,6 +1010,7 @@ export default {
 				materialPrices: newMaterialData,
 				printConfig: printConfig.value,
 				bookConfig: bookConfig.value,
+				specialConfig: specialConfig.value,
 			};
 		};
 		const bookConfig = ref({
@@ -729,6 +1069,7 @@ export default {
 			printConfig,
 			materialGroups,
 			bookConfig,
+			specialConfig,
 			getFullConfig,
 			handleClick,
 			deleteMenu,
@@ -743,9 +1084,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.price-table-container {
-	margin: 20px 0;
-}
 .form-columns {
 	display: flex;
 	flex-wrap: wrap;
@@ -765,8 +1103,6 @@ export default {
 	}
 }
 .book-config-container {
-	padding: 20px;
-	background: #f9f9f9;
 	border-radius: 4px;
 	.el-row {
 		width: 100%;

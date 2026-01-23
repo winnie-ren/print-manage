@@ -194,6 +194,26 @@ export default {
 						],
 					},
 					{
+						name: "memberManage",
+						path: "/memberManage",
+						meta: {
+							title: "会员管理",
+							icon: "el-icon-menu",
+							type: "memberManage",
+						},
+						children: [
+							{
+								name: "memberList",
+								path: "/memberManage/memberList",
+								meta: {
+									title: "会员管理",
+									icon: "el-icon-user",
+								},
+								component: "memberManage/memberList",
+							},
+						],
+					},
+					{
 						name: "print",
 						path: "/print",
 						meta: {
