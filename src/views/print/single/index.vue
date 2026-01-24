@@ -246,8 +246,8 @@ const formConfigOptions = [
 		prop: "printColor",
 		type: "radio",
 		options: [
-			{ label: "黑白", value: "黑白" },
-			{ label: "彩色", value: "彩色" },
+			{ label: "黑白", value: "blackWhite" },
+			{ label: "彩色", value: "color" },
 		],
 	},
 	{
@@ -255,8 +255,8 @@ const formConfigOptions = [
 		prop: "printSide",
 		type: "radio",
 		options: [
-			{ label: "单面", value: "单面" },
-			{ label: "双面", value: "双面" },
+			{ label: "单面", value: "single" },
+			{ label: "双面", value: "double" },
 		],
 	},
 	{
@@ -264,9 +264,9 @@ const formConfigOptions = [
 		prop: "material",
 		type: "radio",
 		options: [
-			{ label: "铜版纸", value: "铜版纸" },
-			{ label: "哑粉纸", value: "哑粉纸" },
-			{ label: "双胶纸", value: "双胶纸" },
+			{ label: "铜版纸", value: "coatedPaper" },
+			{ label: "哑粉纸", value: "mattePaper" },
+			{ label: "双胶纸", value: "twoSidePaper" },
 		],
 	},
 ];
@@ -292,8 +292,8 @@ const searchConfig = [
 		options: {
 			placeholder: "请选择印面",
 			items: [
-				{ value: "单面", label: "单面" },
-				{ value: "双面", label: "双面" },
+				{ value: "single", label: "单面" },
+				{ value: "double", label: "双面" },
 			],
 		},
 	},
@@ -310,9 +310,9 @@ const searchConfig = [
 		options: {
 			placeholder: "请选择材料",
 			items: [
-				{ value: "铜版纸", label: "铜版纸" },
-				{ value: "哑粉纸", label: "哑粉纸" },
-				{ value: "双胶纸", label: "双胶纸" },
+				{ label: "铜版纸", value: "coatedPaper" },
+				{ label: "哑粉纸", value: "mattePaper" },
+				{ label: "双胶纸", value: "twoSidePaper" },
 			],
 		},
 	},
@@ -419,11 +419,11 @@ export default {
 				styleCount: "",
 			},
 			formDetail: {
-				printColor: "黑白",
-				printSide: "单面",
-				size: "148*210",
-				material: "铜版纸",
-				weight: "157g",
+				printColor: "blackWhite",
+				printSide: "single",
+				size: "A5",
+				material: "coatedPaper",
+				weight: 157,
 				styleCount: 1,
 				sheetCount: 1,
 				deliveryMethod: "自取",
@@ -436,8 +436,8 @@ export default {
 					prop: "printColor",
 					type: "radio",
 					options: [
-						{ label: "黑白", value: "黑白" },
-						{ label: "彩色", value: "彩色" },
+						{ label: "黑白", value: "blackWhite" },
+						{ label: "彩色", value: "color" },
 					],
 				},
 				{
@@ -445,8 +445,8 @@ export default {
 					prop: "printSide",
 					type: "radio",
 					options: [
-						{ label: "单面", value: "单面" },
-						{ label: "双面", value: "双面" },
+						{ label: "单面", value: "single" },
+						{ label: "双面", value: "double" },
 					],
 				},
 				{
@@ -454,10 +454,10 @@ export default {
 					prop: "size",
 					type: "radio",
 					options: [
-						{ label: "148*210", value: "148*210" },
-						{ label: "176*250", value: "176*250" },
-						{ label: "210*297", value: "210*297" },
-						{ label: "297*420", value: "297*420" },
+						{ label: "A5 (148*210)", value: "A5" },
+						{ label: "B5 (176*250)", value: "B5" },
+						{ label: "A4 (210*297)", value: "A4" },
+						{ label: "A3 (297*420)", value: "A3" },
 						{ label: "自定义", value: 0 },
 					],
 				},
@@ -466,9 +466,9 @@ export default {
 					prop: "material",
 					type: "radio",
 					options: [
-						{ label: "铜版纸", value: "铜版纸" },
-						{ label: "哑粉纸", value: "哑粉纸" },
-						{ label: "双胶纸", value: "双胶纸" },
+						{ label: "铜版纸", value: "coatedPaper" },
+						{ label: "哑粉纸", value: "mattePaper" },
+						{ label: "双胶纸", value: "twoSidePaper" },
 					],
 				},
 				{
@@ -476,13 +476,13 @@ export default {
 					prop: "weight",
 					type: "radio",
 					options: [
-						{ label: "157g", value: "157g" },
-						{ label: "200g", value: "200g" },
-						{ label: "250g", value: "250g" },
-						{ label: "300g", value: "300g" },
-						{ label: "80g", value: "80g" },
-						{ label: "100g", value: "100g" },
-						{ label: "120g", value: "120g" },
+						{ label: "157g", value: 157 },
+						{ label: "200g", value: 200 },
+						{ label: "250g", value: 250 },
+						{ label: "300g", value: 300 },
+						{ label: "80g", value: 80 },
+						{ label: "100g", value: 100 },
+						{ label: "120g", value: 120 },
 						{ label: "自定义", value: 0 },
 					],
 				},
@@ -636,11 +636,11 @@ export default {
 		},
 		resetForm() {
 			this.formDetail = {
-				printColor: "黑白",
-				printSide: "单面",
-				size: "148*210",
-				material: "铜版纸",
-				weight: "157g",
+				printColor: "blackWhite",
+				printSide: "single",
+				size: "A5",
+				material: "coatedPaper",
+				weight: 157,
 				styleCount: 1,
 				sheetCount: 1,
 				deliveryMethod: "自取",

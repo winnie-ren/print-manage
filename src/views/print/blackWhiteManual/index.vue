@@ -169,7 +169,7 @@
 								</el-radio>
 								<el-input
 									v-if="
-										item.prop === 'printColor' &&
+										item.prop === 'spec' &&
 										formDetail[item.prop] === 0
 									"
 									v-model="formDetail[item.prop + 'Custom']"
@@ -235,41 +235,41 @@ import { UploadFilled } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 // 从表单配置中提取选项数据
 const formConfigOptions = {
-	printColor: [
-		{ label: "A4", value: 1 },
-		{ label: "A3", value: 2 },
-		{ label: "A5", value: 3 },
-		{ label: "B4", value: 4 },
-		{ label: "16K", value: 5 },
-		{ label: "A2", value: 6 },
-		{ label: "A1", value: 7 },
-		{ label: "A0", value: 8 },
-		{ label: "8K", value: 9 },
+	spec: [
+		{ label: "A4", value: "A4" },
+		{ label: "A3", value: "A3" },
+		{ label: "A5", value: "A5" },
+		{ label: "B4", value: "B4" },
+		{ label: "16K", value: "16K" },
+		{ label: "A2", value: "A2" },
+		{ label: "A1", value: "A1" },
+		{ label: "A0", value: "A0" },
+		{ label: "8K", value: "8K" },
 		{ label: "自定义尺寸", value: 0 },
 	],
 	deliveryMethod: [
-		{ label: "自取", value: 1 },
-		{ label: "送货上门", value: 2 },
-		{ label: "快递", value: 3 },
-		{ label: "到店取货", value: 4 },
+		{ label: "自取", value: "self" },
+		{ label: "送货上门", value: "delivery" },
+		{ label: "快递", value: "express" },
+		{ label: "到店取货", value: "pickupStore" },
 	],
 	coverColor: [
-		{ label: "黑白", value: 1 },
-		{ label: "彩色", value: 2 },
-		{ label: "单色", value: 3 },
-		{ label: "全彩", value: 4 },
+		{ label: "黑白", value: "black" },
+		{ label: "彩色", value: "color" },
+		{ label: "单色", value: "single" },
+		{ label: "全彩", value: "fullColor" },
 	],
 	innerColor: [
-		{ label: "黑白", value: 1 },
-		{ label: "彩色", value: 2 },
-		{ label: "单色", value: 3 },
-		{ label: "全彩", value: 4 },
+		{ label: "黑白", value: "black" },
+		{ label: "彩色", value: "color" },
+		{ label: "单色", value: "single" },
+		{ label: "全彩", value: "fullColor" },
 	],
 	paperType: [
-		{ label: "80克双胶纸", value: 1 },
-		{ label: "100克双胶纸", value: 2 },
-		{ label: "128克铜版纸", value: 3 },
-		{ label: "157克铜板纸", value: 4 },
+		{ label: "80克双胶纸", value: "80" },
+		{ label: "100克双胶纸", value: "100" },
+		{ label: "128克铜版纸", value: "128" },
+		{ label: "157克铜板纸", value: "157" },
 	],
 };
 
@@ -283,11 +283,11 @@ const searchConfig = [
 	},
 	{
 		label: "成品规格",
-		name: "printColor",
+		name: "spec",
 		component: "select",
 		options: {
 			placeholder: "请选择成品规格",
-			items: formConfigOptions["printColor"],
+			items: formConfigOptions["spec"],
 		},
 	},
 	{
@@ -345,9 +345,9 @@ const tableHeader = [
 	},
 	{
 		label: "成品规格",
-		name: "printColor",
+		name: "spec",
 		component: "select",
-		options: formConfigOptions["printColor"],
+		options: formConfigOptions["spec"],
 		table: true,
 		span: 6,
 	},
@@ -414,7 +414,7 @@ export default {
 			dialogTitle: "新增",
 			search: {
 				printNo: "",
-				printColor: "",
+				spec: "",
 				quantity: "",
 				paperType: "",
 				coverColor: "",
@@ -422,16 +422,16 @@ export default {
 				deliveryMethod: "",
 			},
 			formDetail: {
-				printColor: 1,
+				spec: "A4",
 				printArea: 1,
 				quantity: 1,
-				paperType: 1,
-				coverColor: 1,
-				innerColor: 1,
-				coverMaterial: 1,
-				coverProcess: 1,
-				bindingMethod: 1,
-				deliveryMethod: 1,
+				paperType: "80",
+				coverColor: "black",
+				innerColor: "black",
+				coverMaterial: "coatedPaper",
+				coverProcess: "no",
+				bindingMethod: "mount",
+				deliveryMethod: "self",
 				remarks: "",
 				customSize: "",
 			},
@@ -487,20 +487,9 @@ export default {
 			formConfig: [
 				{
 					label: "成品规格",
-					prop: "printColor",
+					prop: "spec",
 					type: "radio",
-					options: [
-						{ label: "A4", value: 1 },
-						{ label: "A3", value: 2 },
-						{ label: "A5", value: 3 },
-						{ label: "B4", value: 4 },
-						{ label: "16K", value: 5 },
-						{ label: "A2", value: 6 },
-						{ label: "A1", value: 7 },
-						{ label: "A0", value: 8 },
-						{ label: "8K", value: 9 },
-						{ label: "自定义尺寸", value: 0 },
-					],
+					options: formConfigOptions["spec"],
 				},
 				{
 					label: "文件页数",
@@ -542,9 +531,9 @@ export default {
 					prop: "coverMaterial",
 					type: "radio",
 					options: [
-						{ label: "铜板纸", value: 1 },
-						{ label: "特种纸", value: 2 },
-						{ label: "皮革纸", value: 3 },
+						{ label: "铜板纸", value: "coatedPaper" },
+						{ label: "特种纸", value: "specialPaper" },
+						{ label: "皮革纸", value: "stripedPaper" },
 					],
 				},
 				{
@@ -552,9 +541,9 @@ export default {
 					prop: "coverProcess",
 					type: "radio",
 					options: [
-						{ label: "不加膜", value: 1 },
-						{ label: "烫金", value: 2 },
-						{ label: "单面光膜", value: 3 },
+						{ label: "不加膜", value: "no" },
+						{ label: "烫金", value: "singleDummy" },
+						{ label: "单面光膜", value: "singleLight" },
 					],
 				},
 				{
@@ -562,8 +551,8 @@ export default {
 					prop: "bindingMethod",
 					type: "radio",
 					options: [
-						{ label: "骑马钉", value: 1 },
-						{ label: "胶装", value: 2 },
+						{ label: "骑马钉", value: "mount" },
+						{ label: "胶装", value: "glue" },
 					],
 				},
 				{
@@ -678,16 +667,16 @@ export default {
 		},
 		resetForm() {
 			this.formDetail = {
-				printColor: 1,
+				spec: "A4",
 				printArea: 1,
 				quantity: 1,
-				paperType: 1,
-				coverColor: 1,
-				innerColor: 1,
-				coverMaterial: 1,
-				coverProcess: 1,
-				bindingMethod: 1,
-				deliveryMethod: 1,
+				paperType: "80",
+				coverColor: "black",
+				innerColor: "black",
+				coverMaterial: "coatedPaper",
+				coverProcess: "no",
+				bindingMethod: "mount",
+				deliveryMethod: "self",
 				remarks: "",
 				customSize: "",
 			};

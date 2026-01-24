@@ -296,7 +296,7 @@ export default {
 				var res = await this.apiObj.post(reqData);
 			} catch (error) {
 				this.loading = false;
-				this.emptyText = error.statusText;
+				this.emptyText = error?.statusText;
 				return false;
 			}
 			try {

@@ -236,7 +236,7 @@ import { ElMessage } from "element-plus";
 // 从表单配置中提取选项数据
 const formConfigOptions = {
 	spec: [{ label: "A4", value: "A4" }],
-	paymentMethod: [
+	deliveryMethod: [
 		{ label: "自取", value: "自取" },
 		{ label: "送货上门", value: "送货上门" },
 		{ label: "快递到付", value: "快递到付" },
@@ -246,17 +246,17 @@ const formConfigOptions = {
 		{ label: "是", value: "是" },
 		{ label: "否", value: "否" },
 	],
-	originalPrintColor: [
-		{ label: "黑白", value: "黑白" },
-		{ label: "彩色", value: "彩色" },
-		{ label: "单面", value: "单面" },
-		{ label: "双面", value: "双面" },
+	originalColor: [
+		{ label: "黑白", value: "black" },
+		{ label: "彩色", value: "color" },
+		{ label: "单面", value: "single" },
+		{ label: "双面", value: "double" },
 	],
-	copyPrintColor: [
-		{ label: "黑白", value: "黑白" },
-		{ label: "彩色", value: "彩色" },
-		{ label: "单面", value: "单面" },
-		{ label: "双面", value: "双面" },
+	copyColor: [
+		{ label: "黑白", value: "black" },
+		{ label: "彩色", value: "color" },
+		{ label: "单面", value: "single" },
+		{ label: "双面", value: "double" },
 	],
 };
 
@@ -300,29 +300,29 @@ const searchConfig = [
 	},
 	{
 		label: "正本印色",
-		name: "originalPrintColor",
+		name: "originalColor",
 		component: "select",
 		options: {
 			placeholder: "请选择正本印色",
-			items: formConfigOptions["originalPrintColor"],
+			items: formConfigOptions["originalColor"],
 		},
 	},
 	{
 		label: "副本印色",
-		name: "copyPrintColor",
+		name: "copyColor",
 		component: "select",
 		options: {
 			placeholder: "请选择副本印色",
-			items: formConfigOptions["copyPrintColor"],
+			items: formConfigOptions["copyColor"],
 		},
 	},
 	{
-		label: "支付方式",
-		name: "paymentMethod",
+		label: "交付方式",
+		name: "deliveryMethod",
 		component: "select",
 		options: {
 			placeholder: "请选择支付方式",
-			items: formConfigOptions["paymentMethod"],
+			items: formConfigOptions["deliveryMethod"],
 		},
 	},
 ];
@@ -368,25 +368,25 @@ const tableHeader = [
 	},
 	{
 		label: "正本印色",
-		name: "originalPrintColor",
+		name: "originalColor",
 		component: "select",
-		options: formConfigOptions["originalPrintColor"],
+		options: formConfigOptions["originalColor"],
 		table: true,
 		span: 6,
 	},
 	{
 		label: "副本印色",
-		name: "copyPrintColor",
+		name: "copyColor",
 		component: "select",
-		options: formConfigOptions["copyPrintColor"],
+		options: formConfigOptions["copyColor"],
 		table: true,
 		span: 6,
 	},
 	{
-		label: "支付方式",
-		name: "paymentMethod",
+		label: "交付方式",
+		name: "deliveryMethod",
 		component: "select",
-		options: formConfigOptions["paymentMethod"],
+		options: formConfigOptions["deliveryMethod"],
 		table: true,
 		span: 6,
 	},
@@ -418,23 +418,24 @@ export default {
 				originalCount: "",
 				copyCopies: "",
 				isScan: "",
-				originalPrintColor: "",
-				copyPrintColor: "",
-				paymentMethod: "",
+				originalColor: "",
+				copyColor: "",
+				deliveryMethod: "",
 			},
 			formDetail: {
 				spec: "A4",
 				workflow: "先印正本",
 				originalCount: 1,
 				copyCopies: 1,
-				isScan: "否",
-				scanFile: 1,
-				originalPrintColor: 1,
-				copyPrintColor: 1,
-				coverColor: 1,
-				bindingMethod: 1,
-				deliveryTime: 1,
-				paymentMethod: 1,
+				isScan: "yes", // 改为选项值
+				scanFile: "send", // 改为选项值
+				originalColor: "black", // 改为选项值
+				copyColor: "black", // 改为选项值
+				coverColor: "white", // 改为选项值
+				bindingMethod: "glue", // 改为选项值
+				deliveryTime: "1", // 改为选项值
+				deliveryMethod: "自取", // 改为选项值
+				remarks: "",
 			},
 			rules: {
 				required: [{ required: true, message: "请填写" }],
@@ -521,8 +522,8 @@ export default {
 					prop: "isScan",
 					type: "radio",
 					options: [
-						{ label: "是", value: "是" },
-						{ label: "否", value: "否" },
+						{ label: "是", value: "yes" },
+						{ label: "否", value: "no" },
 					],
 				},
 				// 扫描文件
@@ -531,34 +532,24 @@ export default {
 					prop: "scanFile",
 					type: "radio",
 					options: [
-						{ label: "发送", value: "发送" },
-						{ label: "立即", value: "立即" },
-						{ label: "刻录光盘", value: "刻录光盘" },
+						{ label: "发送", value: "send" },
+						{ label: "U盘", value: "uDisk" },
+						{ label: "刻录光盘", value: "cd" },
 					],
 				},
 				// 正本印色
 				{
 					label: "正本印色",
-					prop: "originalPrintColor",
+					prop: "originalColor",
 					type: "radio",
-					options: [
-						{ label: "黑白", value: "黑白" },
-						{ label: "彩色", value: "彩色" },
-						{ label: "单面", value: "单面" },
-						{ label: "双面", value: "双面" },
-					],
+					options: formConfigOptions["originalColor"],
 				},
 				// 副本印色
 				{
 					label: "副本印色",
-					prop: "copyPrintColor",
+					prop: "copyColor",
 					type: "radio",
-					options: [
-						{ label: "黑白", value: "黑白" },
-						{ label: "彩色", value: "彩色" },
-						{ label: "单面", value: "单面" },
-						{ label: "双面", value: "双面" },
-					],
+					options: formConfigOptions["copyColor"],
 				},
 				// 封面颜色
 				{
@@ -566,13 +557,13 @@ export default {
 					prop: "coverColor",
 					type: "radio",
 					options: [
-						{ label: "白色", value: "白色" },
-						{ label: "大兰", value: "大兰" },
-						{ label: "深蓝", value: "深蓝" },
-						{ label: "浅绿", value: "浅绿" },
-						{ label: "浅黄", value: "浅黄" },
-						{ label: "大红", value: "大红" },
-						{ label: "透明封面", value: "透明封面" },
+						{ label: "白色", value: "white" },
+						{ label: "天兰", value: "skyBlue" },
+						{ label: "深蓝", value: "deepBlue" },
+						{ label: "浅绿", value: "lightGreen" },
+						{ label: "浅黄", value: "lightYellow" },
+						{ label: "大红", value: "red" },
+						{ label: "透明封面", value: "transparent" },
 					],
 				},
 				// 装订方式
@@ -581,9 +572,9 @@ export default {
 					prop: "bindingMethod",
 					type: "radio",
 					options: [
-						{ label: "胶装", value: "胶装" },
-						{ label: "夹条装", value: "夹条装" },
-						{ label: "铁圈装", value: "铁圈装" },
+						{ label: "胶装", value: "glue" },
+						{ label: "夹条装", value: "ribbon" },
+						{ label: "铁圈装", value: "iron" },
 					],
 				},
 				// 出货时效
@@ -592,22 +583,17 @@ export default {
 					prop: "deliveryTime",
 					type: "radio",
 					options: [
-						{ label: "1小时", value: "1小时" },
-						{ label: "2小时", value: "2小时" },
-						{ label: "4小时", value: "4小时" },
+						{ label: "1小时", value: "1" },
+						{ label: "2小时", value: "2" },
+						{ label: "4小时", value: "4" },
 					],
 				},
-				// 支付方式
+				// 交付方式
 				{
-					label: "支付方式",
-					prop: "paymentMethod",
+					label: "交付方式",
+					prop: "deliveryMethod",
 					type: "radio",
-					options: [
-						{ label: "自取", value: "自取" },
-						{ label: "送货上门", value: "送货上门" },
-						{ label: "快递到付", value: "快递到付" },
-						{ label: "快递寄付", value: "快递寄付" },
-					],
+					options: formConfigOptions["deliveryMethod"],
 				},
 			],
 		};
@@ -719,14 +705,14 @@ export default {
 				workflow: "先印正本",
 				originalCount: 1,
 				copyCopies: 1,
-				isScan: "否",
-				scanFile: 1,
-				originalPrintColor: 1,
-				copyPrintColor: 1,
-				coverColor: 1,
-				bindingMethod: 1,
-				deliveryTime: 1,
-				paymentMethod: 1,
+				isScan: "yes", // 改为选项值
+				scanFile: "send", // 改为选项值
+				originalColor: "black", // 改为选项值
+				copyColor: "black", // 改为选项值
+				coverColor: "white", // 改为选项值
+				bindingMethod: "glue", // 改为选项值
+				deliveryTime: "1", // 改为选项值
+				deliveryMethod: "自取", // 改为选项值
 				remarks: "",
 			};
 		},

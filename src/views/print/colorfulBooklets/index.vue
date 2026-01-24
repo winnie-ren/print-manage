@@ -237,40 +237,40 @@ import { ElMessage } from "element-plus";
 // 从表单配置中提取选项数据
 const formConfigOptions = {
 	spec: [
-		{ label: "A4", value: 1 },
-		{ label: "A3", value: 2 },
-		{ label: "A5", value: 3 },
-		{ label: "B4", value: 4 },
-		{ label: "16K", value: 5 },
-		{ label: "A2", value: 6 },
-		{ label: "A1", value: 7 },
-		{ label: "A0", value: 8 },
-		{ label: "8K", value: 9 },
+		{ label: "A4", value: "A4" },
+		{ label: "A3", value: "A3" },
+		{ label: "A5", value: "A5" },
+		{ label: "B4", value: "B4" },
+		{ label: "16K", value: "16K" },
+		{ label: "A2", value: "A2" },
+		{ label: "A1", value: "A1" },
+		{ label: "A0", value: "A0" },
+		{ label: "8K", value: "8K" },
 		{ label: "自定义尺寸", value: 0 },
 	],
 	deliveryMethod: [
-		{ label: "自取", value: 1 },
-		{ label: "送货上门", value: 2 },
-		{ label: "快递到付", value: 3 },
-		{ label: "快递寄付", value: 4 },
+		{ label: "自取", value: "self" },
+		{ label: "送货上门", value: "delivery" },
+		{ label: "快递", value: "express" },
+		{ label: "到店取货", value: "pickupStore" },
 	],
 	paperType: [
-		{ label: "80克双胶纸", value: 1 },
-		{ label: "100克双胶纸", value: 2 },
-		{ label: "128克铜板纸", value: 3 },
-		{ label: "157克铜板纸", value: 4 },
+		{ label: "80克双胶纸", value: "80" },
+		{ label: "100克双胶纸", value: "100" },
+		{ label: "128克铜版纸", value: "128" },
+		{ label: "157克铜板纸", value: "157" },
 	],
 	coverColor: [
-		{ label: "黑白", value: 1 },
-		{ label: "彩色", value: 2 },
-		{ label: "单面", value: 3 },
-		{ label: "双面", value: 4 },
+		{ label: "黑白", value: "black" },
+		{ label: "彩色", value: "color" },
+		{ label: "单色", value: "single" },
+		{ label: "全彩", value: "fullColor" },
 	],
 	innerColor: [
-		{ label: "黑白", value: 1 },
-		{ label: "彩色", value: 2 },
-		{ label: "单面", value: 3 },
-		{ label: "双面", value: 4 },
+		{ label: "黑白", value: "black" },
+		{ label: "彩色", value: "color" },
+		{ label: "单色", value: "single" },
+		{ label: "全彩", value: "fullColor" },
 	],
 };
 
@@ -423,16 +423,16 @@ export default {
 				deliveryMethod: "",
 			},
 			formDetail: {
-				spec: 1,
-				pageCount: 1,
-				quantity: 1,
-				paperType: 1,
-				coverColor: 1,
-				innerColor: 1,
-				coverMaterial: 1,
-				coverProcess: 1,
-				bindingMethod: 1,
-				deliveryMethod: 1,
+				spec: "A4", // 默认成品规格为 A4
+				pageCount: 1, // 默认文件页数为 100
+				quantity: 1, // 默认份数为 1
+				paperType: "80", // 默认纸张为 80克双胶纸
+				coverColor: "black", // 默认封面印色为黑白
+				innerColor: "black", // 默认内页印色为黑白
+				coverMaterial: "coatedPaper", // 默认封面材质为铜板纸
+				coverProcess: "no", // 默认封面工艺为不加膜
+				bindingMethod: "mount", // 默认装订方式为胶装
+				deliveryMethod: "self", // 默认交付方式为自取
 				remarks: "",
 				customSize: "",
 			},
@@ -490,18 +490,7 @@ export default {
 					label: "成品规格",
 					prop: "spec",
 					type: "radio",
-					options: [
-						{ label: "A4", value: 1 },
-						{ label: "A3", value: 2 },
-						{ label: "A5", value: 3 },
-						{ label: "B4", value: 4 },
-						{ label: "16K", value: 5 },
-						{ label: "A2", value: 6 },
-						{ label: "A1", value: 7 },
-						{ label: "A0", value: 8 },
-						{ label: "8K", value: 9 },
-						{ label: "自定义尺寸", value: 0 },
-					],
+					options: formConfigOptions["spec"],
 				},
 				{
 					label: "文件页数",
@@ -524,43 +513,28 @@ export default {
 					label: "纸张",
 					prop: "paperType",
 					type: "radio",
-					options: [
-						{ label: "80克双胶纸", value: 1 },
-						{ label: "100克双胶纸", value: 2 },
-						{ label: "128克铜板纸", value: 3 },
-						{ label: "157克铜板纸", value: 4 },
-					],
+					options: formConfigOptions["paperType"],
 				},
 				{
 					label: "封面印色",
 					prop: "coverColor",
 					type: "radio",
-					options: [
-						{ label: "黑白", value: 1 },
-						{ label: "彩色", value: 2 },
-						{ label: "单面", value: 3 },
-						{ label: "双面", value: 4 },
-					],
+					options: formConfigOptions["coverColor"],
 				},
 				{
 					label: "内页印色",
 					prop: "innerColor",
 					type: "radio",
-					options: [
-						{ label: "黑白", value: 1 },
-						{ label: "彩色", value: 2 },
-						{ label: "单面", value: 3 },
-						{ label: "双面", value: 4 },
-					],
+					options: formConfigOptions["innerColor"],
 				},
 				{
 					label: "封面材质",
 					prop: "coverMaterial",
 					type: "radio",
 					options: [
-						{ label: "铜板纸", value: 1 },
-						{ label: "特种纸", value: 2 },
-						{ label: "皮革纸", value: 3 },
+						{ label: "铜板纸", value: "coatedPaper" },
+						{ label: "特种纸", value: "specialPaper" },
+						{ label: "皮革纸", value: "stripedPaper" },
 					],
 				},
 				{
@@ -568,9 +542,9 @@ export default {
 					prop: "coverProcess",
 					type: "radio",
 					options: [
-						{ label: "不加膜", value: 1 },
-						{ label: "单面哑膜", value: 2 },
-						{ label: "单面光膜", value: 3 },
+						{ label: "不加膜", value: "no" },
+						{ label: "单面哑膜", value: "singleMatteFilm" },
+						{ label: "单面光膜", value: "singleLight" },
 					],
 				},
 				{
@@ -578,20 +552,15 @@ export default {
 					prop: "bindingMethod",
 					type: "radio",
 					options: [
-						{ label: "骑马钉", value: 1 },
-						{ label: "胶装", value: 2 },
+						{ label: "骑马钉", value: "mount" },
+						{ label: "胶装", value: "glue" },
 					],
 				},
 				{
 					label: "交付方式",
 					prop: "deliveryMethod",
 					type: "radio",
-					options: [
-						{ label: "自取", value: 1 },
-						{ label: "送货上门", value: 2 },
-						{ label: "快递到付", value: 3 },
-						{ label: "快递寄付", value: 4 },
-					],
+					options: formConfigOptions["deliveryMethod"],
 				},
 			],
 		};
@@ -699,16 +668,16 @@ export default {
 		},
 		resetForm() {
 			this.formDetail = {
-				spec: 1,
-				pageCount: 1,
-				quantity: 1,
-				paperType: 1,
-				coverColor: 1,
-				innerColor: 1,
-				coverMaterial: 1,
-				coverProcess: 1,
-				bindingMethod: 1,
-				deliveryMethod: 1,
+				spec: "A4", // 默认成品规格为 A4
+				pageCount: 1, // 默认文件页数为 100
+				quantity: 1, // 默认份数为 1
+				paperType: "80", // 默认纸张为 80克双胶纸
+				coverColor: "black", // 默认封面印色为黑白
+				innerColor: "black", // 默认内页印色为黑白
+				coverMaterial: "coatedPaper", // 默认封面材质为铜板纸
+				coverProcess: "no", // 默认封面工艺为不加膜
+				bindingMethod: "mount", // 默认装订方式为胶装
+				deliveryMethod: "self", // 默认交付方式为自取
 				remarks: "",
 				customSize: "",
 			};

@@ -29,20 +29,20 @@
 					>
 						<el-form-item
 							v-for="item in singleFormConfig"
-							:key="item.prop"
+							:key="item.value"
 							:label="item.label"
 						>
 							<el-row :gutter="20">
 								<el-col
 									v-for="sItem in item.children"
-									:key="sItem.prop"
+									:key="sItem.value"
 									:span="6"
 								>
 									<el-form-item :label="sItem.label">
 										<el-input-number
 											v-model.number="
 												singleForm[
-													`${item.prop}_${sItem.prop}`
+													`${item.value}_${sItem.value}`
 												]
 											"
 											:min="0"
@@ -118,13 +118,13 @@
 					>
 						<el-form-item
 							v-for="item in blackBookFormConfig"
-							:key="item.prop"
+							:key="item.value"
 							:label="item.label"
 						>
 							<el-row :gutter="20">
 								<el-col
 									v-for="sItem in item.children"
-									:key="sItem.prop"
+									:key="sItem.value"
 									:span="6"
 								>
 									<el-form-item
@@ -134,7 +134,7 @@
 										<el-input-number
 											v-model.number="
 												blackForm[
-													`${item.prop}_${sItem.prop}`
+													`${item.value}_${sItem.value}`
 												]
 											"
 											:min="0"
@@ -160,13 +160,13 @@
 					>
 						<el-form-item
 							v-for="item in blackBookFormConfig"
-							:key="item.prop"
+							:key="item.value"
 							:label="item.label"
 						>
 							<el-row :gutter="20">
 								<el-col
 									v-for="sItem in item.children"
-									:key="sItem.prop"
+									:key="sItem.value"
 									:span="6"
 								>
 									<el-form-item
@@ -176,7 +176,7 @@
 										<el-input-number
 											v-model.number="
 												colorForm[
-													`${item.prop}_${sItem.prop}`
+													`${item.value}_${sItem.value}`
 												]
 											"
 											:min="0"
@@ -202,13 +202,13 @@
 					>
 						<el-form-item
 							v-for="item in specialFormConfig"
-							:key="item.prop"
+							:key="item.value"
 							:label="item.label"
 						>
 							<el-row :gutter="20">
 								<el-col
 									v-for="sItem in item.children"
-									:key="sItem.prop"
+									:key="sItem.value"
 									:span="6"
 								>
 									<el-form-item
@@ -218,7 +218,7 @@
 										<el-input-number
 											v-model.number="
 												specialForm[
-													`${item.prop}_${sItem.prop}`
+													`${item.value}_${sItem.value}`
 												]
 											"
 											:min="0"
