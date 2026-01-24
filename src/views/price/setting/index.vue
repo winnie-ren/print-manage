@@ -1,7 +1,7 @@
 <template>
 	<common-list-page
 		ref="commonListPage"
-		:api-obj="$API.menu.userPage"
+		:api-obj="$API.price.pricePage"
 		:search-config="searchConfig"
 		:table-columns="tableColumns"
 		:form-config="{}"
@@ -314,10 +314,10 @@ export default {
 		];
 		// API 方法
 		const deleteMenu = async (ids) => {
-			return await $API.menu.userDelete.delete(ids);
+			return await $API.price.priceDelete.delete(ids);
 		};
 		const saveMenu = async (data) => {
-			return await $API.menu.userSave.post(data);
+			return await $API.price.priceSave.post(data);
 		};
 		// 事件处理
 		const handleAdd = () => {
@@ -456,10 +456,10 @@ export default {
 		}
 		const handleSubmit = () => {
 			const params = {
-				single: singleForm.value,
-				blackWhite: blackForm.value,
-				color: colorForm.value,
-				special: specialForm.value,
+				printSinglePage: singleForm.value,
+				printBlackBook: blackForm.value,
+				printColor: colorForm.value,
+				printBlackBookService: specialForm.value,
 			};
 			console.log("保存配置:", params);
 			// 这里可以调用 API 保存
