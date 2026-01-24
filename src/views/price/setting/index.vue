@@ -15,231 +15,229 @@
 		@view="handleView"
 		@submit="handleSubmit"
 	>
-		<div>
-			<el-tabs v-model="activeName" @tab-click="handleClick">
-				<el-tab-pane label="单张" name="first">
-					<div class="config-container">
-						<el-form
-							:model="singleForm"
-							label-width="100px"
-							style="margin: 10px 0"
+		<el-tabs
+			v-model="activeName"
+			@tab-click="handleClick"
+			class="tab-container"
+		>
+			<el-tab-pane label="单张" name="first">
+				<div class="config-container">
+					<el-form
+						:model="singleForm"
+						label-width="100px"
+						style="margin: 10px 0"
+					>
+						<el-form-item
+							v-for="item in singleFormConfig"
+							:key="item.prop"
+							:label="item.label"
 						>
-							<el-form-item
-								v-for="item in singleFormConfig"
-								:key="item.prop"
-								:label="item.label"
-							>
-								<el-row :gutter="20">
-									<el-col
-										v-for="sItem in item.children"
-										:key="sItem.prop"
-										:span="6"
-									>
-										<el-form-item :label="sItem.label">
-											<el-input-number
-												v-model.number="
-													singleForm[
-														`${item.prop}_${sItem.prop}`
-													]
-												"
-												:min="0"
-												step="0.01"
-												precision="2"
-												controls-position="right"
-												placeholder="请输入"
-												style="width: 100%"
-											/>
-										</el-form-item>
-									</el-col>
-								</el-row>
+							<el-row :gutter="20">
+								<el-col
+									v-for="sItem in item.children"
+									:key="sItem.prop"
+									:span="6"
+								>
+									<el-form-item :label="sItem.label">
+										<el-input-number
+											v-model.number="
+												singleForm[
+													`${item.prop}_${sItem.prop}`
+												]
+											"
+											:min="0"
+											step="0.01"
+											precision="2"
+											controls-position="right"
+											placeholder="请输入"
+											style="width: 100%"
+										/>
+									</el-form-item>
+								</el-col>
+							</el-row>
+						</el-form-item>
+					</el-form>
+					<div class="form-columns">
+						<el-form
+							v-for="group in materialData"
+							:key="`${group.material}_${group.weight}_${group.color}`"
+							:model="group"
+							label-width="45px"
+						>
+							<el-form-item label="材料">
+								<span>{{
+									materialConfig[group.material]
+								}}</span>
 							</el-form-item>
-						</el-form>
-						<div class="form-columns">
-							<el-form
-								v-for="group in materialData"
-								:key="`${group.material}_${group.weight}_${group.color}`"
-								:model="group"
-								label-width="45px"
-							>
-								<el-form-item label="材料">
-									<span>{{
-										materialConfig[group.material]
-									}}</span>
-								</el-form-item>
 
-								<el-form-item label="克重">
-									<span>{{
-										weightConfig[group.weight]
-									}}</span>
-								</el-form-item>
+							<el-form-item label="克重">
+								<span>{{ weightConfig[group.weight] }}</span>
+							</el-form-item>
 
-								<el-form-item label="黑白">
-									<el-input-number
-										v-model.number="
-											singleForm[
-												`${group.material}_${group.weight}_black`
-											]
-										"
-										:min="0"
-										step="0.01"
-										precision="2"
-										controls-position="right"
-										placeholder="请输入"
-										style="width: 100%"
-									/>
-								</el-form-item>
+							<el-form-item label="黑白">
+								<el-input-number
+									v-model.number="
+										singleForm[
+											`${group.material}_${group.weight}_black`
+										]
+									"
+									:min="0"
+									step="0.01"
+									precision="2"
+									controls-position="right"
+									placeholder="请输入"
+									style="width: 100%"
+								/>
+							</el-form-item>
 
-								<el-form-item label="彩色">
-									<el-input-number
-										v-model.number="
-											singleForm[
-												`${group.material}_${group.weight}_color`
-											]
-										"
-										:min="0"
-										step="0.01"
-										precision="2"
-										controls-position="right"
-										placeholder="请输入"
-										style="width: 100%"
-									/>
-								</el-form-item>
-							</el-form>
-						</div>
-					</div>
-				</el-tab-pane>
-				<el-tab-pane label="黑白书册" name="second">
-					<div class="config-container">
-						<el-form
-							:model="blackForm"
-							label-width="100px"
-							style="margin: 10px 0"
-						>
-							<el-form-item
-								v-for="item in blackBookFormConfig"
-								:key="item.prop"
-								:label="item.label"
-							>
-								<el-row :gutter="20">
-									<el-col
-										v-for="sItem in item.children"
-										:key="sItem.prop"
-										:span="6"
-									>
-										<el-form-item
-											:label="sItem.label"
-											style="margin-bottom: 0"
-										>
-											<el-input-number
-												v-model.number="
-													blackForm[
-														`${item.prop}_${sItem.prop}`
-													]
-												"
-												:min="0"
-												step="0.01"
-												precision="2"
-												controls-position="right"
-												placeholder="请输入"
-												style="width: 100%"
-											/>
-										</el-form-item>
-									</el-col>
-								</el-row>
+							<el-form-item label="彩色">
+								<el-input-number
+									v-model.number="
+										singleForm[
+											`${group.material}_${group.weight}_color`
+										]
+									"
+									:min="0"
+									step="0.01"
+									precision="2"
+									controls-position="right"
+									placeholder="请输入"
+									style="width: 100%"
+								/>
 							</el-form-item>
 						</el-form>
 					</div>
-				</el-tab-pane>
-				<el-tab-pane label="彩色书册" name="third">
-					<div class="config-container">
-						<el-form
-							:model="colorForm"
-							label-width="100px"
-							style="margin: 10px 0"
+				</div>
+			</el-tab-pane>
+			<el-tab-pane label="黑白书册" name="second">
+				<div class="config-container">
+					<el-form
+						:model="blackForm"
+						label-width="100px"
+						style="margin: 10px 0"
+					>
+						<el-form-item
+							v-for="item in blackBookFormConfig"
+							:key="item.prop"
+							:label="item.label"
 						>
-							<el-form-item
-								v-for="item in blackBookFormConfig"
-								:key="item.prop"
-								:label="item.label"
-							>
-								<el-row :gutter="20">
-									<el-col
-										v-for="sItem in item.children"
-										:key="sItem.prop"
-										:span="6"
+							<el-row :gutter="20">
+								<el-col
+									v-for="sItem in item.children"
+									:key="sItem.prop"
+									:span="6"
+								>
+									<el-form-item
+										:label="sItem.label"
+										style="margin-bottom: 0"
 									>
-										<el-form-item
-											:label="sItem.label"
-											style="margin-bottom: 0"
-										>
-											<el-input-number
-												v-model.number="
-													colorForm[
-														`${item.prop}_${sItem.prop}`
-													]
-												"
-												:min="0"
-												step="0.01"
-												precision="2"
-												controls-position="right"
-												placeholder="请输入"
-												style="width: 100%"
-											/>
-										</el-form-item>
-									</el-col>
-								</el-row>
-							</el-form-item>
-						</el-form>
-					</div>
-				</el-tab-pane>
-				<el-tab-pane label="标书专项" name="fourth">
-					<div class="config-container">
-						<el-form
-							:model="specialForm"
-							label-width="100px"
-							style="margin: 10px 0"
+										<el-input-number
+											v-model.number="
+												blackForm[
+													`${item.prop}_${sItem.prop}`
+												]
+											"
+											:min="0"
+											step="0.01"
+											precision="2"
+											controls-position="right"
+											placeholder="请输入"
+											style="width: 100%"
+										/>
+									</el-form-item>
+								</el-col>
+							</el-row>
+						</el-form-item>
+					</el-form>
+				</div>
+			</el-tab-pane>
+			<el-tab-pane label="彩色书册" name="third">
+				<div class="config-container">
+					<el-form
+						:model="colorForm"
+						label-width="100px"
+						style="margin: 10px 0"
+					>
+						<el-form-item
+							v-for="item in blackBookFormConfig"
+							:key="item.prop"
+							:label="item.label"
 						>
-							<el-form-item
-								v-for="item in specialFormConfig"
-								:key="item.prop"
-								:label="item.label"
-							>
-								<el-row :gutter="20">
-									<el-col
-										v-for="sItem in item.children"
-										:key="sItem.prop"
-										:span="6"
+							<el-row :gutter="20">
+								<el-col
+									v-for="sItem in item.children"
+									:key="sItem.prop"
+									:span="6"
+								>
+									<el-form-item
+										:label="sItem.label"
+										style="margin-bottom: 0"
 									>
-										<el-form-item
-											:label="sItem.label"
-											style="margin-bottom: 0"
-										>
-											<el-input-number
-												v-model.number="
-													specialForm[
-														`${item.prop}_${sItem.prop}`
-													]
-												"
-												:min="0"
-												step="0.01"
-												precision="2"
-												controls-position="right"
-												placeholder="请输入"
-												style="width: 100%"
-											/>
-										</el-form-item>
-									</el-col>
-								</el-row>
-							</el-form-item>
-						</el-form>
-					</div>
-				</el-tab-pane>
-			</el-tabs>
-			<div class="footer-btn">
-				<el-button type="primary" @click="handleSubmit()"
-					>提交</el-button
-				>
-			</div>
+										<el-input-number
+											v-model.number="
+												colorForm[
+													`${item.prop}_${sItem.prop}`
+												]
+											"
+											:min="0"
+											step="0.01"
+											precision="2"
+											controls-position="right"
+											placeholder="请输入"
+											style="width: 100%"
+										/>
+									</el-form-item>
+								</el-col>
+							</el-row>
+						</el-form-item>
+					</el-form>
+				</div>
+			</el-tab-pane>
+			<el-tab-pane label="标书专项" name="fourth">
+				<div class="config-container">
+					<el-form
+						:model="specialForm"
+						label-width="100px"
+						style="margin: 10px 0"
+					>
+						<el-form-item
+							v-for="item in specialFormConfig"
+							:key="item.prop"
+							:label="item.label"
+						>
+							<el-row :gutter="20">
+								<el-col
+									v-for="sItem in item.children"
+									:key="sItem.prop"
+									:span="6"
+								>
+									<el-form-item
+										:label="sItem.label"
+										style="margin-bottom: 0"
+									>
+										<el-input-number
+											v-model.number="
+												specialForm[
+													`${item.prop}_${sItem.prop}`
+												]
+											"
+											:min="0"
+											step="0.01"
+											precision="2"
+											controls-position="right"
+											placeholder="请输入"
+											style="width: 100%"
+										/>
+									</el-form-item>
+								</el-col>
+							</el-row>
+						</el-form-item>
+					</el-form>
+				</div>
+			</el-tab-pane>
+		</el-tabs>
+		<div class="footer-btn">
+			<el-button type="primary" @click="handleSubmit()"> 提交 </el-button>
 		</div>
 	</common-list-page>
 </template>
@@ -492,6 +490,18 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.tab-container {
+	height: calc(100% - 41px);
+	overflow: hidden;
+	:deep(.el-tabs__content) {
+		height: calc(100% - 60px);
+		overflow: auto;
+	}
+}
+.footer-btn {
+	padding-top: 8px;
+	border-top: 1px solid #eeeeee;
+}
 .form-columns {
 	display: flex;
 	flex-wrap: wrap;
