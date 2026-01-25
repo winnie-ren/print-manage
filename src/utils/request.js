@@ -37,7 +37,7 @@ axios.interceptors.response.use(
 		if (![0, 200].includes(data.code)) {
 			ElNotification.error({
 				title: '请求失败',
-				message: data.msg || `Status:${response.status}，未知错误！`
+				message: data?.msg || `未知错误！`
 			});
 			if ([-100000001].includes(data.code)) {
 				router.replace({ path: '/login' });

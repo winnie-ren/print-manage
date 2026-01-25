@@ -194,16 +194,55 @@
 						<el-form-item label="文件上传" prop="files">
 							<el-upload
 								class="upload-demo"
-								drag
-								action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+								:auto-upload="false"
+								:show-file-list="true"
+								:on-change="handleFileChange"
+								:http-request="customUpload"
 								multiple
+								drag
 								style="flex: 1"
 							>
-								<el-icon size="80" color="#ffaf58"
-									><upload-filled
-								/></el-icon>
+								<el-icon size="80" color="#ffaf58">
+									<upload-filled />
+								</el-icon>
 								<div class="el-upload__text">
 									请将文件拖到此处或 <em>点击上传</em>
+								</div>
+								<!-- 显示上传进度 -->
+								<div
+									v-for="(fileInfo, index) in fileList"
+									:key="index"
+									class="progress-info"
+								>
+									<div class="file-name">
+										{{ fileInfo.name }}
+									</div>
+									<el-progress
+										:percentage="fileInfo.progress"
+									/>
+									<div class="progress-text">
+										<el-button
+											v-if="
+												fileInfo.status === 'uploading'
+											"
+											@click="pauseUpload(fileInfo)"
+											type="info"
+											size="small"
+										>
+											暂停
+										</el-button>
+										<el-button
+											v-else-if="
+												fileInfo.status === 'paused'
+											"
+											@click="resumeUpload(fileInfo)"
+											type="primary"
+											size="small"
+										>
+											继续
+										</el-button>
+										<span>{{ fileInfo.statusText }}</span>
+									</div>
 								</div>
 							</el-upload>
 						</el-form-item>
@@ -238,7 +277,7 @@
 <script>
 import { UploadFilled } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-
+import SparkMD5 from "spark-md5";
 // 从表单配置中提取选项数据
 const formConfigOptions = [
 	{
@@ -396,6 +435,8 @@ export default {
 	},
 	data() {
 		return {
+			fileList: [], // 文件列表
+			chunkSize: 2 * 1024 * 1024, // 2MB 分片大小
 			list: {
 				apiObj: this.$API.print.singlePage,
 			},
@@ -634,6 +675,257 @@ export default {
 				ElMessage.error(res.message || "操作失败");
 			}
 		},
+		async buyNow() {
+			const res = await this.$API.print.singleSave.post(this.formDetail);
+			if (res.code === 0 && res.data) {
+				if (this.formDetail.payType === "ALIPAY") {
+					// 调用支付宝统一收单下单并支付页面接口
+					// 将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
+					document.write(res.data);
+				}
+			}
+		},
+		// 处理文件变化
+		handleFileChange(file) {
+			// 创建文件信息对象
+			const fileInfo = {
+				raw: file.raw,
+				name: file.name,
+				uid: file.uid,
+				progress: 0,
+				status: "pending", // pending, uploading, paused, completed, error
+				statusText: "等待上传",
+				chunks: [],
+				uploadedChunks: [],
+			};
+
+			// 检查是否已有相同的文件信息
+			const existingIndex = this.fileList.findIndex(
+				(f) => f.uid === file.uid
+			);
+			if (existingIndex === -1) {
+				this.fileList.push(fileInfo);
+			}
+
+			// 开始上传文件
+			this.startUpload(fileInfo);
+		},
+		// 开始上传文件
+		async startUpload(fileInfo) {
+			try {
+				// 计算文件MD5
+				fileInfo.status = "calculating";
+				fileInfo.statusText = "计算文件MD5...";
+				fileInfo.fileMd5 = await this.calculateFileMd5(fileInfo.raw);
+
+				// 检查文件是否已存在
+				const checkRes = await this.$API.file.check.get({
+					fileMD5: fileInfo.fileMd5,
+				});
+				if (!checkRes) {
+					return
+				}
+				if (checkRes.code === 0 && checkRes.data.exists) {
+					// 文件已存在，直接完成
+					fileInfo.progress = 100;
+					fileInfo.status = "completed";
+					fileInfo.statusText = "文件已存在";
+					this.$message.success(`文件 ${fileInfo.name} 已存在`);
+					return;
+				}
+
+				// 初始化分片上传
+				fileInfo.status = "initializing";
+				fileInfo.statusText = "初始化上传...";
+				const initRes = await this.$API.file.init.post({
+					fileName: fileInfo.name,
+					fileSize: fileInfo.raw.size,
+					chunkSize: this.chunkSize,
+					fileMd5: fileInfo.fileMd5,
+				});
+
+				if (initRes.code !== 0) {
+					throw new Error(initRes.message || "初始化失败");
+				}
+
+				// 开始分片上传
+				await this.uploadFileChunks(fileInfo);
+			} catch (error) {
+				fileInfo.status = "error";
+				fileInfo.statusText = "上传失败";
+				this.$message.error(
+					`文件 ${fileInfo.name} 上传失败: ${error.message}`
+				);
+			}
+		},
+		// 计算文件MD5
+		calculateFileMd5(file) {
+			return new Promise((resolve, reject) => {
+				const blobSlice =
+					File.prototype.slice ||
+					File.prototype.mozSlice ||
+					File.prototype.webkitSlice;
+				const chunkSize = 2097152; // 2MB
+				const chunks = Math.ceil(file.size / chunkSize);
+				let currentChunk = 0;
+				const spark = new SparkMD5.ArrayBuffer();
+				const fileReader = new FileReader();
+
+				fileReader.onload = (e) => {
+					spark.append(e.target.result); // Append array buffer
+					currentChunk++;
+
+					if (currentChunk < chunks) {
+						loadNext();
+					} else {
+						resolve(spark.end());
+					}
+				};
+
+				fileReader.onerror = () => {
+					reject(new Error("读取文件失败"));
+				};
+
+				const loadNext = () => {
+					const start = currentChunk * chunkSize;
+					const end =
+						start + chunkSize >= file.size
+							? file.size
+							: start + chunkSize;
+
+					fileReader.readAsArrayBuffer(
+						blobSlice.call(file, start, end)
+					);
+				};
+
+				loadNext();
+			});
+		},
+		// 上传文件分片
+		async uploadFileChunks(fileInfo) {
+			const chunks = Math.ceil(fileInfo.raw.size / this.chunkSize);
+			fileInfo.chunks = Array.from({ length: chunks }, (_, i) => i);
+			fileInfo.uploadedChunks = [];
+
+			// 检查已上传的分片
+			const checkRes = await this.$API.file.check.get({
+				fileMD5: fileInfo.fileMd5,
+			});
+			if (checkRes.code === 0 && checkRes.data.uploadedChunks) {
+				fileInfo.uploadedChunks = checkRes.data.uploadedChunks;
+			}
+
+			fileInfo.status = "uploading";
+			fileInfo.statusText = "上传中...";
+
+			// 上传每个分片
+			for (let i = 0; i < chunks; i++) {
+				// 如果已上传则跳过
+				if (fileInfo.uploadedChunks.includes(i)) {
+					continue;
+				}
+
+				// 检查是否暂停
+				if (fileInfo.status === "paused") {
+					fileInfo.statusText = "已暂停";
+					return;
+				}
+
+				try {
+					const start = i * this.chunkSize;
+					const end = Math.min(
+						start + this.chunkSize,
+						fileInfo.raw.size
+					);
+					const chunk = fileInfo.raw.slice(start, end);
+
+					const formData = new FormData();
+					formData.append("chunk", chunk);
+					formData.append("chunkIndex", i);
+					formData.append("totalChunks", chunks);
+					formData.append("fileMd5", fileInfo.fileMd5);
+					formData.append("fileName", fileInfo.name);
+
+					const res = await this.$API.file.uploadScreenshot.post(
+						formData
+					);
+
+					if (res.code === 0) {
+						fileInfo.uploadedChunks.push(i);
+
+						// 更新进度
+						const progress = Math.round(
+							(fileInfo.uploadedChunks.length / chunks) * 100
+						);
+						fileInfo.progress = progress;
+						fileInfo.statusText = `上传中... ${progress}%`;
+					} else {
+						throw new Error(res.message || "分片上传失败");
+					}
+				} catch (error) {
+					fileInfo.status = "error";
+					fileInfo.statusText = "上传失败";
+					this.$message.error(
+						`分片 ${i + 1} 上传失败: ${error.message}`
+					);
+					return;
+				}
+			}
+			// 合并文件
+			await this.mergeFile(fileInfo);
+		},
+		// 合并文件
+		async mergeFile(fileInfo) {
+			try {
+				const res = await this.$API.file.merge.post({
+					fileMd5: fileInfo.fileMd5,
+					fileName: fileInfo.name,
+					totalChunks: fileInfo.chunks.length,
+				});
+
+				if (res.code === 0) {
+					fileInfo.status = "completed";
+					fileInfo.statusText = "上传完成";
+					fileInfo.progress = 100;
+					this.$message.success(`文件 ${fileInfo.name} 上传成功`);
+
+					// 将文件信息保存到表单
+					if (!this.formDetail.files) {
+						this.formDetail.files = [];
+					}
+					this.formDetail.files.push({
+						name: fileInfo.name,
+						url: res.data.url, // 假设后端返回文件URL
+						md5: fileInfo.fileMd5,
+					});
+				} else {
+					throw new Error(res.message || "合并失败");
+				}
+			} catch (error) {
+				fileInfo.status = "error";
+				fileInfo.statusText = "合并失败";
+				this.$message.error(
+					`文件 ${fileInfo.name} 合并失败: ${error.message}`
+				);
+			}
+		},
+		// 暂停上传
+		pauseUpload(fileInfo) {
+			if (fileInfo.status === "uploading") {
+				fileInfo.status = "paused";
+			}
+		},
+		// 继续上传
+		resumeUpload(fileInfo) {
+			if (fileInfo.status === "paused") {
+				this.startUpload(fileInfo);
+			}
+		},
+		// 自定义上传方法（拦截默认上传）
+		customUpload() {
+			// 此方法被定义以防止默认上传行为，实际上传在 handleFileChange 中处理
+		},
+		// 重置表单时清空文件列表
 		resetForm() {
 			this.formDetail = {
 				printColor: "blackWhite",
@@ -646,17 +938,9 @@ export default {
 				deliveryMethod: "自取",
 				payType: "ALIPAY",
 				remarks: "",
+				files: [], // 添加文件数组
 			};
-		},
-		async buyNow() {
-			const res = await this.$API.print.singleSave.post(this.formDetail);
-			if (res.code === 0 && res.data) {
-				if (this.formDetail.payType === "ALIPAY") {
-					// 调用支付宝统一收单下单并支付页面接口
-					// 将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
-					document.write(res.data);
-				}
-			}
+			this.fileList = []; // 清空文件列表
 		},
 	},
 };
