@@ -232,48 +232,9 @@
 
 <script>
 import { UploadFilled } from "@element-plus/icons-vue";
-import { ElMessage } from "element-plus";
-
 // 从表单配置中提取选项数据
-const formConfigOptions = {
-	spec: [
-		{ label: "A4", value: "A4" },
-		{ label: "A3", value: "A3" },
-		{ label: "A5", value: "A5" },
-		{ label: "B4", value: "B4" },
-		{ label: "16K", value: "16K" },
-		{ label: "A2", value: "A2" },
-		{ label: "A1", value: "A1" },
-		{ label: "A0", value: "A0" },
-		{ label: "8K", value: "8K" },
-		{ label: "自定义尺寸", value: 0 },
-	],
-	deliveryMethod: [
-		{ label: "自取", value: "self" },
-		{ label: "送货上门", value: "delivery" },
-		{ label: "快递", value: "express" },
-		{ label: "到店取货", value: "pickupStore" },
-	],
-	paperType: [
-		{ label: "80克双胶纸", value: "80" },
-		{ label: "100克双胶纸", value: "100" },
-		{ label: "128克铜版纸", value: "128" },
-		{ label: "157克铜板纸", value: "157" },
-	],
-	coverColor: [
-		{ label: "黑白", value: "black" },
-		{ label: "彩色", value: "color" },
-		{ label: "单色", value: "single" },
-		{ label: "全彩", value: "fullColor" },
-	],
-	innerColor: [
-		{ label: "黑白", value: "black" },
-		{ label: "彩色", value: "color" },
-		{ label: "单色", value: "single" },
-		{ label: "全彩", value: "fullColor" },
-	],
-};
-
+import { formConfigOptions } from "@/views/price/config/index.ts";
+import { ElMessage } from "element-plus";
 // 搜索配置
 const searchConfig = [
 	{
@@ -426,7 +387,7 @@ export default {
 				spec: "A4", // 默认成品规格为 A4
 				pageCount: 1, // 默认文件页数为 100
 				quantity: 1, // 默认份数为 1
-				paperType: "80", // 默认纸张为 80克双胶纸
+				paperType: "twoSidePaper_80", // 默认纸张为 80克双胶纸
 				coverColor: "black", // 默认封面印色为黑白
 				innerColor: "black", // 默认内页印色为黑白
 				coverMaterial: "coatedPaper", // 默认封面材质为铜板纸
@@ -531,30 +492,19 @@ export default {
 					label: "封面材质",
 					prop: "coverMaterial",
 					type: "radio",
-					options: [
-						{ label: "铜板纸", value: "coatedPaper" },
-						{ label: "特种纸", value: "specialPaper" },
-						{ label: "皮革纸", value: "stripedPaper" },
-					],
+					options: formConfigOptions["coverMaterial"],
 				},
 				{
 					label: "封面工艺",
 					prop: "coverProcess",
 					type: "radio",
-					options: [
-						{ label: "不加膜", value: "no" },
-						{ label: "单面哑膜", value: "singleMatteFilm" },
-						{ label: "单面光膜", value: "singleLight" },
-					],
+					options: formConfigOptions["coverProcess"],
 				},
 				{
 					label: "装订方式",
 					prop: "bindingMethod",
 					type: "radio",
-					options: [
-						{ label: "骑马钉", value: "mount" },
-						{ label: "胶装", value: "glue" },
-					],
+					options: formConfigOptions["bindingMethod"],
 				},
 				{
 					label: "交付方式",
@@ -671,7 +621,7 @@ export default {
 				spec: "A4", // 默认成品规格为 A4
 				pageCount: 1, // 默认文件页数为 100
 				quantity: 1, // 默认份数为 1
-				paperType: "80", // 默认纸张为 80克双胶纸
+				paperType: "twoSidePaper_80", // 默认纸张为 80克双胶纸
 				coverColor: "black", // 默认封面印色为黑白
 				innerColor: "black", // 默认内页印色为黑白
 				coverMaterial: "coatedPaper", // 默认封面材质为铜板纸

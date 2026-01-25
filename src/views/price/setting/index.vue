@@ -8,16 +8,21 @@
 		:edit-disabled-fields="['gco']"
 		:delete-api="deleteMenu"
 		:dialogWidth="'80%'"
-		:save-api="saveMenu"
 		:useScForm="false"
-		@add="handleAdd"
-		@edit="handleEdit"
-		@view="handleView"
-		@submit="handleSubmit"
+		:showOperationColumn="false"
 	>
+		<template #header-buttons>
+			<el-button
+				type="primary"
+				icon="el-icon-edit"
+				size="small"
+				@click="handleEdit"
+			>
+				修改
+			</el-button>
+		</template>
 		<el-tabs
 			v-model="activeName"
-			@tab-click="handleClick"
 			class="tab-container"
 		>
 			<el-tab-pane label="单张" name="first">
@@ -237,13 +242,14 @@
 			</el-tab-pane>
 		</el-tabs>
 		<div class="footer-btn">
-			<el-button type="primary" @click="handleSubmit()"> 提交 </el-button>
+			<el-button type="primary" @click="handleSubmit()" :loading="submitLoading"> {{ submitLoading ? '提交中' : '提交' }} </el-button>
 		</div>
 	</common-list-page>
 </template>
 
 <script>
 import CommonListPage from "@/components/commonTable/index.vue";
+import { ElMessage } from "element-plus";
 import {
 	materialData,
 	singleFormConfig,
@@ -266,16 +272,22 @@ export default {
 		// 搜索配置
 		const searchConfig = [
 			{
-				label: "项",
-				name: "gco",
+				label: "类型",
+				name: "printTypeName",
 				component: "input",
-				options: { placeholder: "请输入项" },
+				options: { placeholder: "请输入" },
 			},
 			{
-				label: "值",
-				name: "gna",
+				label: "项",
+				name: "printItemName",
 				component: "input",
-				options: { placeholder: "请输入值" },
+				options: { placeholder: "请输入" },
+			},
+			{
+				label: "编码",
+				name: "printName",
+				component: "input",
+				options: { placeholder: "请输入" },
 			},
 			{
 				label: "状态",
@@ -292,17 +304,33 @@ export default {
 		];
 		// 表格列配置
 		const tableColumns = [
+			// {
+			// 	label: "类型",
+			// 	name: "printTypeCode",
+			// },
+			{
+				label: "类型",
+				name: "printTypeName",
+			},
+			// {
+			// 	label: "项",
+			// 	name: "printItemCode",
+			// },
 			{
 				label: "项",
-				name: "gco",
+				name: "printItemName",
 			},
+			// {
+			// 	label: "编码",
+			// 	name: "printCode",
+			// },
 			{
-				label: "值",
-				name: "gna",
+				label: "编码",
+				name: "printName",
 			},
 			{
 				label: "价格",
-				name: "pgco",
+				name: "price",
 			},
 			{
 				label: "状态",
@@ -314,18 +342,34 @@ export default {
 		const deleteMenu = async (ids) => {
 			return await $API.price.priceDelete.delete(ids);
 		};
-		const saveMenu = async (data) => {
-			return await $API.price.priceSave.post(data);
-		};
-		// 事件处理
-		const handleAdd = () => {
-			console.log("新增菜单");
-		};
-		const handleEdit = (row) => {
-			console.log("编辑菜单", row);
-		};
-		const handleView = (row) => {
-			console.log("查看菜单", row);
+		const commonListPage = ref(null);
+		// 修改价格
+		const handleEdit = async () => {
+			activeName.value = "first";
+			// 打开弹窗
+			commonListPage.value.handleEdit();
+			// 获取配置
+			const res = await $API.price.priceGetByConfig.post();
+			if (res && res.data) {
+				const {
+					printSinglePage,
+					printBidding,
+					printBlackBook,
+					printColor,
+				} = res.data;
+				if (Object.keys(printSinglePage || {}).length > 0) {
+					singleForm.value = printSinglePage;
+				}
+				if (Object.keys(printBidding || {}).length > 0) {
+					specialForm.value = printBidding;
+				}
+				if (Object.keys(printBlackBook || {}).length > 0) {
+					blackForm.value = printBlackBook;
+				}
+				if (Object.keys(printColor || {}).length > 0) {
+					colorForm.value = printColor;
+				}
+			}
 		};
 		// 单张表单数据
 		const singleForm = ref({
@@ -370,12 +414,12 @@ export default {
 		});
 		// 黑白书册表单数据
 		const blackForm = ref({
-			sizes_A4: 1,
-			sizes_B5: 0.85,
-			papers_80: 0.1,
-			papers_100: 0.2,
-			papers_128: 0.5,
-			papers_157: 0.6,
+			spec_A4: 1,
+			spec_B5: 0.85,
+			paperType_twoSidePaper_80: 0.1,
+			paperType_twoSidePaper_100: 0.2,
+			paperType_coatedPaper_128: 0.5,
+			paperType_coatedPaper_157: 0.6,
 			coverColor_black: 2,
 			coverColor_color: 3,
 			innerColor_black: 1,
@@ -386,20 +430,20 @@ export default {
 			coverProcess_no: 0,
 			coverProcess_singleDummy: 1,
 			coverProcess_singleLight: 1,
-			binding_mount: 2,
-			binding_glue: 3,
-			delivery_self: 0,
-			delivery_delivery: 10,
-			delivery_express: 0,
+			bindingMethod_mount: 2,
+			bindingMethod_glue: 3,
+			deliveryMethod_self: 0,
+			deliveryMethod_delivery: 10,
+			deliveryMethod_express: 0,
 		});
 		// 彩色书册表单数据
 		const colorForm = ref({
-			sizes_A4: 1,
-			sizes_B5: 0.85,
-			papers_80: 0.1,
-			papers_100: 0.2,
-			papers_128: 0.5,
-			papers_157: 0.6,
+			spec_A4: 1,
+			spec_B5: 0.85,
+			paperType_twoSidePaper_80: 0.1,
+			paperType_twoSidePaper_100: 0.2,
+			paperType_coatedPaper_128: 0.5,
+			paperType_coatedPaper_157: 0.6,
 			coverColor_black: 2,
 			coverColor_color: 3,
 			innerColor_black: 1,
@@ -410,16 +454,16 @@ export default {
 			coverProcess_no: 0,
 			coverProcess_singleDummy: 1,
 			coverProcess_singleLight: 1,
-			binding_mount: 2,
-			binding_glue: 3,
-			delivery_self: 0,
-			delivery_delivery: 10,
-			delivery_express: 0,
+			bindingMethod_mount: 2,
+			bindingMethod_glue: 3,
+			deliveryMethod_self: 0,
+			deliveryMethod_delivery: 10,
+			deliveryMethod_express: 0,
 		});
 		//	标书专项表单数据
 		const specialForm = ref({
-			scan_yes: 1,
-			scan_no: 0,
+			isScan_yes: 1,
+			isScan_no: 0,
 			scanFile_send: 0,
 			scanFile_uDisk: 25,
 			scanFile_cd: 7,
@@ -438,30 +482,36 @@ export default {
 			coverColor_lightYellow: 6,
 			coverColor_red: 6,
 			coverColor_transparent: 8,
-			binding_glue: 2,
-			binding_ribbon: 4,
-			binding_iron: 4,
+			bindingMethod_glue: 2,
+			bindingMethod_ribbon: 4,
+			bindingMethod_iron: 4,
 			deliveryTime_1: 1,
 			deliveryTime_2: 2,
 			deliveryTime_4: 4,
-			delivery_self: 0,
-			delivery_delivery: 10,
-			delivery_cashOnDelivery: 0,
-			delivery_express: 0,
+			deliveryMethod_self: 0,
+			deliveryMethod_delivery: 10,
+			deliveryMethod_cashOnDelivery: 0,
+			deliveryMethod_express: 0,
 		});
-		function handleClick(tab, event) {
-			console.log(tab, event);
-		}
-		const handleSubmit = () => {
+		const submitLoading = ref(false);
+		// 保存价格配置
+		const handleSubmit = async () => {
+			submitLoading.value = true;
 			const params = {
 				printSinglePage: singleForm.value,
 				printBlackBook: blackForm.value,
 				printColor: colorForm.value,
-				printBlackBookService: specialForm.value,
+				printBidding: specialForm.value,
 			};
-			console.log("保存配置:", params);
-			// 这里可以调用 API 保存
-			saveMenu(params);
+			const res = await $API.price.priceSave.post(params);
+			if (res && res.success) {
+				ElMessage.success("保存成功");
+				// 关闭弹窗
+				commonListPage.value.handleCancel();
+				// 刷新数据
+				commonListPage.value.handleSearch();
+			}
+			submitLoading.value = false
 		};
 		return {
 			searchConfig,
@@ -477,12 +527,10 @@ export default {
 			specialForm,
 			materialConfig,
 			weightConfig,
-			handleClick,
+			commonListPage,
+			submitLoading,
 			deleteMenu,
-			saveMenu,
-			handleAdd,
 			handleEdit,
-			handleView,
 			handleSubmit,
 		};
 	},

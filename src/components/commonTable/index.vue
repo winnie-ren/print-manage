@@ -193,6 +193,8 @@
 			:title="dialogTitle"
 			:size="dialogWidth"
 			:top="dialogTop"
+			:close-on-click-modal="false"
+			:close-on-press-escape="false"
 			@close="handleDialogClose"
 		>
 			<template v-if="useScForm">

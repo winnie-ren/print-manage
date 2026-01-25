@@ -23,11 +23,11 @@ export default {
 			return await http.post(this.url, data);
 		}
  },
- priceGetById: {
-		url: `${config.API_URL}${priceApi}/getById`,
+ priceGetByConfig: {
+		url: `${config.API_URL}${priceApi}/getByConfig`,
 		name: "价格详情",
-		get: async function(data={}){
-			return await http.get(this.url, data);
+		post: async function(data={}){
+			return await http.post(this.url, data);
 		}
  },
  priceDelete: {

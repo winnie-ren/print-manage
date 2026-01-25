@@ -1,3 +1,82 @@
+export const formConfigOptions = {
+ spec: [
+  { label: "A4", value: "A4" },
+  { label: "A3", value: "A3" },
+  { label: "A5", value: "A5" },
+  { label: "B4", value: "B4" },
+  { label: "16K", value: "16K" },
+  { label: "A2", value: "A2" },
+  { label: "A1", value: "A1" },
+  { label: "A0", value: "A0" },
+  { label: "8K", value: "8K" },
+  { label: "自定义尺寸", value: 0 },
+ ],
+ paperType: [
+  { label: "80克双胶纸", value: "twoSidePaper_80" },
+  { label: "100克双胶纸", value: "twoSidePaper_100" },
+  { label: "128克铜版纸", value: "coatedPaper_128" },
+  { label: "157克铜板纸", value: "coatedPaper_157" },
+ ],
+ coverColor: [
+  { label: "黑白", value: "black" },
+  { label: "彩色", value: "color" },
+  { label: "单色", value: "single" },
+  { label: "全彩", value: "fullColor" },
+ ],
+ innerColor: [
+  { label: "黑白", value: "black" },
+  { label: "彩色", value: "color" },
+  { label: "单色", value: "single" },
+  { label: "全彩", value: "fullColor" },
+ ],
+ coverMaterial: [
+  { label: "铜板纸", value: "coatedPaper" },
+  { label: "特种纸", value: "specialPaper" },
+  { label: "皮革纸", value: "stripedPaper" },
+ ],
+ coverProcess: [
+  { label: "不加膜", value: "no" },
+  { label: "单面哑膜", value: "singleMatteFilm" },
+  { label: "单面光膜", value: "singleLight" },
+ ],
+ bindingMethod: [
+  { label: "骑马钉", value: "mount" },
+  { label: "胶装", value: "glue" },
+ ],
+ deliveryMethod: [
+  { label: "自取", value: "self" },
+  { label: "送货上门", value: "delivery" },
+  { label: "快递到付", value: "cashOnDelivery" },
+  { label: "快递寄付", value: "express" },
+  { label: "到店取货", value: "pickupStore" },
+ ],
+ isScan: [
+  { label: "是", value: "yes" },
+  { label: "否", value: "no" },
+ ],
+ originalColor: [
+  { label: "黑白", value: "black" },
+  { label: "彩色", value: "color" },
+  { label: "单面", value: "single" },
+  { label: "双面", value: "double" },
+ ],
+ copyColor: [
+  { label: "黑白", value: "black" },
+  { label: "彩色", value: "color" },
+  { label: "单面", value: "single" },
+  { label: "双面", value: "double" },
+ ],
+ deliveryTime: [
+  { label: "1小时", value: "1" },
+  { label: "2小时", value: "2" },
+  { label: "4小时", value: "4" },
+ ],
+ scanFile: [
+  { label: "发送", value: "send" },
+  { label: "U盘", value: "uDisk" },
+  { label: "刻录光盘", value: "cd" },
+ ],
+};
 export const materialConfig = {
  coatedPaper: '铜版纸',
  mattePaper: '哑粉纸',

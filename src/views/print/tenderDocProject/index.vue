@@ -232,34 +232,8 @@
 <script>
 import { UploadFilled } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-
 // 从表单配置中提取选项数据
-const formConfigOptions = {
-	spec: [{ label: "A4", value: "A4" }],
-	deliveryMethod: [
-		{ label: "自取", value: "自取" },
-		{ label: "送货上门", value: "送货上门" },
-		{ label: "快递到付", value: "快递到付" },
-		{ label: "快递寄付", value: "快递寄付" },
-	],
-	isScan: [
-		{ label: "是", value: "是" },
-		{ label: "否", value: "否" },
-	],
-	originalColor: [
-		{ label: "黑白", value: "black" },
-		{ label: "彩色", value: "color" },
-		{ label: "单面", value: "single" },
-		{ label: "双面", value: "double" },
-	],
-	copyColor: [
-		{ label: "黑白", value: "black" },
-		{ label: "彩色", value: "color" },
-		{ label: "单面", value: "single" },
-		{ label: "双面", value: "double" },
-	],
-};
-
+import { formConfigOptions } from "@/views/price/config/index.ts";
 // 搜索配置
 const searchConfig = [
 	{
@@ -434,7 +408,7 @@ export default {
 				coverColor: "white", // 改为选项值
 				bindingMethod: "glue", // 改为选项值
 				deliveryTime: "1", // 改为选项值
-				deliveryMethod: "自取", // 改为选项值
+				deliveryMethod: "self", // 改为选项值
 				remarks: "",
 			},
 			rules: {
@@ -492,7 +466,7 @@ export default {
 					label: "规格",
 					prop: "spec",
 					type: "radio",
-					options: [{ label: "A4", value: "A4" }],
+					options: formConfigOptions["spec"],
 				},
 				// 工作流程
 				{
@@ -521,21 +495,14 @@ export default {
 					label: "是否扫描",
 					prop: "isScan",
 					type: "radio",
-					options: [
-						{ label: "是", value: "yes" },
-						{ label: "否", value: "no" },
-					],
+					options: formConfigOptions["isScan"],
 				},
 				// 扫描文件
 				{
 					label: "扫描文件",
 					prop: "scanFile",
 					type: "radio",
-					options: [
-						{ label: "发送", value: "send" },
-						{ label: "U盘", value: "uDisk" },
-						{ label: "刻录光盘", value: "cd" },
-					],
+					options: formConfigOptions["scanFile"],
 				},
 				// 正本印色
 				{
@@ -582,11 +549,7 @@ export default {
 					label: "出货时效",
 					prop: "deliveryTime",
 					type: "radio",
-					options: [
-						{ label: "1小时", value: "1" },
-						{ label: "2小时", value: "2" },
-						{ label: "4小时", value: "4" },
-					],
+					options: formConfigOptions["deliveryTime"],
 				},
 				// 交付方式
 				{
@@ -712,7 +675,7 @@ export default {
 				coverColor: "white", // 改为选项值
 				bindingMethod: "glue", // 改为选项值
 				deliveryTime: "1", // 改为选项值
-				deliveryMethod: "自取", // 改为选项值
+				deliveryMethod: "self", // 改为选项值
 				remarks: "",
 			};
 		},
