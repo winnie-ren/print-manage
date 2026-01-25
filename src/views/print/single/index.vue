@@ -194,59 +194,173 @@
 						<el-form-item label="文件上传" prop="files">
 							<el-upload
 								class="upload-demo"
-								:auto-upload="false"
-								:show-file-list="true"
+								ref="upload"
+								:on-remove="handleRemove"
 								:on-change="handleFileChange"
-								:http-request="customUpload"
+								:file-list="uploadFileList"
+								:show-file-list="false"
+								:auto-upload="false"
 								multiple
-								drag
-								style="flex: 1"
 							>
-								<el-icon size="80" color="#ffaf58">
-									<upload-filled />
-								</el-icon>
-								<div class="el-upload__text">
-									请将文件拖到此处或 <em>点击上传</em>
-								</div>
-								<!-- 显示上传进度 -->
-								<div
-									v-for="(fileInfo, index) in fileList"
-									:key="index"
-									class="progress-info"
-								>
-									<div class="file-name">
-										{{ fileInfo.name }}
-									</div>
-									<el-progress
-										:percentage="fileInfo.progress"
-									/>
-									<div class="progress-text">
-										<el-button
-											v-if="
-												fileInfo.status === 'uploading'
-											"
-											@click="pauseUpload(fileInfo)"
-											type="info"
-											size="small"
-										>
-											暂停
-										</el-button>
-										<el-button
-											v-else-if="
-												fileInfo.status === 'paused'
-											"
-											@click="resumeUpload(fileInfo)"
-											type="primary"
-											size="small"
-										>
-											继续
-										</el-button>
-										<span>{{ fileInfo.statusText }}</span>
-									</div>
-								</div>
+								<template #trigger>
+									<el-button type="primary" plain>
+										选择文件
+									</el-button>
+									<el-button
+										style="margin-left: 5px"
+										type="success"
+										@click="handler"
+										plain
+									>
+										上传
+									</el-button>
+									<el-button
+										type="danger"
+										@click="clearFileHandler"
+										plain
+									>
+										清空
+									</el-button>
+								</template>
 							</el-upload>
 						</el-form-item>
 					</el-form>
+					<!-- 文件列表 -->
+					<div
+						class="file-list-wrapper"
+						v-if="uploadFileList.length > 0"
+					>
+						<el-collapse accordion>
+							<el-collapse-item
+								v-for="(item, index) in uploadFileList"
+								:key="index"
+							>
+								<template #title>
+									<div class="upload-file-item">
+										<div
+											class="file-info-item file-name"
+											:title="item.name"
+										>
+											{{ item.name }}
+										</div>
+										<div class="file-info-item file-size">
+											{{ item.size || transformByte }}
+										</div>
+										<div
+											class="file-info-item file-progress"
+										>
+											<el-progress
+												:percentage="
+													item.uploadProgress
+												"
+												class="file-progress-value"
+											/>
+										</div>
+										<div class="file-info-item file-status">
+											<el-tag
+												v-if="
+													item.status === '等待上传'
+												"
+												size="small"
+												type="info"
+												>等待上传</el-tag
+											>
+											<el-tag
+												v-else-if="
+													item.status === '校验MD5'
+												"
+												size="small"
+												type="warning"
+												>校验MD5</el-tag
+											>
+											<el-tag
+												v-else-if="
+													item.status ===
+													'正在创建序列'
+												"
+												size="small"
+												type="primary"
+												>正在创建序列</el-tag
+											>
+											<el-tag
+												v-else-if="
+													item.status === '正在上传'
+												"
+												size="small"
+												>正在上传</el-tag
+											>
+											<el-tag
+												v-else-if="
+													item.status === '上传完成'
+												"
+												size="small"
+												type="success"
+												>上传完成</el-tag
+											>
+											<el-tag
+												v-else-if="
+													item.status === '上传错误'
+												"
+												size="small"
+												type="danger"
+												>上传错误</el-tag
+											>
+											<el-tag
+												v-else
+												size="small"
+												type="info"
+												>{{ item.status }}</el-tag
+											>
+										</div>
+									</div>
+								</template>
+								<div class="file-chunk-list-wrapper">
+									<!-- 分片列表 -->
+									<el-table
+										:data="item.chunkList"
+										max-height="400"
+										style="width: 100%"
+									>
+										<el-table-column
+											prop="chunkNumber"
+											label="分片序号"
+											width="120"
+										>
+										</el-table-column>
+										<el-table-column
+											prop="progress"
+											label="上传进度"
+											width="200"
+										>
+											<template #default="{ row }">
+												<el-progress
+													v-if="
+														!row.status ||
+														row.progressStatus ===
+															'normal'
+													"
+													:percentage="row.progress"
+												/>
+												<el-progress
+													v-else
+													:percentage="row.progress"
+													:status="row.progressStatus"
+													:text-inside="true"
+													:stroke-width="16"
+												/>
+											</template>
+										</el-table-column>
+										<el-table-column
+											prop="status"
+											label="状态"
+											width="120"
+										>
+										</el-table-column>
+									</el-table>
+								</div>
+							</el-collapse-item>
+						</el-collapse>
+					</div>
 				</el-main>
 				<div class="bottom-shop">
 					<div class="order-content">
@@ -278,6 +392,16 @@
 import { UploadFilled } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import SparkMD5 from "spark-md5";
+import { fileSuffixTypeUtil } from "@/utils/FileUtil";
+// 文件状态枚举
+const FileStatus = {
+	wait: "等待上传",
+	getMd5: "校验MD5",
+	chip: "正在创建序列",
+	uploading: "正在上传",
+	success: "上传完成",
+	error: "上传错误",
+};
 // 从表单配置中提取选项数据
 const formConfigOptions = [
 	{
@@ -435,8 +559,12 @@ export default {
 	},
 	data() {
 		return {
-			fileList: [], // 文件列表
+			uploadFileList: [], // 文件列表
 			chunkSize: 2 * 1024 * 1024, // 2MB 分片大小
+			// 上传并发数
+			simultaneousUploads: 3,
+			currentFileIndex: 0,
+
 			list: {
 				apiObj: this.$API.print.singlePage,
 			},
@@ -497,7 +625,6 @@ export default {
 					options: [
 						{ label: "A5 (148*210)", value: "A5" },
 						{ label: "B5 (176*250)", value: "B5" },
-						{ label: "A4 (210*297)", value: "A4" },
 						{ label: "A3 (297*420)", value: "A3" },
 						{ label: "自定义", value: 0 },
 					],
@@ -685,246 +812,407 @@ export default {
 				}
 			}
 		},
+
 		// 处理文件变化
-		handleFileChange(file) {
-			// 创建文件信息对象
-			const fileInfo = {
-				raw: file.raw,
-				name: file.name,
-				uid: file.uid,
-				progress: 0,
-				status: "pending", // pending, uploading, paused, completed, error
-				statusText: "等待上传",
-				chunks: [],
-				uploadedChunks: [],
-			};
-
-			// 检查是否已有相同的文件信息
-			const existingIndex = this.fileList.findIndex(
-				(f) => f.uid === file.uid
-			);
-			if (existingIndex === -1) {
-				this.fileList.push(fileInfo);
-			}
-
-			// 开始上传文件
-			this.startUpload(fileInfo);
+		handleFileChange(file, fileList) {
+			// 初始化文件属性
+			this.initFileProperties(file);
+			console.log(this.uploadFileList, fileList, file);
+			this.uploadFileList = fileList;
 		},
-		// 开始上传文件
-		async startUpload(fileInfo) {
-			try {
-				// 计算文件MD5
-				fileInfo.status = "calculating";
-				fileInfo.statusText = "计算文件MD5...";
-				fileInfo.fileMd5 = await this.calculateFileMd5(fileInfo.raw);
 
-				// 检查文件是否已存在
+		// 初始化文件属性
+		initFileProperties(file) {
+			file.chunkList = [];
+			file.status = FileStatus.wait;
+			file.progressStatus = "warning";
+			file.uploadProgress = 0;
+			file.size = file.raw.size;
+			file.chunkUploadedList = [];
+		},
+		// 开始上传所有文件
+		startUploadAll() {
+			this.currentFileIndex = 0;
+			this.handler();
+		},
+
+		/**
+		 * 开始上传文件
+		 */
+		handler() {
+			const self = this;
+			//判断文件列表是否为空
+			if (this.uploadFileList.length === 0) {
+				this.$message.error("请先选择文件");
+				return;
+			}
+			if (this.currentFileIndex >= this.uploadFileList.length) {
+				this.$message.success("文件上传成功");
+				return;
+			}
+			//当前操作文件
+			const currentFile = this.uploadFileList[this.currentFileIndex];
+			console.log("当前操作文件：", currentFile);
+			//更新上传标签
+			currentFile.status = FileStatus.getMd5;
+			currentFile.chunkUploadedList = [];
+
+			// 1. 计算文件MD5
+			this.getFileMd5(currentFile.raw, async (md5, totalChunks) => {
+				console.log("md5值", md5);
+
+				// 2. 检查文件是否已存在
 				const checkRes = await this.$API.file.check.get({
-					fileMD5: fileInfo.fileMd5,
+					fileMD5: md5,
 				});
-				if (!checkRes) {
-					return
-				}
-				if (checkRes.code === 0) {
+				console.log("检查是否已上传-->", checkRes);
+
+				if (checkRes.code === 0 && checkRes.data.exists) {
 					// 文件已存在，直接完成
-					fileInfo.progress = 100;
-					fileInfo.status = "completed";
-					fileInfo.statusText = "文件已存在";
-					this.$message.success(`文件 ${fileInfo.name} 已存在`);
+					console.log("上传成功文件访问地址：" + checkRes.data.url);
+					currentFile.status = FileStatus.success;
+					currentFile.uploadProgress = 100;
+					// 如果此文件上传过，就跳到下一个文件
+					this.currentFileIndex++;
+					this.handler();
 					return;
+				} else if (
+					checkRes.code === 0 &&
+					checkRes.data.uploadedChunks
+				) {
+					// "上传中" 状态
+					// 获取已上传分片列表
+					console.log("上传中：", checkRes);
+					currentFile.status = FileStatus.uploading;
+					let chunkUploadedList = checkRes.data.uploadedChunks;
+					console.log("chunkUploadedList", chunkUploadedList);
+					currentFile.chunkUploadedList = chunkUploadedList;
+					console.log("成功上传的分片信息", chunkUploadedList);
+				} else {
+					// 未上传
+					console.log("未上传");
 				}
 
-				// 初始化分片上传
-				fileInfo.status = "initializing";
-				fileInfo.statusText = "初始化上传...";
-				const initRes = await this.$API.file.init.post({
-					fileName: fileInfo.name,
-					fileSize: fileInfo.raw.size,
-					chunkSize: this.chunkSize,
-					fileMd5: fileInfo.fileMd5,
-				});
+				// 3. 正在创建分片
+				currentFile.status = FileStatus.chip;
 
+				// 创建分片
+				let fileChunks = self.createFileChunk(
+					currentFile.raw,
+					self.chunkSize
+				);
+				console.log(currentFile);
+				let type = fileSuffixTypeUtil(currentFile.name);
+				let param = {
+					fileName: currentFile.name,
+					fileSize: currentFile.size,
+					chunkSize: self.chunkSize,
+					chunkNum: totalChunks,
+					fileMd5: md5,
+					contentType: "application/octet-stream",
+					fileType: type,
+					chunkUploadedList: currentFile.chunkUploadedList, // 已上传的分片索引+1
+				};
+
+				// 4. 初始化上传
+				const initRes = await this.$API.file.init.post(param);
 				if (initRes.code !== 0) {
 					throw new Error(initRes.message || "初始化失败");
 				}
 
-				// 开始分片上传
-				await this.uploadFileChunks(fileInfo);
-			} catch (error) {
-				fileInfo.status = "error";
-				fileInfo.statusText = "上传失败";
-				this.$message.error(
-					`文件 ${fileInfo.name} 上传失败: ${error.message}`
-				);
-			}
-		},
-		// 计算文件MD5
-		calculateFileMd5(file) {
-			return new Promise((resolve, reject) => {
-				const blobSlice =
-					File.prototype.slice ||
-					File.prototype.mozSlice ||
-					File.prototype.webkitSlice;
-				const chunkSize = 2097152; // 2MB
-				const chunks = Math.ceil(file.size / chunkSize);
-				let currentChunk = 0;
-				const spark = new SparkMD5.ArrayBuffer();
-				const fileReader = new FileReader();
+				self.$set(currentFile, "chunkList", []);
 
-				fileReader.onload = (e) => {
-					spark.append(e.target.result); // Append array buffer
-					currentChunk++;
-
-					if (currentChunk < chunks) {
-						loadNext();
+				// 创建分片列表
+				fileChunks.forEach((chunkItem, index) => {
+					if (currentFile.chunkUploadedList.includes(index + 1)) {
+						currentFile.chunkList.push({
+							chunkNumber: index + 1,
+							chunk: chunkItem,
+							progress: 100,
+							progressStatus: "success",
+							status: "上传成功",
+						});
 					} else {
-						resolve(spark.end());
+						currentFile.chunkList.push({
+							chunkNumber: index + 1,
+							chunk: chunkItem,
+							progress: 0,
+							status: "—",
+						});
 					}
-				};
+				});
+				console.log("所有分片信息：", currentFile.chunkList);
 
-				fileReader.onerror = () => {
-					reject(new Error("读取文件失败"));
-				};
+				let tempFileChunks = [...currentFile.chunkList];
 
-				const loadNext = () => {
-					const start = currentChunk * chunkSize;
-					const end =
-						start + chunkSize >= file.size
-							? file.size
-							: start + chunkSize;
+				// 更新状态
+				currentFile.status = FileStatus.uploading;
 
-					fileReader.readAsArrayBuffer(
-						blobSlice.call(file, start, end)
-					);
-				};
+				// 处理分片列表，删除已上传的分片
+				tempFileChunks = self.processUploadChunkList(tempFileChunks);
+				console.log("删除已上传的分片-->", tempFileChunks);
 
-				loadNext();
-			});
-		},
-		// 上传文件分片
-		async uploadFileChunks(fileInfo) {
-			const chunks = Math.ceil(fileInfo.raw.size / this.chunkSize);
-			fileInfo.chunks = Array.from({ length: chunks }, (_, i) => i);
-			fileInfo.uploadedChunks = [];
+				// 5. 并发上传分片
+				await self.uploadChunkConcurrent(tempFileChunks);
 
-			// 检查已上传的分片
-			const checkRes = await this.$API.file.check.get({
-				fileMD5: fileInfo.fileMd5,
-			});
-			if (checkRes.code === 0 && checkRes.data.uploadedChunks) {
-				fileInfo.uploadedChunks = checkRes.data.uploadedChunks;
-			}
+				console.log("---上传完成---");
 
-			fileInfo.status = "uploading";
-			fileInfo.statusText = "上传中...";
-
-			// 上传每个分片
-			for (let i = 0; i < chunks; i++) {
-				// 如果已上传则跳过
-				if (fileInfo.uploadedChunks.includes(i)) {
-					continue;
-				}
-
-				// 检查是否暂停
-				if (fileInfo.status === "paused") {
-					fileInfo.statusText = "已暂停";
-					return;
-				}
-
-				try {
-					const start = i * this.chunkSize;
-					const end = Math.min(
-						start + this.chunkSize,
-						fileInfo.raw.size
-					);
-					const chunk = fileInfo.raw.slice(start, end);
-
-					const formData = new FormData();
-					formData.append("chunk", chunk);
-					formData.append("chunkIndex", i);
-					formData.append("totalChunks", chunks);
-					formData.append("fileMd5", fileInfo.fileMd5);
-					formData.append("fileName", fileInfo.name);
-
-					const res = await this.$API.file.uploadScreenshot.post(
-						formData
-					);
-
-					if (res.code === 0) {
-						fileInfo.uploadedChunks.push(i);
-
-						// 更新进度
-						const progress = Math.round(
-							(fileInfo.uploadedChunks.length / chunks) * 100
-						);
-						fileInfo.progress = progress;
-						fileInfo.statusText = `上传中... ${progress}%`;
-					} else {
-						throw new Error(res.message || "分片上传失败");
-					}
-				} catch (error) {
-					fileInfo.status = "error";
-					fileInfo.statusText = "上传失败";
-					this.$message.error(
-						`分片 ${i + 1} 上传失败: ${error.message}`
-					);
-					return;
-				}
-			}
-			// 合并文件
-			await this.mergeFile(fileInfo);
-		},
-		// 合并文件
-		async mergeFile(fileInfo) {
-			try {
-				const res = await this.$API.file.merge.post({
-					fileMd5: fileInfo.fileMd5,
-					fileName: fileInfo.name,
-					totalChunks: fileInfo.chunks.length,
+				// 6. 合并文件
+				console.log("合并文件-->", currentFile);
+				const mergeRes = await this.$API.file.merge.post({
+					fileMd5: md5,
+					fileName: currentFile.name,
+					totalChunks: fileChunks.length,
 				});
 
-				if (res.code === 0) {
-					fileInfo.status = "completed";
-					fileInfo.statusText = "上传完成";
-					fileInfo.progress = 100;
-					this.$message.success(`文件 ${fileInfo.name} 上传成功`);
+				// 合并文件状态
+				if (mergeRes.code === 0) {
+					currentFile.status = FileStatus.success;
+					console.log("文件访问地址：" + mergeRes.data.url);
 
 					// 将文件信息保存到表单
 					if (!this.formDetail.files) {
 						this.formDetail.files = [];
 					}
 					this.formDetail.files.push({
-						name: fileInfo.name,
-						url: res.data.url, // 假设后端返回文件URL
-						md5: fileInfo.fileMd5,
+						name: currentFile.name,
+						url: mergeRes.data.url,
+						md5: md5,
 					});
+
+					// 文件下标偏移
+					this.currentFileIndex++;
+					// 递归上传下一个文件
+					this.handler();
 				} else {
-					throw new Error(res.message || "合并失败");
+					currentFile.status = FileStatus.error;
+					self.$message.error(mergeRes.message || "合并失败");
 				}
-			} catch (error) {
-				fileInfo.status = "error";
-				fileInfo.statusText = "合并失败";
-				this.$message.error(
-					`文件 ${fileInfo.name} 合并失败: ${error.message}`
+			});
+		},
+
+		/**
+		 * 分片读取文件 获取文件的MD5
+		 * @param file
+		 * @param callback
+		 */
+		getFileMd5(file, callback) {
+			const blobSlice =
+				File.prototype.slice ||
+				File.prototype.mozSlice ||
+				File.prototype.webkitSlice;
+			const fileReader = new FileReader();
+			// 计算分片数
+			const totalChunks = Math.ceil(file.size / this.chunkSize);
+			console.log("总分片数：" + totalChunks);
+			let currentChunk = 0;
+			const spark = new SparkMD5.ArrayBuffer();
+			const self = this; // 保存this引用
+
+			loadNext();
+			fileReader.onload = function (e) {
+				try {
+					spark.append(e.target.result);
+				} catch (error) {
+					console.log("获取Md5错误：" + currentChunk);
+				}
+				if (currentChunk < totalChunks) {
+					currentChunk++;
+					loadNext();
+				} else {
+					callback(spark.end(), totalChunks);
+				}
+			};
+			fileReader.onerror = function () {
+				console.warn("读取Md5失败，文件读取错误");
+			};
+
+			function loadNext() {
+				const start = currentChunk * self.chunkSize; // 使用self而不是this
+				const end =
+					start + self.chunkSize >= file.size
+						? file.size
+						: start + self.chunkSize;
+				fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+			}
+		},
+
+		/**
+		 * 文件分片
+		 */
+		createFileChunk(file, size = this.chunkSize) {
+			const fileChunkList = [];
+			let count = 0;
+			while (count < file.size) {
+				fileChunkList.push({
+					file: file.slice(count, count + size),
+				});
+				count += size;
+			}
+			return fileChunkList;
+		},
+
+		/**
+		 * 处理即将上传的分片列表，判断是否有已上传的分片，有则从列表中删除
+		 */
+		processUploadChunkList(chunkList) {
+			const currentFile = this.uploadFileList[this.currentFileIndex];
+			let chunkUploadedList = currentFile.chunkUploadedList;
+			if (
+				chunkUploadedList === undefined ||
+				chunkUploadedList === null ||
+				chunkUploadedList.length === 0
+			) {
+				return chunkList;
+			}
+
+			for (let i = chunkList.length - 1; i >= 0; i--) {
+				const chunkItem = chunkList[i];
+				for (let j = 0; j < chunkUploadedList.length; j++) {
+					if (chunkItem.chunkNumber === chunkUploadedList[j]) {
+						chunkList.splice(i, 1);
+						break;
+					}
+				}
+			}
+			return chunkList;
+		},
+
+		/**
+		 * 并发上传分片
+		 * @param chunkList
+		 * @returns {Promise<unknown>}
+		 */
+		uploadChunkConcurrent(chunkList) {
+			let successCount = 0;
+			let totalChunks = chunkList.length;
+			return new Promise((resolve) => {
+				const handler = () => {
+					if (chunkList.length) {
+						const chunkItem = chunkList.shift();
+						// 上传分片
+						this.uploadSingleChunk(chunkItem)
+							.then(() => {
+								console.log(
+									"分片：" +
+										chunkItem.chunkNumber +
+										" 上传成功"
+								);
+								successCount++;
+								// 继续上传下一个分片
+								handler();
+							})
+							.catch((error) => {
+								// 更新状态
+								console.log(
+									"分片：" +
+										chunkItem.chunkNumber +
+										" 上传失败，" +
+										error
+								);
+								// 重新添加到队列中
+								chunkList.push(chunkItem);
+								handler();
+							});
+					}
+					if (successCount >= totalChunks) {
+						resolve();
+					}
+				};
+				// 并发上传
+				for (let i = 0; i < this.simultaneousUploads; i++) {
+					handler();
+				}
+			});
+		},
+
+		// 上传单个分片
+		async uploadSingleChunk(chunkItem) {
+			const formData = new FormData();
+			formData.append("chunk", chunkItem.chunk.file);
+			formData.append("chunkIndex", chunkItem.chunkNumber - 1);
+			formData.append(
+				"totalChunks",
+				this.uploadFileList[this.currentFileIndex].chunkList.length
+			);
+			formData.append(
+				"fileMd5",
+				this.uploadFileList[this.currentFileIndex].fileMd5
+			);
+			formData.append(
+				"fileName",
+				this.uploadFileList[this.currentFileIndex].name
+			);
+
+			const res = await this.$API.file.uploadScreenshot.post(formData);
+
+			if (res.code === 0) {
+				chunkItem.progress = 100;
+				chunkItem.status = "上传成功";
+				chunkItem.progressStatus = "success";
+				// 更新分片列表
+				const chunkIndex = chunkItem.chunkNumber - 1;
+				this.$set(
+					this.uploadFileList[this.currentFileIndex].chunkList,
+					chunkIndex,
+					chunkItem
 				);
+				// 更新文件上传进度
+				this.getCurrentFileProgress();
+				return Promise.resolve();
+			} else {
+				return Promise.reject(new Error(res.message || "分片上传失败"));
 			}
 		},
-		// 暂停上传
-		pauseUpload(fileInfo) {
-			if (fileInfo.status === "uploading") {
-				fileInfo.status = "paused";
+
+		// 检查分片上传进度
+		checkChunkUploadProgress(item) {
+			return (p) => {
+				item.progress = parseInt(String((p.loaded / p.total) * 100));
+				this.updateChunkUploadStatus(item);
+			};
+		},
+
+		updateChunkUploadStatus(item) {
+			let status = FileStatus.uploading;
+			let progressStatus = "normal";
+			if (item.progress >= 100) {
+				status = FileStatus.success;
+				progressStatus = "success";
 			}
+			let chunkIndex = item.chunkNumber - 1;
+			let currentChunk =
+				this.uploadFileList[this.currentFileIndex].chunkList[
+					chunkIndex
+				];
+			// 修改状态
+			currentChunk.status = status;
+			currentChunk.progressStatus = progressStatus;
+			// 更新状态
+			this.$set(
+				this.uploadFileList[this.currentFileIndex].chunkList,
+				chunkIndex,
+				currentChunk
+			);
+			// 获取文件上传进度
+			this.getCurrentFileProgress();
 		},
-		// 继续上传
-		resumeUpload(fileInfo) {
-			if (fileInfo.status === "paused") {
-				this.startUpload(fileInfo);
+
+		getCurrentFileProgress() {
+			const currentFile = this.uploadFileList[this.currentFileIndex];
+			if (!currentFile || !currentFile.chunkList) {
+				return;
 			}
+			const chunkList = currentFile.chunkList;
+			const uploadedSize = chunkList
+				.filter((item) => item.progress >= 100) // 只统计已完成的分片
+				.reduce((acc, cur) => acc + cur.chunk.file.size, 0);
+			// 计算方式：已上传大小 / 文件总大小
+			let progress = parseInt((uploadedSize / currentFile.size) * 100);
+			currentFile.uploadProgress = progress;
+			this.$set(this.uploadFileList, this.currentFileIndex, currentFile);
 		},
-		// 自定义上传方法（拦截默认上传）
-		customUpload() {
-			// 此方法被定义以防止默认上传行为，实际上传在 handleFileChange 中处理
-		},
+
 		// 重置表单时清空文件列表
 		resetForm() {
 			this.formDetail = {
@@ -940,11 +1228,38 @@ export default {
 				remarks: "",
 				files: [], // 添加文件数组
 			};
-			this.fileList = []; // 清空文件列表
+			this.uploadFileList = []; // 清空文件列表
+			this.currentFileIndex = 0; // 重置文件索引
+		},
+	},
+	filters: {
+		transformByte(size) {
+			if (!size) {
+				return "0B";
+			}
+			const unitSize = 1024;
+			if (size < unitSize) {
+				return size + " B";
+			}
+			// KB
+			if (size < Math.pow(unitSize, 2)) {
+				return (size / unitSize).toFixed(2) + " K";
+			}
+			// MB
+			if (size < Math.pow(unitSize, 3)) {
+				return (size / Math.pow(unitSize, 2)).toFixed(2) + " MB";
+			}
+			// GB
+			if (size < Math.pow(unitSize, 4)) {
+				return (size / Math.pow(unitSize, 3)).toFixed(2) + " GB";
+			}
+			// TB
+			return (size / Math.pow(unitSize, 4)).toFixed(2) + " TB";
 		},
 	},
 };
 </script>
+
 <style lang="scss">
 .print-dialog {
 	.el-dialog__body {
@@ -955,6 +1270,7 @@ export default {
 	}
 }
 </style>
+
 <style lang="scss" scoped>
 .el-header {
 	--el-header-height: 40px;
@@ -998,5 +1314,39 @@ export default {
 	flex: 1;
 	font-size: 16px;
 	font-weight: bold;
+}
+
+.file-list-wrapper {
+	margin-top: 20px;
+}
+
+.upload-file-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px 0;
+}
+
+.file-info-item {
+	margin: 0 10px;
+}
+
+.file-name {
+	width: 250px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.file-size {
+	width: 100px;
+}
+
+.file-progress {
+	width: 150px;
+}
+
+.file-status {
+	width: 100px;
 }
 </style>
