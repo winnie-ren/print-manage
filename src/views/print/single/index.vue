@@ -725,7 +725,7 @@ export default {
 				if (!checkRes) {
 					return
 				}
-				if (checkRes.code === 0 && checkRes.data.exists) {
+				if (checkRes.code === 0) {
 					// 文件已存在，直接完成
 					fileInfo.progress = 100;
 					fileInfo.status = "completed";
