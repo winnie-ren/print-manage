@@ -153,184 +153,202 @@ export default {
 			// 		);
 			// 		return false;
 			// 	}
-				const menuList = [
-					{
-						name: "home",
-						path: "/home",
-						meta: {
-							title: "系统管理",
-							icon: "el-icon-menu",
-							type: "menu",
-						},
-						children: [
-							{
-								name: "menuManage",
-								path: "/menuManage",
-								meta: {
-									title: "菜单管理",
-									icon: "el-icon-menu",
-									affix: true,
-								},
-								component: "menuManage",
-							},
-							{
-								name: "roleManage",
-								path: "/roleManage",
-								meta: {
-									title: "角色管理",
-									icon: "el-icon-Postcard",
-								},
-								component: "roleManage",
-							},
-							{
-								name: "userManage",
-								path: "/userManage",
-								meta: {
-									title: "用户管理",
-									icon: "el-icon-user",
-								},
-								component: "userManage",
-							},
-						],
+			const menuList = [
+				{
+					name: "home",
+					path: "/home",
+					meta: {
+						title: "系统管理",
+						icon: "el-icon-menu",
+						type: "menu",
 					},
-					{
-						name: "memberManage",
-						path: "/memberManage",
-						meta: {
-							title: "会员管理",
-							icon: "el-icon-menu",
-							type: "memberManage",
+					children: [
+						{
+							name: "menuManage",
+							path: "/menuManage",
+							meta: {
+								title: "菜单管理",
+								icon: "el-icon-menu",
+								affix: true,
+							},
+							component: "menuManage",
 						},
-						children: [
-							{
-								name: "memberList",
-								path: "/memberManage/memberList",
-								meta: {
-									title: "会员管理",
-									icon: "el-icon-user",
-								},
-								component: "memberManage/memberList",
+						{
+							name: "roleManage",
+							path: "/roleManage",
+							meta: {
+								title: "角色管理",
+								icon: "el-icon-Postcard",
 							},
-						],
-					},
-					{
-						name: "print",
-						path: "/print",
-						meta: {
-							title: "打印",
-							icon: "el-icon-files",
-							type: "menu",
+							component: "roleManage",
 						},
-						children: [
-							{
-								path: "/print/single",
-								name: "single",
-								meta: {
-									title: "单张",
-									icon: "el-icon-tickets",
-									type: "menu",
-								},
-								component: "print/single",
+						{
+							name: "userManage",
+							path: "/userManage",
+							meta: {
+								title: "用户管理",
+								icon: "el-icon-user",
 							},
-							{
-								path: "/print/blackWhiteManual",
-								name: "blackWhiteManual",
-								meta: {
-									title: "黑白书册",
-									icon: "el-icon-notebook",
-									type: "menu",
-								},
-								component: "print/blackWhiteManual",
-							},
-							{
-								path: "/print/colorfulBooklets",
-								name: "colorfulBooklets",
-								meta: {
-									title: "彩色书册",
-									icon: "el-icon-notebook",
-									type: "menu",
-								},
-								component: "print/colorfulBooklets",
-							},
-							{
-								path: "/print/tenderDocProject",
-								name: "tenderDocProject",
-								meta: {
-									title: "标书专项",
-									icon: "el-icon-collection",
-									type: "menu",
-								},
-								component: "print/tenderDocProject",
-							},
-						],
-					},
-					{
-						name: "订单管理",
-						path: "/order",
-						meta: {
-							title: "订单",
-							icon: "el-icon-files",
-							type: "menu",
+							component: "userManage",
 						},
-						children: [
-							{
-								path: "/order/orderList",
-								name: "orderList",
-								meta: {
-									title: "订单列表",
-									icon: "el-icon-tickets",
-									type: "menu",
-								},
-								component: "order/orderList",
-							},
-						],
+					],
+				},
+				{
+					name: "memberManage",
+					path: "/memberManage",
+					meta: {
+						title: "会员管理",
+						icon: "el-icon-menu",
+						type: "memberManage",
 					},
-					{
-						name: "价格设置",
-						path: "/price",
-						meta: {
-							title: "价格",
-							icon: "el-icon-files",
-							type: "menu",
+					children: [
+						{
+							name: "memberList",
+							path: "/memberManage/memberList",
+							meta: {
+								title: "会员管理",
+								icon: "el-icon-user",
+							},
+							component: "memberManage/memberList",
 						},
-						children: [
-							{
-								path: "/price/setting",
-								name: "priceSetting",
-								meta: {
-									title: "价格设置",
-									icon: "el-icon-tickets",
-									type: "menu",
-								},
-								component: "price/setting",
+						{
+							name: "rechargeRecord",
+							path: "/memberManage/rechargeRecord",
+							meta: {
+								title: "充值记录",
+								icon: "el-icon-coin",
 							},
-							{
-								path: "/price/mobile",
-								name: "mobile",
-								meta: {
-									title: "手机打印价格",
-									icon: "el-icon-tickets",
-									type: "menu",
-								},
-								component: "price/mobile",
-							},
-						],
-					},
-					{
-						name: "积分设置",
-						path: "/pointsSetting",
-						component: "pointsSetting",
-						meta: {
-							title: "积分设置",
-							icon: "el-icon-files",
-							type: "menu",
-							isHide: true
+							component: "memberManage/rechargeRecord",
 						},
+						{
+							name: "memberLevel",
+							path: "/memberManage/memberLevel",
+							meta: {
+								title: "会员等级",
+								icon: "el-icon-goods",
+							},
+							component: "memberManage/memberLevel",
+						},
+					],
+				},
+				{
+					name: "print",
+					path: "/print",
+					meta: {
+						title: "打印",
+						icon: "el-icon-files",
+						type: "menu",
 					},
-				];
-				this.$TOOL.data.set("MENU", menuList);
-				this.$TOOL.data.set("PERMISSIONS", '');
-				this.$TOOL.data.set("DASHBOARDGRID", '');
+					children: [
+						{
+							path: "/print/single",
+							name: "single",
+							meta: {
+								title: "单张",
+								icon: "el-icon-tickets",
+								type: "menu",
+							},
+							component: "print/single",
+						},
+						{
+							path: "/print/blackWhiteManual",
+							name: "blackWhiteManual",
+							meta: {
+								title: "黑白书册",
+								icon: "el-icon-notebook",
+								type: "menu",
+							},
+							component: "print/blackWhiteManual",
+						},
+						{
+							path: "/print/colorfulBooklets",
+							name: "colorfulBooklets",
+							meta: {
+								title: "彩色书册",
+								icon: "el-icon-notebook",
+								type: "menu",
+							},
+							component: "print/colorfulBooklets",
+						},
+						{
+							path: "/print/tenderDocProject",
+							name: "tenderDocProject",
+							meta: {
+								title: "标书专项",
+								icon: "el-icon-collection",
+								type: "menu",
+							},
+							component: "print/tenderDocProject",
+						},
+					],
+				},
+				{
+					name: "订单管理",
+					path: "/order",
+					meta: {
+						title: "订单",
+						icon: "el-icon-files",
+						type: "menu",
+					},
+					children: [
+						{
+							path: "/order/orderList",
+							name: "orderList",
+							meta: {
+								title: "订单列表",
+								icon: "el-icon-tickets",
+								type: "menu",
+							},
+							component: "order/orderList",
+						},
+					],
+				},
+				{
+					name: "价格设置",
+					path: "/price",
+					meta: {
+						title: "价格",
+						icon: "el-icon-files",
+						type: "menu",
+					},
+					children: [
+						{
+							path: "/price/setting",
+							name: "priceSetting",
+							meta: {
+								title: "价格设置",
+								icon: "el-icon-tickets",
+								type: "menu",
+							},
+							component: "price/setting",
+						},
+						{
+							path: "/price/mobile",
+							name: "mobile",
+							meta: {
+								title: "手机打印价格",
+								icon: "el-icon-tickets",
+								type: "menu",
+							},
+							component: "price/mobile",
+						},
+					],
+				},
+				{
+					name: "积分设置",
+					path: "/pointsSetting",
+					component: "pointsSetting",
+					meta: {
+						title: "积分设置",
+						icon: "el-icon-files",
+						type: "menu",
+						isHide: true,
+					},
+				},
+			];
+			this.$TOOL.data.set("MENU", menuList);
+			this.$TOOL.data.set("PERMISSIONS", "");
+			this.$TOOL.data.set("DASHBOARDGRID", "");
 			// } else {
 			// 	this.islogin = false;
 			// 	this.$message.warning(menu.message);

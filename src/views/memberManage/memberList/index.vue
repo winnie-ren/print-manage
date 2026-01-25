@@ -29,16 +29,16 @@ export default {
 		// 搜索配置
 		const searchConfig = [
 			{
-				label: "会员编码",
+				label: "账号",
 				name: "gco",
 				component: "input",
-				options: { placeholder: "请输入会员编码" },
+				options: { placeholder: "请输入编码" },
 			},
 			{
-				label: "会员名称",
+				label: "名称",
 				name: "gna",
 				component: "input",
-				options: { placeholder: "请输入会员名称" },
+				options: { placeholder: "请输入名称" },
 			},
 			{
 				label: "状态",
@@ -47,8 +47,9 @@ export default {
 				options: {
 					placeholder: "请选择状态",
 					items: [
-						{ value: "1", label: "有效" },
-						{ value: "0", label: "无效" },
+						{ value: "1", label: "启用" },
+						{ value: "0", label: "禁用" },
+						{ value: "2", label: "冻结" },
 					],
 				},
 			},
@@ -57,52 +58,51 @@ export default {
 		// 表格列配置
 		const tableColumns = [
 			{
-				label: "会员编码",
+				label: "账号",
 				name: "gco",
 				width: 120,
 			},
 			{
-				label: "会员名称",
+				label: "名称",
 				name: "gna",
 				width: 150,
 			},
 			{
-				label: "父级编码",
+				label: "等级名称",
 				name: "pgco",
 				width: 120,
 			},
 			{
-				label: "访问URL",
+				label: "消费金额",
 				name: "url",
 				width: 200,
 			},
 			{
-				label: "图标",
+				label: "备注",
 				name: "icon",
 				width: 100,
-			},
-			{
-				label: "显示排序",
-				name: "sorts",
-				width: 80,
-			},
-			{
-				label: "会员类型",
-				name: "menuType",
-				width: 100,
-				format: "dir:文件夹/node:会员",
-			},
-			{
-				label: "打开方式",
-				name: "target",
-				width: 120,
-				format: "0:本系统窗口/1:浏览器新标签页",
 			},
 			{
 				label: "状态",
 				name: "status",
 				width: 80,
-				format: "0:无效/1:有效",
+				format: "0:禁用/1:启用/2:冻结",
+			},
+			{
+				label: "创建时间",
+				name: "sorts",
+			},
+			{
+				label: "创建人",
+				name: "createUser",
+			},
+			{
+				label: "更新时间",
+				name: "sorts",
+			},
+			{
+				label: "更新人",
+				name: "createUser",
 			},
 		];
 
@@ -112,79 +112,42 @@ export default {
 			labelPosition: "right",
 			formItems: [
 				{
-					label: "会员编码",
+					label: "账号",
 					name: "gco",
 					component: "input",
 					options: { placeholder: "请输入" },
 					rules: [
 						{
 							required: true,
-							message: "请输入会员编码",
+							message: "请输入账号",
 							trigger: "blur",
 						},
 					],
 				},
 				{
-					label: "会员名称",
+					label: "名称",
 					name: "gna",
 					component: "input",
 					options: { placeholder: "请输入" },
 					rules: [
 						{
 							required: true,
-							message: "请输入会员名称",
+							message: "请输入名称",
 							trigger: "blur",
 						},
 					],
 				},
 				{
-					label: "父级编码",
+					label: "等级名称",
 					name: "pgco",
 					component: "input",
 					options: { placeholder: "请输入" },
 				},
 				{
-					label: "访问URL",
+					label: "消费金额",
 					name: "url",
 					component: "input",
 					options: { placeholder: "请输入" },
-				},
-				{
-					label: "图标",
-					name: "icon",
-					component: "input",
-					options: { placeholder: "请输入" },
-				},
-				{
-					label: "显示排序",
-					name: "sorts",
-					component: "number",
-					props: { min: 0 },
-					options: { placeholder: "请输入" },
-				},
-				{
-					label: "会员类型",
-					name: "menuType",
-					component: "radio",
-					options: {
-						placeholder: "请输入",
-						items: [
-							{ label: "文件夹", value: "dir" },
-							{ label: "会员", value: "node" },
-						],
-					},
-				},
-				{
-					label: "打开方式",
-					name: "target",
-					component: "radio",
-					options: {
-						placeholder: "请输入",
-						items: [
-							{ label: "本系统窗口", value: 0 },
-							{ label: "浏览器新标签页", value: 1 },
-						],
-					},
 				},
 				{
 					label: "状态",
@@ -193,8 +156,9 @@ export default {
 					options: {
 						placeholder: "请输入",
 						items: [
-							{ label: "无效", value: "0" },
-							{ label: "有效", value: "1" },
+							{ value: "1", label: "启用" },
+							{ value: "0", label: "禁用" },
+							{ value: "2", label: "冻结" },
 						],
 					},
 				},
