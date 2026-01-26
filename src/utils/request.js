@@ -34,7 +34,7 @@ let MessageBox_401_show = false
 axios.interceptors.response.use(
 	(response) => {
 		const { data } = response
-		if (![0, 200].includes(data.code)) {
+		if (![0, 200, 100000013].includes(data.code)) {
 			ElNotification.error({
 				title: '请求失败',
 				message: data?.msg || `未知错误！`
