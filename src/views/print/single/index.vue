@@ -192,7 +192,20 @@
 							></el-input>
 						</el-form-item>
 						<el-form-item label="文件上传" prop="files">
-							<MultipartFile />
+							<el-upload
+								class="upload-demo"
+								drag
+								action="/api/files/upload"
+								:on-success="uploadSuccess"
+								style="flex: 1"
+							>
+								<el-icon size="80" color="#ffaf58"
+									><upload-filled
+								/></el-icon>
+								<div class="el-upload__text">
+									请将文件拖到此处或 <em>点击上传</em>
+								</div>
+							</el-upload>
 						</el-form-item>
 					</el-form>
 				</el-main>
@@ -225,7 +238,7 @@
 <script>
 import { UploadFilled } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import MultipartFile from "@/components/multipartFile/index";
+
 // 从表单配置中提取选项数据
 const formConfigOptions = [
 	{
@@ -380,16 +393,9 @@ export default {
 	name: "single",
 	components: {
 		UploadFilled,
-		MultipartFile,
 	},
 	data() {
 		return {
-			uploadFileList: [], // 文件列表
-			chunkSize: 2 * 1024 * 1024, // 2MB 分片大小
-			// 上传并发数
-			simultaneousUploads: 3,
-			currentFileIndex: 0,
-
 			list: {
 				apiObj: this.$API.print.singlePage,
 			},
@@ -423,6 +429,7 @@ export default {
 				deliveryMethod: "自取",
 				payType: "ALIPAY",
 				remarks: "",
+				fileId: "",
 			},
 			formConfig: [
 				{
@@ -450,6 +457,7 @@ export default {
 					options: [
 						{ label: "A5 (148*210)", value: "A5" },
 						{ label: "B5 (176*250)", value: "B5" },
+						{ label: "A4 (210*297)", value: "A4" },
 						{ label: "A3 (297*420)", value: "A3" },
 						{ label: "自定义", value: 0 },
 					],
@@ -627,31 +635,6 @@ export default {
 				ElMessage.error(res.message || "操作失败");
 			}
 		},
-		async buyNow() {
-			const res = await this.$API.print.singleSave.post(this.formDetail);
-			if (res.code === 0 && res.data) {
-				if (this.formDetail.payType === "ALIPAY") {
-					// 调用支付宝统一收单下单并支付页面接口
-					// 将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
-					document.write(res.data);
-				}
-			}
-		},
-		getCurrentFileProgress() {
-			const currentFile = this.uploadFileList[this.currentFileIndex];
-			if (!currentFile || !currentFile.chunkList) {
-				return;
-			}
-			const chunkList = currentFile.chunkList;
-			const uploadedSize = chunkList
-				.filter((item) => item.progress >= 100) // 只统计已完成的分片
-				.reduce((acc, cur) => acc + cur.chunk.file.size, 0);
-			// 计算方式：已上传大小 / 文件总大小
-			let progress = parseInt((uploadedSize / currentFile.size) * 100);
-			currentFile.uploadProgress = progress;
-			this.$set(this.uploadFileList, this.currentFileIndex, currentFile);
-		},
-		// 重置表单时清空文件列表
 		resetForm() {
 			this.formDetail = {
 				printColor: "blackWhite",
@@ -664,15 +647,28 @@ export default {
 				deliveryMethod: "自取",
 				payType: "ALIPAY",
 				remarks: "",
-				files: [], // 添加文件数组
+				fileId: "",
 			};
-			this.uploadFileList = []; // 清空文件列表
-			this.currentFileIndex = 0; // 重置文件索引
+		},
+		uploadSuccess(response) {
+			console.log("上传成功:", response);
+			if (response?.code === 0) {
+				this.formDetail.fileId = response.data.fileCode;
+			}
+		},
+		async buyNow() {
+			const res = await this.$API.print.singleSave.post(this.formDetail);
+			if (res.code === 0 && res.data) {
+				if (this.formDetail.payType === "ALIPAY") {
+					// 调用支付宝统一收单下单并支付页面接口
+					// 将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
+					document.write(res.data);
+				}
+			}
 		},
 	},
 };
 </script>
-
 <style lang="scss">
 .print-dialog {
 	.el-dialog__body {
@@ -683,7 +679,6 @@ export default {
 	}
 }
 </style>
-
 <style lang="scss" scoped>
 .el-header {
 	--el-header-height: 40px;
