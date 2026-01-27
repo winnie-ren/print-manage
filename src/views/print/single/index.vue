@@ -195,7 +195,9 @@
 							<el-upload
 								class="upload-demo"
 								drag
+								:limit="1"
 								action="/api/files/upload"
+								:on-exceed="handleExceed"
 								:on-success="uploadSuccess"
 								style="flex: 1"
 							>
@@ -655,6 +657,9 @@ export default {
 			if (response?.code === 0) {
 				this.formDetail.fileId = response.data.fileCode;
 			}
+		},
+		handleExceed() {
+			this.$message.warning(`只允许上传一个文件`);
 		},
 		async buyNow() {
 			const res = await this.$API.print.singleSave.post(this.formDetail);

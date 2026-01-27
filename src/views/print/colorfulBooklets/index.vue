@@ -190,8 +190,10 @@
 							<el-upload
 								class="upload-demo"
 								drag
-								action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-								multiple
+								:limit="1"
+								action="/api/files/upload"
+								:on-exceed="handleExceed"
+								:on-success="uploadSuccess"
 								style="flex: 1"
 							>
 								<el-icon size="80" color="#ffaf58"
@@ -396,6 +398,7 @@ export default {
 				deliveryMethod: "self", // 默认交付方式为自取
 				remarks: "",
 				customSize: "",
+				fileId: "",
 			},
 			rules: {
 				required: [{ required: true, message: "请填写" }],
@@ -630,7 +633,17 @@ export default {
 				deliveryMethod: "self", // 默认交付方式为自取
 				remarks: "",
 				customSize: "",
+				fileId: "",
 			};
+		},
+		uploadSuccess(response) {
+			console.log("上传成功:", response);
+			if (response?.code === 0) {
+				this.formDetail.fileId = response.data.fileCode;
+			}
+		},
+		handleExceed() {
+			this.$message.warning(`只允许上传一个文件`);
 		},
 		async buyNow() {
 			const res = await this.$API.print.colorSave.post(this.formDetail);
