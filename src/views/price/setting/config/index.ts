@@ -113,14 +113,6 @@ export const materialData = [
 // 单张表单配置
 export const singleFormConfig = [
  {
-  label: "印色",
-  value: "printColor",
-  children: [
-   { label: "黑白", value: "blackWhite" },
-   { label: "彩色", value: "color" },
-  ],
- },
- {
   label: "印面",
   value: "printSide",
   children: [
@@ -136,6 +128,15 @@ export const singleFormConfig = [
    { label: "B5 (176*250)", value: "B5" },
    { label: "A4 (210*297)", value: "A4" },
    { label: "A3 (297*420)", value: "A3" },
+  ],
+ },
+ {
+  label: "交付方式",
+  value: "deliveryMethod",
+  children: [
+   { label: "自取", value: "self" },
+   { label: "送货上门", value: "delivery" },
+   { label: "快递到付", value: "express" },
   ],
  },
 ];

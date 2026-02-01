@@ -5,7 +5,7 @@
 
 export default (error, vm)=>{
 	//过滤HTTP请求错误
-	if(error.status || error.status==0){
+	if(!error || error.status || error.status==0){
 		return false
 	}
 

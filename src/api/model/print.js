@@ -61,4 +61,11 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	payOrder: {
+		url: `${config.API_URL}/pay/payOrder`,
+		name: "预支付订单",
+		post: async function (data = {}) {
+			return await http.post(this.url, data);
+		}
+	},
 }

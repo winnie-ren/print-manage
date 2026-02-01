@@ -248,7 +248,7 @@ const formConfigOptions = [
 		prop: "printColor",
 		type: "radio",
 		options: [
-			{ label: "黑白", value: "blackWhite" },
+			{ label: "黑白", value: "black" },
 			{ label: "彩色", value: "color" },
 		],
 	},
@@ -421,7 +421,7 @@ export default {
 				styleCount: "",
 			},
 			formDetail: {
-				printColor: "blackWhite",
+				printColor: "black",
 				printSide: "single",
 				size: "A5",
 				material: "coatedPaper",
@@ -439,7 +439,7 @@ export default {
 					prop: "printColor",
 					type: "radio",
 					options: [
-						{ label: "黑白", value: "blackWhite" },
+						{ label: "黑白", value: "black" },
 						{ label: "彩色", value: "color" },
 					],
 				},
@@ -639,7 +639,7 @@ export default {
 		},
 		resetForm() {
 			this.formDetail = {
-				printColor: "blackWhite",
+				printColor: "black",
 				printSide: "single",
 				size: "A5",
 				material: "coatedPaper",
@@ -664,10 +664,17 @@ export default {
 		async buyNow() {
 			const res = await this.$API.print.singleSave.post(this.formDetail);
 			if (res.code === 0 && res.data) {
-				if (this.formDetail.payType === "ALIPAY") {
-					// 调用支付宝统一收单下单并支付页面接口
-					// 将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
-					document.write(res.data);
+				const orderNo = res.data?.printNo;
+				if (orderNo) {
+					// 订单预支付
+					const payRes = await this.$API.print.payOrder.post({ orderNo, printType: 'singlepage' });
+					if (payRes.code === 0) {
+						if (this.formDetail.payType === "ALIPAY") {
+							// 调用支付宝统一收单下单并支付页面接口
+							// 将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
+							document.write(res.data);
+						}
+					}
 				}
 			}
 		},

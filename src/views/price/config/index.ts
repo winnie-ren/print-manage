@@ -116,7 +116,7 @@ export const singleFormConfig = [
   label: "印色",
   value: "printColor",
   children: [
-   { label: "黑白", value: "blackWhite" },
+   { label: "黑白", value: "black" },
    { label: "彩色", value: "color" },
   ],
  },

@@ -373,14 +373,15 @@ export default {
 		};
 		// 单张表单数据
 		const singleForm = ref({
-			printColor_blackWhite: 1,
-			printColor_color: 1,
 			printSide_single: 1,
 			printSide_double: 1.5,
 			size_A5: 0.5,
 			size_B5: 0.8,
 			size_A4: 1,
 			size_A3: 2,
+			deliveryMethod_self: 0,
+			deliveryMethod_delivery: 10,
+			deliveryMethod_express: 0,
 			coatedPaper_157_black: 0.25,
 			coatedPaper_157_color: 0.3,
 			coatedPaper_200_black: 0.35,
