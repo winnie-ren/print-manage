@@ -211,17 +211,17 @@
 						<span class="price"> 官网下单￥ </span>
 						<span>预计生产时间， 预计净重</span>
 					</div>
-					<el-button
+					<!-- <el-button
 						type="primary"
 						size="large"
 						plain
 						style="margin-right: 10px"
 						>计算价格</el-button
-					>
+					> -->
 					<el-button-group>
-						<el-button type="danger" size="large">
+						<!-- <el-button type="danger" size="large">
 							加入购物车
-						</el-button>
+						</el-button> -->
 						<el-button type="success" size="large" @click="buyNow"
 							>立即购买</el-button
 						>
@@ -308,6 +308,21 @@ const tableHeader = [
 		span: 6,
 	},
 	{
+		label: "订单金额(分)",
+		name: "totalFee",
+		component: "input", // 保留输入框因为有自定义值
+		table: true,
+		span: 6,
+	},
+	{
+		label: "状态",
+		name: "status",
+		component: "input", // 保留输入框因为有自定义值
+		table: true,
+		span: 6,
+		format: 'INIT:已创建/PAYING:已下单等待支付/SUCCESS:支付成功/FAIL:支付失败/CLOSED:已关闭或超时'
+	},
+	{
 		label: "成品规格",
 		name: "spec",
 		component: "select",
@@ -329,6 +344,7 @@ const tableHeader = [
 		options: formConfigOptions["paperType"],
 		table: true,
 		span: 6,
+		format: 'twoSidePaper_80:80克双胶纸/twoSidePaper_100:100克双胶纸/coatedPaper_128:128克铜版纸/coatedPaper_157:157克铜板纸'
 	},
 	{
 		label: "封面印色",
@@ -337,6 +353,7 @@ const tableHeader = [
 		options: formConfigOptions["coverColor"],
 		table: true,
 		span: 6,
+		format: 'black:黑白/color:彩色/single:单色/fullColor:全彩'
 	},
 	{
 		label: "内页印色",
@@ -345,6 +362,7 @@ const tableHeader = [
 		options: formConfigOptions["innerColor"],
 		table: true,
 		span: 6,
+		format: 'black:黑白/color:彩色/single:单色/fullColor:全彩'
 	},
 	{
 		label: "交付方式",
@@ -353,6 +371,7 @@ const tableHeader = [
 		options: formConfigOptions["deliveryMethod"],
 		table: true,
 		span: 6,
+		format: 'self:自取/delivery:送货上门/cashOnDelivery:快递到付/express:快递寄付/pickupStore:到店取货'
 	},
 ];
 
@@ -530,20 +549,30 @@ export default {
 			this.dialogVisible = true;
 		},
 		// 编辑
-		table_edit(row) {
+		async table_edit(row) {
 			this.dialogTitle = "编辑";
 			this.dialogVisible = true;
-			this.$nextTick(() => {
-				this.formDetail = { ...row };
-			});
+			var res = await this.$API.print.blackGetById.get({ id: row.id });
+			if (res.code == 0) {
+				this.formDetail = res.data;
+			} else {
+				this.$nextTick(() => {
+					this.formDetail = { ...row };
+				});
+			}
 		},
 		// 查看
-		table_show(row) {
+		async table_show(row) {
 			this.dialogTitle = "查看";
 			this.dialogVisible = true;
-			this.$nextTick(() => {
-				this.formDetail = { ...row };
-			});
+			var res = await this.$API.print.blackGetById.get({ id: row.id });
+			if (res.code == 0) {
+				this.formDetail = res.data;
+			} else {
+				this.$nextTick(() => {
+					this.formDetail = { ...row };
+				});
+			}
 		},
 		// 删除
 		async table_del(row, index) {

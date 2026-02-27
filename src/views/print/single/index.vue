@@ -216,17 +216,17 @@
 						<span class="price"> 官网下单￥ </span>
 						<span>预计生产时间， 预计净重</span>
 					</div>
-					<el-button
+					<!-- <el-button
 						type="primary"
 						size="large"
 						plain
 						style="margin-right: 10px"
 						>计算价格</el-button
-					>
+					> -->
 					<el-button-group>
-						<el-button type="danger" size="large">
+						<!-- <el-button type="danger" size="large">
 							加入购物车
-						</el-button>
+						</el-button> -->
 						<el-button type="success" size="large" @click="buyNow"
 							>立即购买</el-button
 						>
@@ -342,6 +342,21 @@ const tableHeader = [
 		span: 6,
 	},
 	{
+		label: "订单金额(分)",
+		name: "totalFee",
+		component: "input", // 保留输入框因为有自定义值
+		table: true,
+		span: 6,
+	},
+	{
+		label: "状态",
+		name: "status",
+		component: "input", // 保留输入框因为有自定义值
+		table: true,
+		span: 6,
+		format: "INIT:已创建/PAYING:已下单等待支付/SUCCESS:支付成功/FAIL:支付失败/CLOSED:已关闭或超时",
+	},
+	{
 		label: "张数",
 		name: "sheetCount",
 		component: "number", // 保留输入框因为有自定义值
@@ -357,6 +372,7 @@ const tableHeader = [
 				?.options || [],
 		table: true,
 		span: 6,
+		format: "single:单面/double:双面",
 	},
 	{
 		label: "成品尺寸",
@@ -374,6 +390,7 @@ const tableHeader = [
 				?.options || [],
 		table: true,
 		span: 6,
+		format: "coatedPaper:铜版纸/mattePaper:哑粉纸/twoSidePaper:双胶纸",
 	},
 	{
 		label: "克重",
@@ -544,20 +561,30 @@ export default {
 			this.dialogVisible = true;
 		},
 		// 编辑
-		table_edit(row) {
+		async table_edit(row) {
 			this.dialogTitle = "编辑";
 			this.dialogVisible = true;
-			this.$nextTick(() => {
-				this.formDetail = { ...row };
-			});
+			var res = await this.$API.print.singleGetById.get({ id: row.id });
+			if (res.code == 0) {
+				this.formDetail = res.data;
+			} else {
+				this.$nextTick(() => {
+					this.formDetail = { ...row };
+				});
+			}
 		},
 		// 查看
-		table_show(row) {
+		async table_show(row) {
 			this.dialogTitle = "查看";
 			this.dialogVisible = true;
-			this.$nextTick(() => {
-				this.formDetail = { ...row };
-			});
+			var res = await this.$API.print.singleGetById.get({ id: row.id });
+			if (res.code == 0) {
+				this.formDetail = res.data;
+			} else {
+				this.$nextTick(() => {
+					this.formDetail = { ...row };
+				});
+			}
 		},
 		// 删除
 		async table_del(row, index) {
@@ -667,12 +694,15 @@ export default {
 				const orderNo = res.data?.printNo;
 				if (orderNo) {
 					// 订单预支付
-					const payRes = await this.$API.print.payOrder.post({ orderNo, printType: 'singlepage' });
+					const payRes = await this.$API.print.payOrder.post({
+						orderNo,
+						printType: "printSinglePage",
+					});
 					if (payRes.code === 0) {
 						if (this.formDetail.payType === "ALIPAY") {
 							// 调用支付宝统一收单下单并支付页面接口
 							// 将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
-							document.write(res.data);
+							document.write(payRes.data);
 						}
 					}
 				}
