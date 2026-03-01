@@ -26,6 +26,13 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	fileDownload: {
+		url: `${config.API_URL}${singleApi}/download`,
+		name: "文件下载",
+		post: async function (url, data = {}) {
+			return await http.post(url, data, { responseType: 'blob' });
+		}
+	},
 	singleGetById: {
 		url: `${config.API_URL}${singleApi}/getById`,
 		name: "单张获取",

@@ -66,6 +66,19 @@ export const formConfigOptions = {
   { label: "单面", value: "single" },
   { label: "双面", value: "double" },
  ],
+ printColor: [
+  { label: "黑白", value: "black" },
+  { label: "彩色", value: "color" },
+ ],
+ printSide:[
+  { label: "单面", value: "single" },
+  { label: "双面", value: "double" },
+ ],
+ material: [
+  { label: "铜版纸", value: "coatedPaper" },
+  { label: "特种纸", value: "specialPaper" },
+  { label: "皮纹纸", value: "stripedPaper" },
+ ],
  deliveryTime: [
   { label: "1小时", value: "1" },
   { label: "2小时", value: "2" },

@@ -190,6 +190,7 @@
 								action="/api/files/upload"
 								:on-exceed="handleExceed"
 								:on-success="uploadSuccess"
+								v-if="!uploadDisabled"
 								style="flex: 1"
 							>
 								<el-icon size="80" color="#ffaf58"
@@ -199,13 +200,20 @@
 									请将文件拖到此处或 <em>点击上传</em>
 								</div>
 							</el-upload>
+							<div
+								v-if="uploadDisabled && formDetail.fileUrl"
+								class="file-list"
+							>
+								<span>文件数量：1</span>
+								<el-button type="primary" @click="downloadFile(formDetail.fileUrl)">下载文件</el-button>
+							</div>
 						</el-form-item>
 					</el-form>
 				</el-main>
 				<div class="bottom-shop">
 					<div class="order-content">
-						<span class="price"> 官网下单￥ </span>
-						<span>预计生产时间， 预计净重</span>
+						<!-- <span class="price"> 官网下单￥ </span>
+						<span>预计生产时间， 预计净重</span> -->
 					</div>
 					<!-- <el-button
 						type="primary"
@@ -231,39 +239,8 @@
 <script>
 import { UploadFilled } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-
 // 从表单配置中提取选项数据
-const formConfigOptions = [
-	{
-		label: "印色",
-		prop: "printColor",
-		type: "radio",
-		options: [
-			{ label: "黑白", value: "black" },
-			{ label: "彩色", value: "color" },
-		],
-	},
-	{
-		label: "印面",
-		prop: "printSide",
-		type: "radio",
-		options: [
-			{ label: "单面", value: "single" },
-			{ label: "双面", value: "double" },
-		],
-	},
-	{
-		label: "材料",
-		prop: "material",
-		type: "radio",
-		options: [
-			{ label: "铜版纸", value: "coatedPaper" },
-			{ label: "哑粉纸", value: "mattePaper" },
-			{ label: "双胶纸", value: "twoSidePaper" },
-		],
-	},
-];
-
+import { formConfigOptions } from "@/views/price/config/index.ts";
 // 搜索配置
 const searchConfig = [
 	{
@@ -284,10 +261,7 @@ const searchConfig = [
 		component: "select",
 		options: {
 			placeholder: "请选择印面",
-			items: [
-				{ value: "single", label: "单面" },
-				{ value: "double", label: "双面" },
-			],
+			items: formConfigOptions["printSide"],
 		},
 	},
 	{
@@ -302,11 +276,7 @@ const searchConfig = [
 		component: "select",
 		options: {
 			placeholder: "请选择材料",
-			items: [
-				{ label: "铜版纸", value: "coatedPaper" },
-				{ label: "哑粉纸", value: "mattePaper" },
-				{ label: "双胶纸", value: "twoSidePaper" },
-			],
+			items: formConfigOptions["material"],
 		},
 	},
 	{
@@ -358,9 +328,7 @@ const tableHeader = [
 		label: "印面",
 		name: "printSide",
 		component: "select",
-		options:
-			formConfigOptions.find((item) => item.prop === "printSide")
-				?.options || [],
+		options: formConfigOptions["printSide"],
 		table: true,
 		span: 6,
 		format: "single:单面/double:双面",
@@ -376,9 +344,7 @@ const tableHeader = [
 		label: "材料",
 		name: "material",
 		component: "select",
-		options:
-			formConfigOptions.find((item) => item.prop === "material")
-				?.options || [],
+		options: formConfigOptions["material"],
 		table: true,
 		span: 6,
 		format: "coatedPaper:铜版纸/mattePaper:哑粉纸/twoSidePaper:双胶纸",
@@ -436,7 +402,7 @@ export default {
 				weight: 157,
 				styleCount: 1,
 				sheetCount: 1,
-				deliveryMethod: "自取",
+				deliveryMethod: "self",
 				payType: "ALIPAY",
 				remarks: "",
 				fileId: "",
@@ -525,12 +491,7 @@ export default {
 					label: "交付方式",
 					prop: "deliveryMethod",
 					type: "radio",
-					options: [
-						{ label: "自取", value: "自取" },
-						{ label: "送货上门", value: "送货上门" },
-						{ label: "快递到付", value: "快递到付" },
-						{ label: "快递寄付", value: "快递寄付" },
-					],
+					options: formConfigOptions["deliveryMethod"],
 				},
 				{
 					label: "支付方式",
@@ -542,6 +503,7 @@ export default {
 					],
 				},
 			],
+			uploadDisabled: false,
 		};
 	},
 	methods: {
@@ -550,12 +512,16 @@ export default {
 			this.dialogTitle = "新增";
 			this.resetForm();
 			this.dialogVisible = true;
+			this.uploadDisabled = false;
 		},
 		// 查看
 		async table_show(row) {
 			this.dialogTitle = "查看";
 			this.dialogVisible = true;
-			var res = await this.$API.print.singleGetById.get({ printNo: row.printNo });
+			var res = await this.$API.print.singleGetById.get({
+				printNo: row.printNo,
+			});
+			this.uploadDisabled = true;
 			if (res.code == 0) {
 				this.formDetail = res.data;
 			} else {
@@ -648,7 +614,7 @@ export default {
 				weight: 157,
 				styleCount: 1,
 				sheetCount: 1,
-				deliveryMethod: "自取",
+				deliveryMethod: "self",
 				payType: "ALIPAY",
 				remarks: "",
 				fileId: "",
@@ -745,6 +711,38 @@ export default {
 				}
 			}
 		},
+		async downloadFile(fileUrl) {
+			const response = await this.$API.print.fileDownload.post(fileUrl, {});
+			const fileReader = new FileReader();
+			fileReader.readAsText(response.data, 'utf-8');
+			fileReader.onload = function () {
+				try {
+					const result = JSON.parse(fileReader.result);
+					if (!(result.code === 200 || result.code === 0)) {
+						ElMessage.error(result.msg); // 业务中拼接报错提示
+					}
+				} catch (e) {
+					const blob = new Blob([response.data]);
+					const url = window.URL.createObjectURL(blob);
+					const link = document.createElement('a');
+					link.href = url;
+					const contentDisposition = response.headers['content-disposition'];
+					let filename = 'file.txt';
+					if (contentDisposition) {
+						const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+						const matches = filenameRegex.exec(contentDisposition);
+						if (matches != null && matches[1]) {
+							filename = matches[1].replace(/['"]/g, '').replace('UTF-8', '');
+						}
+					}
+					link.setAttribute('download', decodeURIComponent(filename));
+					document.body.appendChild(link);
+					link.click();
+					document.body.removeChild(link);
+					window.URL.revokeObjectURL(url);
+				}
+			};
+		}
 	},
 	beforeUnmount() {
 		this.stopPolling(); // 清理轮询
@@ -808,5 +806,17 @@ export default {
 	flex: 1;
 	font-size: 16px;
 	font-weight: bold;
+}
+.file-list {
+	margin-top: 10px;
+	margin-right: 10px;
+	padding: 10px;
+	border: 1px dashed #ccc;
+	border-radius: 4px;
+	background-color: #f9f9f9;
+	width: 100%;
+	span{
+		padding-right: 10px;
+	}
 }
 </style>
