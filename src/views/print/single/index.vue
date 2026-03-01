@@ -680,7 +680,6 @@ export default {
 			};
 		},
 		uploadSuccess(response) {
-			console.log("上传成功:", response);
 			if (response?.code === 0) {
 				this.formDetail.fileId = response.data.fileCode;
 			}
@@ -688,6 +687,54 @@ export default {
 		handleExceed() {
 			this.$message.warning(`只允许上传一个文件`);
 		},
+		// 启动轮询
+		startPolling(orderNo, payWindow) {
+			this.orderNo = orderNo;
+			this.pollingInterval = setInterval(async () => {
+				const res = await this.$API.print.singleGetById.get({
+					orderNo,
+				});
+				if (res.code === 0 && res.data.status === "SUCCESS") {
+					this.stopPolling();
+					this.handlePaymentSuccess(payWindow);
+				}
+			}, 2000); // 每2秒查询一次
+		},
+		// 停止轮询
+		stopPolling() {
+			if (this.pollingInterval) {
+				clearInterval(this.pollingInterval);
+				this.pollingInterval = null;
+			}
+		},
+		// 处理支付成功
+		handlePaymentSuccess(payWindow) {
+			this.$message.success("支付成功");
+			this.dialogVisible = false;
+			this.$refs.table.getData();
+			if (payWindow && !payWindow.closed) {
+				payWindow.close();
+			}
+		},
+		// 监听页面可见性变化
+		handleVisibilityChange() {
+			if (!document.hidden) {
+				this.checkOrderStatusOnReturn();
+			}
+		},
+		// 页面返回时检查订单状态
+		async checkOrderStatusOnReturn() {
+			if (this.orderNo) {
+				const res = await this.$API.print.singleGetById.get({
+					orderNo: this.orderNo,
+				});
+				if (res.code === 0 && res.data.status === "SUCCESS") {
+					this.stopPolling();
+					this.handlePaymentSuccess();
+				}
+			}
+		},
+		// 立即购买
 		async buyNow() {
 			const res = await this.$API.print.singleSave.post(this.formDetail);
 			if (res.code === 0 && res.data) {
@@ -700,14 +747,33 @@ export default {
 					});
 					if (payRes.code === 0) {
 						if (this.formDetail.payType === "ALIPAY") {
-							// 调用支付宝统一收单下单并支付页面接口
-							// 将支付宝返回的表单字符串写在浏览器中，表单会自动触发submit提交
-							document.write(payRes.data);
+							// 监听页面可见性变化
+							document.addEventListener("visibilitychange", this.handleVisibilityChange);
+							// 打开新页签加载支付页面
+							const paymentWindow = window.open("", "_blank");
+							paymentWindow.document.write(payRes.data);
+							// 启动轮询
+							this.startPolling(orderNo, paymentWindow);
+							paymentWindow.document.close();
+							// 监听新页签关闭事件
+							const checkClosed = setInterval(() => {
+								if (paymentWindow.closed) {
+									clearInterval(checkClosed);
+									this.checkOrderStatusOnReturn(); // 检查支付状态
+								}
+							}, 1000);
 						}
 					}
 				}
 			}
 		},
+	},
+	beforeUnmount() {
+		this.stopPolling(); // 清理轮询
+		document.removeEventListener(
+			"visibilitychange",
+			this.handleVisibilityChange
+		); // 移除事件监听
 	},
 };
 </script>
