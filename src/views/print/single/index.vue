@@ -95,33 +95,19 @@
 						</el-table-column>
 					</template>
 					<el-table-column
-						label="操作"
+						label="文件"
 						fixed="right"
-						align="right"
-						width="160"
+						width="80"
 					>
 						<template #default="scope">
 							<el-button-group>
 								<el-button
-									text
 									type="primary"
 									size="small"
 									@click="table_show(scope.row, scope.$index)"
-									>查看</el-button
 								>
-								<el-popconfirm
-									title="确定删除吗？"
-									@confirm="table_del(scope.row)"
-								>
-									<template #reference>
-										<el-button
-											text
-											type="primary"
-											size="small"
-											>删除</el-button
-										>
-									</template>
-								</el-popconfirm>
+									查看
+								</el-button>
 							</el-button-group>
 						</template>
 					</el-table-column>
@@ -154,6 +140,7 @@
 									v-for="option in item.options"
 									:key="option.value"
 									:label="option.value"
+									:disabled="dialogTitle === '查看'"
 									border
 								>
 									{{ option.label }}
@@ -178,6 +165,7 @@
 						<el-form-item label="补充说明" prop="remarks">
 							<el-input
 								v-model="formDetail.remarks"
+								:disabled="dialogTitle === '查看'"
 								type="textarea"
 								placeholder="其他对商品要求的描述或补充说明"
 							></el-input>
@@ -205,7 +193,11 @@
 								class="file-list"
 							>
 								<span>文件数量：1</span>
-								<el-button type="primary" @click="downloadFile(formDetail.fileUrl)">下载文件</el-button>
+								<el-button
+									type="primary"
+									@click="downloadFile(formDetail.fileUrl)"
+									>下载文件</el-button
+								>
 							</div>
 						</el-form-item>
 					</el-form>
@@ -226,9 +218,14 @@
 						<!-- <el-button type="danger" size="large">
 							加入购物车
 						</el-button> -->
-						<el-button type="success" size="large" @click="buyNow"
-							>立即购买</el-button
+						<el-button
+							v-if="dialogTitle === '新增'"
+							type="success"
+							size="large"
+							@click="buyNow"
 						>
+							立即购买
+						</el-button>
 					</el-button-group>
 				</div>
 			</div>
@@ -530,14 +527,6 @@ export default {
 				});
 			}
 		},
-		// 删除
-		async table_del(row) {
-			var res = await this.$API.print.singleDelete.delete([row.id]);
-			if (res.code == 0) {
-				this.$message.success("删除成功");
-				this.$refs.table.getData(); // 刷新表格
-			}
-		},
 		// 批量删除
 		async batch_del() {
 			this.$confirm(
@@ -712,9 +701,12 @@ export default {
 			}
 		},
 		async downloadFile(fileUrl) {
-			const response = await this.$API.print.fileDownload.post(fileUrl, {});
+			const response = await this.$API.print.fileDownload.post(
+				fileUrl,
+				{}
+			);
 			const fileReader = new FileReader();
-			fileReader.readAsText(response.data, 'utf-8');
+			fileReader.readAsText(response.data, "utf-8");
 			fileReader.onload = function () {
 				try {
 					const result = JSON.parse(fileReader.result);
@@ -724,25 +716,29 @@ export default {
 				} catch (e) {
 					const blob = new Blob([response.data]);
 					const url = window.URL.createObjectURL(blob);
-					const link = document.createElement('a');
+					const link = document.createElement("a");
 					link.href = url;
-					const contentDisposition = response.headers['content-disposition'];
-					let filename = 'file.txt';
+					const contentDisposition =
+						response.headers["content-disposition"];
+					let filename = "file.txt";
 					if (contentDisposition) {
-						const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+						const filenameRegex =
+							/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
 						const matches = filenameRegex.exec(contentDisposition);
 						if (matches != null && matches[1]) {
-							filename = matches[1].replace(/['"]/g, '').replace('UTF-8', '');
+							filename = matches[1]
+								.replace(/['"]/g, "")
+								.replace("UTF-8", "");
 						}
 					}
-					link.setAttribute('download', decodeURIComponent(filename));
+					link.setAttribute("download", decodeURIComponent(filename));
 					document.body.appendChild(link);
 					link.click();
 					document.body.removeChild(link);
 					window.URL.revokeObjectURL(url);
 				}
 			};
-		}
+		},
 	},
 	beforeUnmount() {
 		this.stopPolling(); // 清理轮询
@@ -815,7 +811,7 @@ export default {
 	border-radius: 4px;
 	background-color: #f9f9f9;
 	width: 100%;
-	span{
+	span {
 		padding-right: 10px;
 	}
 }
