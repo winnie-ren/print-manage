@@ -12,6 +12,13 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	singleDelete: {
+		url: `${config.API_URL}${singleApi}/delete`,
+		name: "单张删除",
+		delete: async function (data = {}) {
+			return await http.delete(this.url, data);
+		}
+	},
 	singlePage: {
 		url: `${config.API_URL}${singleApi}/page`,
 		name: "单张分页查询",
@@ -40,6 +47,13 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	blackDelete: {
+		url: `${config.API_URL}${blackApi}/delete`,
+		name: "黑白删除",
+		delete: async function (data = {}) {
+			return await http.delete(this.url, data);
+		}
+	},
 	blackGetById: {
 		url: `${config.API_URL}${blackApi}/getById`,
 		name: "黑白获取",
@@ -61,6 +75,13 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	colorDelete: {
+		url: `${config.API_URL}${colorApi}/delete`,
+		name: "彩色删除",
+		delete: async function (data = {}) {
+			return await http.delete(this.url, data);
+		}
+	},
 	colorGetById: {
 		url: `${config.API_URL}${colorApi}/getById`,
 		name: "彩色获取",
@@ -80,6 +101,13 @@ export default {
 		name: "标书保存",
 		post: async function (data = {}) {
 			return await http.post(this.url, data);
+		}
+	},
+	biddingDelete: {
+		url: `${config.API_URL}${biddingApi}/delete`,
+		name: "标书删除",
+		delete: async function (data = {}) {
+			return await http.delete(this.url, data);
 		}
 	},
 	biddingGetById: {

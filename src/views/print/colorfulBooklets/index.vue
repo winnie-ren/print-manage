@@ -109,18 +109,9 @@
 									@click="table_show(scope.row, scope.$index)"
 									>查看</el-button
 								>
-								<el-button
-									text
-									type="primary"
-									size="small"
-									@click="table_edit(scope.row, scope.$index)"
-									>编辑</el-button
-								>
 								<el-popconfirm
 									title="确定删除吗？"
-									@confirm="
-										table_del(scope.row, scope.$index)
-									"
+									@confirm="table_del(scope.row)"
 								>
 									<template #reference>
 										<el-button
@@ -544,19 +535,6 @@ export default {
 			this.resetForm();
 			this.dialogVisible = true;
 		},
-		// 编辑
-		async table_edit(row) {
-			this.dialogTitle = "编辑";
-			this.dialogVisible = true;
-			var res = await this.$API.print.colorGetById.get({ id: row.id });
-			if (res.code == 0) {
-				this.formDetail = res.data;
-			} else {
-				this.$nextTick(() => {
-					this.formDetail = { ...row };
-				});
-			}
-		},
 		// 查看
 		async table_show(row) {
 			this.dialogTitle = "查看";
@@ -571,15 +549,11 @@ export default {
 			}
 		},
 		// 删除
-		async table_del(row, index) {
-			var reqData = { id: row.id };
-			var res = await this.$API.demo.post.post(reqData);
-			if (res.code == 200) {
-				// 这里选择刷新整个表格 OR 插入/编辑现有表格数据
-				this.$refs.table.tableData.splice(index, 1);
+		async table_del(row) {
+			var res = await this.$API.print.colorDelete.delete([row.id]);
+			if (res.code == 0) {
 				this.$message.success("删除成功");
-			} else {
-				this.$alert(res.message, "提示", { type: "error" });
+				this.$refs.table.getData();
 			}
 		},
 		// 批量删除
@@ -594,11 +568,12 @@ export default {
 				.then(async () => {
 					const loading = this.$loading();
 					const ids = this.selection.map((item) => item.id);
-					const res = await this.$API.user.userDelete.delete(ids);
+					const res = await this.$API.print.colorDelete.delete(ids);
 					if (res.code === 0) {
-						loading.close();
 						this.$message.success("删除成功");
+						this.$refs.table.getData(); // 刷新表格
 					}
+					loading.close();
 				})
 				.catch(() => {});
 		},

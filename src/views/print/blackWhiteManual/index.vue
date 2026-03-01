@@ -109,18 +109,9 @@
 									@click="table_show(scope.row, scope.$index)"
 									>查看</el-button
 								>
-								<el-button
-									text
-									type="primary"
-									size="small"
-									@click="table_edit(scope.row, scope.$index)"
-									>编辑</el-button
-								>
 								<el-popconfirm
 									title="确定删除吗？"
-									@confirm="
-										table_del(scope.row, scope.$index)
-									"
+									@confirm="table_del(scope.row)"
 								>
 									<template #reference>
 										<el-button
@@ -320,7 +311,7 @@ const tableHeader = [
 		component: "input", // 保留输入框因为有自定义值
 		table: true,
 		span: 6,
-		format: 'INIT:已创建/PAYING:已下单等待支付/SUCCESS:支付成功/FAIL:支付失败/CLOSED:已关闭或超时'
+		format: "INIT:已创建/PAYING:已下单等待支付/SUCCESS:支付成功/FAIL:支付失败/CLOSED:已关闭或超时",
 	},
 	{
 		label: "成品规格",
@@ -344,7 +335,7 @@ const tableHeader = [
 		options: formConfigOptions["paperType"],
 		table: true,
 		span: 6,
-		format: 'twoSidePaper_80:80克双胶纸/twoSidePaper_100:100克双胶纸/coatedPaper_128:128克铜版纸/coatedPaper_157:157克铜板纸'
+		format: "twoSidePaper_80:80克双胶纸/twoSidePaper_100:100克双胶纸/coatedPaper_128:128克铜版纸/coatedPaper_157:157克铜板纸",
 	},
 	{
 		label: "封面印色",
@@ -353,7 +344,7 @@ const tableHeader = [
 		options: formConfigOptions["coverColor"],
 		table: true,
 		span: 6,
-		format: 'black:黑白/color:彩色/single:单色/fullColor:全彩'
+		format: "black:黑白/color:彩色/single:单色/fullColor:全彩",
 	},
 	{
 		label: "内页印色",
@@ -362,7 +353,7 @@ const tableHeader = [
 		options: formConfigOptions["innerColor"],
 		table: true,
 		span: 6,
-		format: 'black:黑白/color:彩色/single:单色/fullColor:全彩'
+		format: "black:黑白/color:彩色/single:单色/fullColor:全彩",
 	},
 	{
 		label: "交付方式",
@@ -371,7 +362,7 @@ const tableHeader = [
 		options: formConfigOptions["deliveryMethod"],
 		table: true,
 		span: 6,
-		format: 'self:自取/delivery:送货上门/cashOnDelivery:快递到付/express:快递寄付/pickupStore:到店取货'
+		format: "self:自取/delivery:送货上门/cashOnDelivery:快递到付/express:快递寄付/pickupStore:到店取货",
 	},
 ];
 
@@ -548,19 +539,6 @@ export default {
 			this.resetForm();
 			this.dialogVisible = true;
 		},
-		// 编辑
-		async table_edit(row) {
-			this.dialogTitle = "编辑";
-			this.dialogVisible = true;
-			var res = await this.$API.print.blackGetById.get({ id: row.id });
-			if (res.code == 0) {
-				this.formDetail = res.data;
-			} else {
-				this.$nextTick(() => {
-					this.formDetail = { ...row };
-				});
-			}
-		},
 		// 查看
 		async table_show(row) {
 			this.dialogTitle = "查看";
@@ -575,15 +553,11 @@ export default {
 			}
 		},
 		// 删除
-		async table_del(row, index) {
-			var reqData = { id: row.id };
-			var res = await this.$API.demo.post.post(reqData);
-			if (res.code == 200) {
-				// 这里选择刷新整个表格 OR 插入/编辑现有表格数据
-				this.$refs.table.tableData.splice(index, 1);
+		async table_del(row) {
+			var res = await this.$API.print.blackDelete.delete([row.id]);
+			if (res.code == 0) {
 				this.$message.success("删除成功");
-			} else {
-				this.$alert(res.message, "提示", { type: "error" });
+				this.$refs.table.getData(); // 刷新表格
 			}
 		},
 		// 批量删除
@@ -598,11 +572,12 @@ export default {
 				.then(async () => {
 					const loading = this.$loading();
 					const ids = this.selection.map((item) => item.id);
-					const res = await this.$API.user.userDelete.delete(ids);
+					const res = await this.$API.print.blackDelete.delete(ids);
 					if (res.code === 0) {
-						loading.close();
 						this.$message.success("删除成功");
+						this.$refs.table.getData(); // 刷新表格
 					}
+					loading.close();
 				})
 				.catch(() => {});
 		},
