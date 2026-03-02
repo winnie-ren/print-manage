@@ -389,7 +389,7 @@ export default {
 			search: {
 				printNo: "",
 				spec: "",
-				quantity: "",
+				quantity: null,
 				paperType: "",
 				coverColor: "",
 				innerColor: "",

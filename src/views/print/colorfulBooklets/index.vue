@@ -389,7 +389,7 @@ export default {
 			search: {
 				printNo: "",
 				spec: "",
-				pageCount: "",
+				pageCount: null,
 				paperType: "",
 				coverColor: "",
 				innerColor: "",

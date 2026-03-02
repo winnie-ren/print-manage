@@ -401,7 +401,7 @@ export default {
 			search: {
 				printNo: "",
 				spec: "",
-				originalCount: "",
+				originalCount: null,
 				copyCopies: "",
 				isScan: "",
 				originalColor: "",

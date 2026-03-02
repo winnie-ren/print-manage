@@ -94,11 +94,7 @@
 						>
 						</el-table-column>
 					</template>
-					<el-table-column
-						label="文件"
-						fixed="right"
-						width="80"
-					>
+					<el-table-column label="文件" fixed="right" width="80">
 						<template #default="scope">
 							<el-button-group>
 								<el-button
@@ -174,9 +170,9 @@
 							<el-upload
 								class="upload-demo"
 								drag
-								:limit="1"
 								action="/api/files/upload"
 								:on-exceed="handleExceed"
+								:on-progress="handleProgress"
 								:on-success="uploadSuccess"
 								v-if="!uploadDisabled"
 								style="flex: 1"
@@ -189,15 +185,52 @@
 								</div>
 							</el-upload>
 							<div
-								v-if="uploadDisabled && formDetail.fileUrl"
+								v-if="
+									uploadDisabled &&
+									formDetail.fileResponseDTOList?.length > 0
+								"
 								class="file-list"
 							>
-								<span>文件数量：1</span>
-								<el-button
-									type="primary"
-									@click="downloadFile(formDetail.fileUrl)"
-									>下载文件</el-button
+								<!-- 文件数量统计 -->
+								<div class="file-summary">
+									<el-icon color="#409EFF"
+										><FolderOpened
+									/></el-icon>
+									<span
+										>共
+										{{
+											formDetail.fileResponseDTOList
+												.length
+										}}
+										个文件
+										</span
+									>
+								</div>
+								<!-- 文件列表项 -->
+								<li
+									v-for="file in formDetail.fileResponseDTOList"
+									:key="file.id"
+									class="file-item"
 								>
+									<div class="file-info">
+										<el-icon color="#909399"
+											><Document
+										/></el-icon>
+										<span class="file-name">
+											{{
+											file.fileName
+										}}
+										</span>
+									</div>
+									<el-button
+										type="primary"
+										size="small"
+										plain
+										@click="downloadFile(file.downPath)"
+									>
+										<el-icon><Download /></el-icon> 下载
+									</el-button>
+								</li>
 							</div>
 						</el-form-item>
 					</el-form>
@@ -222,6 +255,8 @@
 							v-if="dialogTitle === '新增'"
 							type="success"
 							size="large"
+							:disabled="buyDisabled"
+							:loading="buyLoading"
 							@click="buyNow"
 						>
 							立即购买
@@ -234,7 +269,12 @@
 </template>
 
 <script>
-import { UploadFilled } from "@element-plus/icons-vue";
+import {
+	UploadFilled,
+	FolderOpened,
+	Download,
+	Document,
+} from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 // 从表单配置中提取选项数据
 import { formConfigOptions } from "@/views/price/config/index.ts";
@@ -366,6 +406,9 @@ export default {
 	name: "single",
 	components: {
 		UploadFilled,
+		FolderOpened,
+		Download,
+		Document,
 	},
 	data() {
 		return {
@@ -384,23 +427,23 @@ export default {
 			dialogTitle: "新增",
 			search: {
 				printNo: "",
-				sheetCount: "",
+				sheetCount: null,
 				printSide: "",
 				size: "",
 				material: "",
 				weight: "",
-				styleCount: "",
+				styleCount: null,
 			},
 			formDetail: {
 				printColor: "black",
 				printSide: "single",
 				size: "A5",
 				material: "coatedPaper",
-				weight: 157,
+				weight: "157",
 				styleCount: 1,
 				sheetCount: 1,
 				deliveryMethod: "self",
-				payType: "ALIPAY",
+				paymentType: "ALIPAY",
 				remarks: "",
 				fileId: "",
 			},
@@ -450,13 +493,13 @@ export default {
 					prop: "weight",
 					type: "radio",
 					options: [
-						{ label: "157g", value: 157 },
-						{ label: "200g", value: 200 },
-						{ label: "250g", value: 250 },
-						{ label: "300g", value: 300 },
-						{ label: "80g", value: 80 },
-						{ label: "100g", value: 100 },
-						{ label: "120g", value: 120 },
+						{ label: "157g", value: "157" },
+						{ label: "200g", value: "200" },
+						{ label: "250g", value: "250" },
+						{ label: "300g", value: "300" },
+						{ label: "80g", value: "80" },
+						{ label: "100g", value: "100" },
+						{ label: "120g", value: "120" },
 						{ label: "自定义", value: 0 },
 					],
 				},
@@ -492,7 +535,7 @@ export default {
 				},
 				{
 					label: "支付方式",
-					prop: "payType",
+					prop: "paymentType",
 					type: "radio",
 					options: [
 						{ label: "微信", value: "WXPAY" },
@@ -501,6 +544,8 @@ export default {
 				},
 			],
 			uploadDisabled: false,
+			buyDisabled: false,
+			buyLoading: false,
 		};
 	},
 	methods: {
@@ -600,19 +645,32 @@ export default {
 				printSide: "single",
 				size: "A5",
 				material: "coatedPaper",
-				weight: 157,
+				weight: '157',
 				styleCount: 1,
 				sheetCount: 1,
 				deliveryMethod: "self",
-				payType: "ALIPAY",
+				paymentType: "ALIPAY",
 				remarks: "",
 				fileId: "",
 			};
 		},
-		uploadSuccess(response) {
+		uploadSuccess(response, uploadFile, uploadFiles) {
+			// 判断上传响应是否成功
 			if (response?.code === 0) {
-				this.formDetail.fileId = response.data.fileCode;
+				let fileId = []
+				// 遍历上传文件列表提取文件编码
+				uploadFiles.forEach((file) => {
+					fileId.push(file.response.data[0].fileCode);
+				});
+				// 将文件编码集合赋值给表单详情
+				this.formDetail.fileId = fileId.join(",");
+				// 解除购买按钮的禁用状态
+				this.buyDisabled = false;
 			}
+		},
+		handleProgress() {
+			// 上传时
+			this.buyDisabled = true;
 		},
 		handleExceed() {
 			this.$message.warning(`只允许上传一个文件`);
@@ -666,7 +724,9 @@ export default {
 		},
 		// 立即购买
 		async buyNow() {
+			this.buyLoading = true;
 			const res = await this.$API.print.singleSave.post(this.formDetail);
+			this.buyLoading = false;
 			if (res.code === 0 && res.data) {
 				const orderNo = res.data?.printNo;
 				if (orderNo) {
@@ -676,7 +736,7 @@ export default {
 						printType: "printSinglePage",
 					});
 					if (payRes.code === 0) {
-						if (this.formDetail.payType === "ALIPAY") {
+						if (this.formDetail.paymentType === "ALIPAY") {
 							// 监听页面可见性变化
 							document.addEventListener(
 								"visibilitychange",
@@ -700,9 +760,9 @@ export default {
 				}
 			}
 		},
-		async downloadFile(fileUrl) {
+		async downloadFile(downPath) {
 			const response = await this.$API.print.fileDownload.post(
-				fileUrl,
+				downPath,
 				{}
 			);
 			const fileReader = new FileReader();
@@ -804,15 +864,39 @@ export default {
 	font-weight: bold;
 }
 .file-list {
-	margin-top: 10px;
-	margin-right: 10px;
-	padding: 10px;
-	border: 1px dashed #ccc;
-	border-radius: 4px;
-	background-color: #f9f9f9;
+	margin-top: 15px;
+	padding: 15px;
+	border: 1px solid #ebeef5;
+	border-radius: 10px;
 	width: 100%;
-	span {
-		padding-right: 10px;
+	.file-summary {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 14px;
+		color: #606266;
+		.el-icon {
+			font-size: 18px;
+		}
+	}
+	.file-item {
+		display: flex;
+		list-style: none;
+		align-items: center;
+		background-color: #fff;
+		margin-bottom: 10px;
+		gap: 10px;
+		cursor: pointer;
+		.file-info {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			.file-name {
+				font-size: 14px;
+				color: #303133;
+				word-break: break-all;
+			}
+		}
 	}
 }
 </style>
