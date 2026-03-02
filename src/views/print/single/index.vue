@@ -555,11 +555,15 @@ export default {
 			this.resetForm();
 			this.dialogVisible = true;
 			this.uploadDisabled = false;
+			this.buyDisabled = false;
+			this.buyLoading = false;
 		},
 		// 查看
 		async table_show(row) {
 			this.dialogTitle = "查看";
 			this.dialogVisible = true;
+			this.buyDisabled = false;
+			this.buyLoading = false;
 			var res = await this.$API.print.singleGetById.get({
 				printNo: row.printNo,
 			});
