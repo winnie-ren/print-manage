@@ -114,6 +114,9 @@
 			class="print-dialog"
 			v-model="dialogVisible"
 			:title="dialogTitle"
+			:close-on-click-modal="false"
+			:close-on-press-escape="false"
+			:before-close="beforeClose"
 			width="80%"
 			top="20px"
 		>
@@ -173,9 +176,11 @@
 								action="/api/files/upload"
 								:on-exceed="handleExceed"
 								:on-progress="handleProgress"
+								:on-remove="handleRemove"
 								:on-success="uploadSuccess"
 								v-if="!uploadDisabled"
 								style="flex: 1"
+								ref="uploadRef"
 							>
 								<el-icon size="80" color="#ffaf58"
 									><upload-filled
@@ -558,6 +563,11 @@ export default {
 			this.buyDisabled = false;
 			this.buyLoading = false;
 		},
+		beforeClose(done) {
+			// 清空文件
+			this.$refs.uploadRef.clearFiles();
+			done()
+		},
 		// 查看
 		async table_show(row) {
 			this.dialogTitle = "查看";
@@ -675,6 +685,11 @@ export default {
 		handleProgress() {
 			// 上传时
 			this.buyDisabled = true;
+		},
+		handleRemove(uploadFile) {
+			// 移除文件时
+			const fileCode = uploadFile.response.data[0].fileCode;
+			this.formDetail.fileId = this.formDetail.fileId.replace(`${fileCode},`, "").replace(fileCode, "");
 		},
 		handleExceed() {
 			this.$message.warning(`只允许上传一个文件`);
