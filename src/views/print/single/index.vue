@@ -565,7 +565,7 @@ export default {
 		},
 		beforeClose(done) {
 			// 清空文件
-			this.$refs.uploadRef.clearFiles();
+			this.$refs.uploadRef?.clearFiles();
 			done()
 		},
 		// 查看
@@ -605,7 +605,7 @@ export default {
 					}
 					loading.close();
 				})
-				.catch(() => {});
+				.catch(() => { });
 		},
 		// 表格选择后回调事件
 		selectionChange(selection) {
@@ -745,7 +745,6 @@ export default {
 		async buyNow() {
 			this.buyLoading = true;
 			const res = await this.$API.print.singleSave.post(this.formDetail);
-			this.buyLoading = false;
 			if (res.code === 0 && res.data) {
 				const orderNo = res.data?.printNo;
 				if (orderNo) {
@@ -775,48 +774,60 @@ export default {
 								}
 							}, 1000);
 						}
+					} else {
+						this.buyLoading = false;
 					}
 				}
+			} else {
+				this.buyLoading = false;
 			}
 		},
 		async downloadFile(downPath) {
-			const response = await this.$API.print.fileDownload.post(
-				downPath,
-				{}
-			);
-			const fileReader = new FileReader();
-			fileReader.readAsText(response.data, "utf-8");
-			fileReader.onload = function () {
-				try {
-					const result = JSON.parse(fileReader.result);
-					if (!(result.code === 200 || result.code === 0)) {
-						ElMessage.error(result.msg); // 业务中拼接报错提示
-					}
-				} catch (e) {
-					const blob = new Blob([response.data]);
-					const url = window.URL.createObjectURL(blob);
-					const link = document.createElement("a");
-					link.href = url;
-					const contentDisposition =
-						response.headers["content-disposition"];
-					let filename = "file.txt";
-					if (contentDisposition) {
-						const filenameRegex =
-							/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-						const matches = filenameRegex.exec(contentDisposition);
-						if (matches != null && matches[1]) {
-							filename = matches[1]
-								.replace(/['"]/g, "")
-								.replace("UTF-8", "");
-						}
-					}
-					link.setAttribute("download", decodeURIComponent(filename));
-					document.body.appendChild(link);
-					link.click();
-					document.body.removeChild(link);
-					window.URL.revokeObjectURL(url);
-				}
-			};
+			// 创建临时 a 标签
+			const link = document.createElement("a");
+			link.href = downPath;
+			link.setAttribute("download", ""); // 触发下载
+			link.style.display = "none";
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			// const response = await this.$API.print.fileDownload.get(
+			// 	downPath,
+			// 	{}
+			// );
+			// const fileReader = new FileReader();
+			// fileReader.readAsText(response.data, "utf-8");
+			// fileReader.onload = function () {
+			// 	try {
+			// 		const result = JSON.parse(fileReader.result);
+			// 		if (!(result.code === 200 || result.code === 0)) {
+			// 			ElMessage.error(result.msg); // 业务中拼接报错提示
+			// 		}
+			// 	} catch (e) {
+			// 		const blob = new Blob([response.data]);
+			// 		const url = window.URL.createObjectURL(blob);
+			// 		const link = document.createElement("a");
+			// 		link.href = url;
+			// 		const contentDisposition =
+			// 			response.headers["content-disposition"];
+			// 		let filename = "file.txt";
+			// 		if (contentDisposition) {
+			// 			const filenameRegex =
+			// 				/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+			// 			const matches = filenameRegex.exec(contentDisposition);
+			// 			if (matches != null && matches[1]) {
+			// 				filename = matches[1]
+			// 					.replace(/['"]/g, "")
+			// 					.replace("UTF-8", "");
+			// 			}
+			// 		}
+			// 		link.setAttribute("download", decodeURIComponent(filename));
+			// 		document.body.appendChild(link);
+			// 		link.click();
+			// 		document.body.removeChild(link);
+			// 		window.URL.revokeObjectURL(url);
+			// 	}
+			// };
 		},
 	},
 	beforeUnmount() {

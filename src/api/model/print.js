@@ -29,8 +29,8 @@ export default {
 	fileDownload: {
 		url: `${config.API_URL}${singleApi}/download`,
 		name: "文件下载",
-		post: async function (url, data = {}) {
-			return await http.post(url, data, { responseType: 'blob' });
+		get: async function (url, data = {}) {
+			return await http.get(url, data, { responseType: 'blob' });
 		}
 	},
 	singleGetById: {
