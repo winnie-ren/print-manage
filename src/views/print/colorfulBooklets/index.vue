@@ -92,6 +92,29 @@
 								item.format ? (row) => formatter(row, item) : ''
 							"
 						>
+							<template #default="scope">
+								<el-tag
+									v-if="
+										item.name === 'status' &&
+										scope.row.status
+									"
+									:type="getStatusType(scope.row.status)"
+									effect="plain"
+								>
+									{{
+										item.format
+											? formatter(scope.row, item)
+											: scope.row[item.name]
+									}}
+								</el-tag>
+								<span v-else>
+									{{
+										item.format
+											? formatter(scope.row, item)
+											: scope.row[item.name]
+									}}
+								</span>
+							</template>
 						</el-table-column>
 					</template>
 					<el-table-column
@@ -299,7 +322,7 @@ const tableHeader = [
 		span: 6,
 	},
 	{
-		label: "订单金额(分)",
+		label: "订单金额(元)",
 		name: "totalFee",
 		component: "input", // 保留输入框因为有自定义值
 		table: true,
@@ -610,7 +633,7 @@ export default {
 				acc[key.trim()] = label.trim();
 				return acc;
 			}, {});
-			return map[String(row[item.name])] || "";
+			return map[String(row[item.name])] || row[item.name];
 		},
 		async onSubmit() {
 			// 提交表单数据
@@ -658,6 +681,17 @@ export default {
 					document.write(res.data);
 				}
 			}
+		},
+		// 获取状态标签颜色类型
+		getStatusType(status) {
+			const typeMap = {
+				INIT: "",
+				PAYING: "warning",
+				SUCCESS: "success",
+				FAIL: "danger",
+				CLOSED: "info",
+			};
+			return typeMap[status] || "";
 		},
 	},
 };

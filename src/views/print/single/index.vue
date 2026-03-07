@@ -92,6 +92,26 @@
 								item.format ? (row) => formatter(row, item) : ''
 							"
 						>
+							<template #default="scope">
+								<el-tag
+									v-if="item.name === 'status' && scope.row.status"
+									:type="getStatusType(scope.row.status)"
+									effect="plain"
+								>
+									{{
+										item.format
+											? formatter(scope.row, item)
+											: scope.row[item.name]
+									}}
+								</el-tag>
+								<span v-else>
+									{{
+										item.format
+											? formatter(scope.row, item)
+											: scope.row[item.name]
+									}}
+								</span>
+							</template>
 						</el-table-column>
 					</template>
 					<el-table-column label="文件" fixed="right" width="80">
@@ -208,8 +228,7 @@
 												.length
 										}}
 										个文件
-										</span
-									>
+									</span>
 								</div>
 								<!-- 文件列表项 -->
 								<li
@@ -222,9 +241,7 @@
 											><Document
 										/></el-icon>
 										<span class="file-name">
-											{{
-											file.fileName
-										}}
+											{{ file.fileName }}
 										</span>
 									</div>
 									<el-button
@@ -345,7 +362,7 @@ const tableHeader = [
 		span: 6,
 	},
 	{
-		label: "订单金额(分)",
+		label: "订单金额(元)",
 		name: "totalFee",
 		component: "input", // 保留输入框因为有自定义值
 		table: true,
@@ -566,7 +583,7 @@ export default {
 		beforeClose(done) {
 			// 清空文件
 			this.$refs.uploadRef?.clearFiles();
-			done()
+			done();
 		},
 		// 查看
 		async table_show(row) {
@@ -605,7 +622,7 @@ export default {
 					}
 					loading.close();
 				})
-				.catch(() => { });
+				.catch(() => {});
 		},
 		// 表格选择后回调事件
 		selectionChange(selection) {
@@ -640,7 +657,7 @@ export default {
 				acc[key.trim()] = label.trim();
 				return acc;
 			}, {});
-			return map[String(row[item.name])] || "";
+			return map[String(row[item.name])] || row[item.name];
 		},
 		async onSubmit() {
 			// 提交表单数据
@@ -659,7 +676,7 @@ export default {
 				printSide: "single",
 				size: "A5",
 				material: "coatedPaper",
-				weight: '157',
+				weight: "157",
 				styleCount: 1,
 				sheetCount: 1,
 				deliveryMethod: "self",
@@ -671,7 +688,7 @@ export default {
 		uploadSuccess(response, uploadFile, uploadFiles) {
 			// 判断上传响应是否成功
 			if (response?.code === 0) {
-				let fileId = []
+				let fileId = [];
 				// 遍历上传文件列表提取文件编码
 				uploadFiles.forEach((file) => {
 					fileId.push(file.response.data[0].fileCode);
@@ -689,7 +706,9 @@ export default {
 		handleRemove(uploadFile) {
 			// 移除文件时
 			const fileCode = uploadFile.response.data[0].fileCode;
-			this.formDetail.fileId = this.formDetail.fileId.replace(`${fileCode},`, "").replace(fileCode, "");
+			this.formDetail.fileId = this.formDetail.fileId
+				.replace(`${fileCode},`, "")
+				.replace(fileCode, "");
 		},
 		handleExceed() {
 			this.$message.warning(`只允许上传一个文件`);
@@ -828,6 +847,17 @@ export default {
 			// 		window.URL.revokeObjectURL(url);
 			// 	}
 			// };
+		},
+		// 获取状态标签颜色类型
+		getStatusType(status) {
+			const typeMap = {
+				INIT: "",
+				PAYING: "warning",
+				SUCCESS: "success",
+				FAIL: "danger",
+				CLOSED: "info",
+			};
+			return typeMap[status] || "";
 		},
 	},
 	beforeUnmount() {

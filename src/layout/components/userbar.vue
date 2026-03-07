@@ -90,6 +90,19 @@
 				</el-container>
 			</el-drawer>
 		</div>
+
+		<!-- 新增：余额显示 -->
+		<div class="balance-panel panel-item">
+			<span class="balance-text">余额：</span>
+			<span class="balance-value">{{ balance }}元</span>
+		</div>
+
+		<!-- 新增：充值按钮 -->
+		<div class="recharge-btn panel-item" @click="openRecharge">
+			<el-button size="small" type="primary">充值</el-button>
+		</div>
+
+		<!-- 用户头像和退出登录 -->
 		<div class="user-avatar">
 			<el-avatar :size="30">{{ userNameF }}</el-avatar>
 			<label>{{ userName }}</label>
@@ -115,7 +128,6 @@
 	>
 		<search @success="searchVisible = false"></search>
 	</el-dialog>
-
 	<el-drawer
 		v-model="tasksVisible"
 		:size="450"
@@ -124,6 +136,53 @@
 	>
 		<tasks></tasks>
 	</el-drawer>
+	<!-- 充值弹窗 -->
+	<el-dialog
+		v-model="rechargeVisible"
+		:width="500"
+		title="充值"
+		center
+		destroy-on-close
+	>
+		<el-form ref="rechargeFormRef" :model="rechargeForm" label-width="80px">
+			<el-form-item label="金额">
+				<el-input-number
+					v-model="rechargeForm.amount"
+					:min="1"
+					:max="10000"
+					:step="1"
+					style="width: 100%"
+					controls-position="right"
+				/>
+			</el-form-item>
+
+			<el-form-item label="支付方式">
+				<el-radio-group v-model="rechargeForm.paymentMethod">
+					<el-radio label="ALIPAY">支付宝</el-radio>
+					<el-radio label="WECHAT">微信</el-radio>
+				</el-radio-group>
+			</el-form-item>
+
+			<el-form-item label="二维码">
+				<div
+					v-if="rechargeForm.paymentMethod === 'ALIPAY'"
+					class="qrcode"
+				>
+					<img src="/img/avatar3.gif" alt="支付宝二维码" />
+				</div>
+				<div v-else class="qrcode">
+					<img src="/img/avatar2.gif" alt="微信二维码" />
+				</div>
+			</el-form-item>
+		</el-form>
+
+		<template #footer>
+			<el-button @click="rechargeVisible = false">取消</el-button>
+			<el-button type="primary" @click="submitRecharge"
+				>确认充值</el-button
+			>
+		</template>
+	</el-dialog>
 </template>
 
 <script>
@@ -141,17 +200,58 @@ export default {
 			userNameF: "",
 			searchVisible: false,
 			tasksVisible: false,
+			balance: 0, // 余额数据
+			rechargeVisible: false, // 充值弹窗状态
+			rechargeForm: {
+				amount: 100,
+				paymentMethod: "ALIPAY",
+			},
 			msg: false,
 			msgList: [],
 		};
 	},
 	created() {
 		var userInfo = this.$TOOL.data.get("USER_INFO");
-		this.userName = userInfo?.usna || '';
+		this.userName = userInfo?.usna || "";
 		this.userNameF = this.userName.substring(0, 1);
+		// 获取用户余额（假设从接口获取）
+		this.fetchBalance();
 	},
 	methods: {
-		//个人信息
+		// 获取用户余额
+		fetchBalance() {
+			// 这里应该调用实际的API获取余额
+			// 示例：
+			// this.$API.user.getBalance().then(res => {
+			//     this.balance = res.data.balance;
+			// });
+
+			// 暂时使用模拟数据
+			this.balance = 100.0;
+		},
+		// 打开充值弹窗
+		openRecharge() {
+			this.rechargeVisible = true;
+		},
+		// 提交充值
+		submitRecharge() {
+			// 这里应该调用实际的充值API
+			// 示例：
+			// this.$API.user.recharge(this.rechargeForm).then(res => {
+			//     if (res.code === 0) {
+			//         this.$message.success("充值成功");
+			//         this.rechargeVisible = false;
+			//         this.fetchBalance(); // 更新余额
+			//     } else {
+			//         this.$message.error(res.message);
+			//     }
+			// });
+
+			this.$message.success("模拟充值成功");
+			this.rechargeVisible = false;
+			this.fetchBalance();
+		},
+		// 个人信息处理
 		handleUser(command) {
 			if (command == "uc") {
 				this.$router.push({ path: "/usercenter" });
@@ -194,16 +294,16 @@ export default {
 					});
 			}
 		},
-		//全屏
+		// 全屏
 		screen() {
 			var element = document.documentElement;
 			this.$TOOL.screen(element);
 		},
-		//显示短消息
+		// 显示短消息
 		showMsg() {
 			this.msg = true;
 		},
-		//标记已读
+		// 标记已读
 		markRead() {
 			this.msgList = [];
 		},
@@ -255,7 +355,6 @@ export default {
 	font-size: 12px;
 	cursor: pointer;
 }
-
 .msg-list li {
 	border-top: 1px solid #eee;
 }
@@ -298,5 +397,39 @@ export default {
 }
 .dark .msg-list li a:hover {
 	background: #383838;
+}
+/* 新增样式：余额显示 */
+.balance-panel {
+	display: flex;
+	align-items: center;
+	color: #fff;
+	font-size: 12px;
+}
+
+.balance-text {
+	margin-right: 5px;
+}
+
+.balance-value {
+	font-weight: bold;
+	color: #fff;
+}
+
+/* 新增样式：充值按钮 */
+.recharge-btn {
+	margin-right: 10px;
+}
+
+/* 二维码样式 */
+.qrcode {
+	text-align: center;
+	margin-top: 10px;
+}
+
+.qrcode img {
+	max-width: 200px;
+	max-height: 200px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
 }
 </style>
