@@ -90,16 +90,16 @@
 				</el-container>
 			</el-drawer>
 		</div>
-
-		<!-- 新增：余额显示 -->
-		<div class="balance-panel panel-item">
-			<span class="balance-text">余额：</span>
-			<span class="balance-value">{{ balance }}元</span>
-		</div>
-
 		<!-- 新增：充值按钮 -->
 		<div class="recharge-btn panel-item" @click="openRecharge">
-			<el-button size="small" type="primary">充值</el-button>
+			<el-tooltip
+				class="box-item"
+				effect="dark"
+				content="充值中心"
+				placement="bottom"
+			>
+				<el-icon><el-icon-wallet /></el-icon>
+			</el-tooltip>
 		</div>
 
 		<!-- 用户头像和退出登录 -->
@@ -147,6 +147,10 @@
 		class="recharge-dialog"
 	>
 		<div class="recharge-content">
+			<div class="balance-label">
+				<span>账户余额：</span>
+				<span class="balance-value">¥ {{ balance }}</span>
+			</div>
 			<!-- 选择金额 -->
 			<div class="recharge-label">选择金额</div>
 			<!-- 快捷金额选项 -->
@@ -185,16 +189,6 @@
 					v-model="rechargeForm.payType"
 					class="payment-radio-group"
 				>
-					<!-- 微信支付选项（带图标） -->
-					<el-radio label="WECHAT" border class="payment-radio-item">
-						<div class="radio-content">
-							<img
-								src="/img/wechat.png"
-								alt="微信支付"
-								class="pay-icon"
-							/>
-						</div>
-					</el-radio>
 					<!-- 支付宝选项（带图标） -->
 					<el-radio label="ALIPAY" border class="payment-radio-item">
 						<div class="radio-content">
@@ -205,9 +199,18 @@
 							/>
 						</div>
 					</el-radio>
+					<!-- 微信支付选项（带图标） -->
+					<el-radio label="WECHAT" border class="payment-radio-item">
+						<div class="radio-content">
+							<img
+								src="/img/wechat.png"
+								alt="微信支付"
+								class="pay-icon"
+							/>
+						</div>
+					</el-radio>
 				</el-radio-group>
 			</div>
-
 			<!-- 确认支付按钮 -->
 			<el-button
 				type="primary"
@@ -260,8 +263,6 @@ export default {
 		var userInfo = this.$TOOL.data.get("USER_INFO");
 		this.userName = userInfo?.usna || "";
 		this.userNameF = this.userName.substring(0, 1);
-		// 获取用户余额
-		this.fetchBalance();
 	},
 	methods: {
 		// 获取用户余额
@@ -288,6 +289,8 @@ export default {
 		// 打开充值弹窗
 		openRecharge() {
 			this.rechargeLoading = false;
+			// 获取用户余额
+			this.fetchBalance();
 			this.rechargeVisible = true;
 		},
 		// 启动轮询
@@ -327,32 +330,33 @@ export default {
 			}
 		},
 		// 提交充值
-		submitRecharge() {
+		async submitRecharge() {
 			this.rechargeLoading = true;
-			this.$API.user.recharge.post(this.rechargeForm).then((res) => {
-				if (res.code === 0 && res.data) {
-					// 监听页面可见性变化
-					document.addEventListener(
-						"visibilitychange",
-						this.handleVisibilityChange
-					);
-					// 打开新页签加载支付页面
-					const paymentWindow = window.open("", "_blank");
-					paymentWindow.document.write(res.data);
-					// 启动轮询
-					this.startPolling(paymentWindow);
-					paymentWindow.document.close();
-					// 监听新页签关闭事件
-					const checkClosed = setInterval(() => {
-						if (paymentWindow.closed) {
-							clearInterval(checkClosed);
-							this.getInfo(); // 检查支付状态
-						}
-					}, 1000);
-				} else {
-					this.rechargeLoading = false;
-				}
-			});
+			const res = await this.$API.user.recharge.post(this.rechargeForm);
+			if (res.code === 0 && res.data) {
+				// // 监听页面可见性变化
+				// document.addEventListener(
+				// 	"visibilitychange",
+				// 	this.handleVisibilityChange
+				// );
+				// 打开新页签加载支付页面
+				const paymentWindow = window.open("", "_blank");
+				paymentWindow.document.write(res.data);
+				this.rechargeVisible = false;
+				this.rechargeLoading = false;
+				// // 启动轮询
+				// this.startPolling(paymentWindow);
+				// paymentWindow.document.close();
+				// // 监听新页签关闭事件
+				// const checkClosed = setInterval(() => {
+				// 	if (paymentWindow.closed) {
+				// 		clearInterval(checkClosed);
+				// 		this.getInfo(); // 检查支付状态
+				// 	}
+				// }, 1000);
+			} else {
+				this.rechargeLoading = false;
+			}
 		},
 		// 个人信息处理
 		handleUser(command) {
@@ -501,22 +505,6 @@ export default {
 .dark .msg-list li a:hover {
 	background: #383838;
 }
-/* 新增样式：余额显示 */
-.balance-panel {
-	display: flex;
-	align-items: center;
-	color: #fff;
-	font-size: 12px;
-}
-
-.balance-text {
-	margin-right: 5px;
-}
-
-.balance-value {
-	font-weight: bold;
-	color: #fff;
-}
 
 .recharge-dialog {
 	border-radius: 16px;
@@ -530,7 +518,15 @@ export default {
 	margin-bottom: 12px;
 	font-weight: 500;
 }
-
+.balance-label {
+	font-size: 20px;
+	font-weight: 500;
+	color: #333;
+	margin-bottom: 12px;
+	.balance-value {
+		color: #432008;
+	}
+}
 .amount-options {
 	display: flex;
 	gap: 12px;
@@ -598,11 +594,6 @@ export default {
 	font-weight: 500;
 	background: linear-gradient(90deg, #4a9fff 0%, #63b3ff 100%);
 	border: none;
-}
-
-.confirm-pay-btn:disabled {
-	background: #ccc;
-	cursor: not-allowed;
 }
 </style>
 <style lang="scss">

@@ -39,7 +39,7 @@ axios.interceptors.response.use(
 				title: '请求失败',
 				message: data?.msg || `未知错误！`
 			});
-			if ([-100000001, -110000000].includes(data.code)) {
+			if ([-100000001, -10000001, -110000000].includes(data.code)) {
 				router.replace({ path: '/login' });
 			}
 		}
