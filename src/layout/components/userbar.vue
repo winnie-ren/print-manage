@@ -143,11 +143,12 @@
 		title="充值"
 		center
 		destroy-on-close
+		:close-on-click-modal="false"
 	>
 		<el-form ref="rechargeFormRef" :model="rechargeForm" label-width="80px">
 			<el-form-item label="金额">
 				<el-input-number
-					v-model="rechargeForm.amount"
+					v-model="rechargeForm.payAmount"
 					:min="1"
 					:max="10000"
 					:step="1"
@@ -155,32 +156,22 @@
 					controls-position="right"
 				/>
 			</el-form-item>
-
 			<el-form-item label="支付方式">
-				<el-radio-group v-model="rechargeForm.paymentMethod">
-					<el-radio label="ALIPAY">支付宝</el-radio>
-					<el-radio label="WECHAT">微信</el-radio>
+				<el-radio-group v-model="rechargeForm.payType">
+					<el-radio label="ALIPAY" border>支付宝</el-radio>
+					<el-radio label="WECHAT" border>微信</el-radio>
 				</el-radio-group>
 			</el-form-item>
-
-			<el-form-item label="二维码">
-				<div
-					v-if="rechargeForm.paymentMethod === 'ALIPAY'"
-					class="qrcode"
-				>
-					<img src="/img/avatar3.gif" alt="支付宝二维码" />
-				</div>
-				<div v-else class="qrcode">
-					<img src="/img/avatar2.gif" alt="微信二维码" />
-				</div>
-			</el-form-item>
 		</el-form>
-
 		<template #footer>
 			<el-button @click="rechargeVisible = false">取消</el-button>
-			<el-button type="primary" @click="submitRecharge"
-				>确认充值</el-button
+			<el-button
+				type="primary"
+				@click="submitRecharge"
+				:loading="rechargeLoading"
 			>
+				确认充值
+			</el-button>
 		</template>
 	</el-dialog>
 </template>
@@ -203,9 +194,10 @@ export default {
 			balance: 0, // 余额数据
 			rechargeVisible: false, // 充值弹窗状态
 			rechargeForm: {
-				amount: 100,
-				paymentMethod: "ALIPAY",
+				payAmount: 100,
+				payType: "ALIPAY",
 			},
+			rechargeLoading: false,
 			msg: false,
 			msgList: [],
 		};
@@ -220,14 +212,11 @@ export default {
 	methods: {
 		// 获取用户余额
 		fetchBalance() {
-			// 这里应该调用实际的API获取余额
-			// 示例：
-			// this.$API.user.getBalance().then(res => {
-			//     this.balance = res.data.balance;
-			// });
-
-			// 暂时使用模拟数据
-			this.balance = 100.0;
+			this.$API.auth.info.get().then((res) => {
+				if (res.code === 0 && res.data) {
+					this.balance = res.data.cashBalance;
+				}
+			});
 		},
 		// 打开充值弹窗
 		openRecharge() {
@@ -235,21 +224,16 @@ export default {
 		},
 		// 提交充值
 		submitRecharge() {
-			// 这里应该调用实际的充值API
-			// 示例：
-			// this.$API.user.recharge(this.rechargeForm).then(res => {
-			//     if (res.code === 0) {
-			//         this.$message.success("充值成功");
-			//         this.rechargeVisible = false;
-			//         this.fetchBalance(); // 更新余额
-			//     } else {
-			//         this.$message.error(res.message);
-			//     }
-			// });
-
-			this.$message.success("模拟充值成功");
-			this.rechargeVisible = false;
-			this.fetchBalance();
+			this.rechargeLoading = true;
+			this.$API.user.recharge.post(this.rechargeForm).then((res) => {
+				if (res.code === 0 && res.data) {
+					// 打开新页签加载支付页面
+					const paymentWindow = window.open("", "_blank");
+					paymentWindow.document.write(res.data);
+					this.rechargeVisible = false;
+					this.fetchBalance(); // 更新余额
+				}
+			});
 		},
 		// 个人信息处理
 		handleUser(command) {
