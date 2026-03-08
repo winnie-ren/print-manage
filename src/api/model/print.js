@@ -27,10 +27,10 @@ export default {
 		}
 	},
 	fileDownload: {
-		url: `${config.API_URL}${singleApi}/download`,
+		url: `${config.API_URL}/files/download/`,
 		name: "文件下载",
-		get: async function (url, data = {}) {
-			return await http.get(url, data, { responseType: 'blob' });
+		get: async function (fileCode = '') {
+			return await http.get(`${this.url}${fileCode}`, {}, { responseType: 'blob' });
 		}
 	},
 	singleGetById: {

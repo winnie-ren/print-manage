@@ -94,7 +94,10 @@
 						>
 							<template #default="scope">
 								<el-tag
-									v-if="item.name === 'status' && scope.row.status"
+									v-if="
+										item.name === 'status' &&
+										scope.row.status
+									"
 									:type="getStatusType(scope.row.status)"
 									effect="plain"
 								>
@@ -248,7 +251,7 @@
 										type="primary"
 										size="small"
 										plain
-										@click="downloadFile(file.downPath)"
+										@click="downloadFile(file.fileCode)"
 									>
 										<el-icon><Download /></el-icon> 下载
 									</el-button>
@@ -801,19 +804,16 @@ export default {
 				this.buyLoading = false;
 			}
 		},
-		async downloadFile(downPath) {
+		async downloadFile(fileCode) {
 			// 创建临时 a 标签
 			const link = document.createElement("a");
-			link.href = downPath;
+			link.href = `${this.$API.print.fileDownload.url}${fileCode}`;
 			link.setAttribute("download", ""); // 触发下载
 			link.style.display = "none";
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
-			// const response = await this.$API.print.fileDownload.get(
-			// 	downPath,
-			// 	{}
-			// );
+			// const response = await this.$API.print.fileDownload.get(fileCode);
 			// const fileReader = new FileReader();
 			// fileReader.readAsText(response.data, "utf-8");
 			// fileReader.onload = function () {
