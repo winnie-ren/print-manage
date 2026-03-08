@@ -220,6 +220,7 @@ export default {
 		},
 		// 打开充值弹窗
 		openRecharge() {
+			this.rechargeLoading = false;
 			this.rechargeVisible = true;
 		},
 		// 提交充值
