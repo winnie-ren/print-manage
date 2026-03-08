@@ -206,7 +206,7 @@ export default {
 		var userInfo = this.$TOOL.data.get("USER_INFO");
 		this.userName = userInfo?.usna || "";
 		this.userNameF = this.userName.substring(0, 1);
-		// 获取用户余额（假设从接口获取）
+		// 获取用户余额
 		this.fetchBalance();
 	},
 	methods: {
@@ -223,16 +223,65 @@ export default {
 			this.rechargeLoading = false;
 			this.rechargeVisible = true;
 		},
+		// 启动轮询
+		startPolling(payWindow) {
+			this.pollingInterval = setInterval(async () => {
+				this.getInfo(payWindow);
+			}, 2000); // 每2秒查询一次
+		},
+		// 停止轮询
+		stopPolling() {
+			if (this.pollingInterval) {
+				clearInterval(this.pollingInterval);
+				this.pollingInterval = null;
+			}
+		},
+		// 处理支付成功
+		handlePaymentSuccess(payWindow) {
+			this.$message.success("支付成功");
+			this.rechargeVisible = false;
+			this.rechargeLoading = false;
+			if (payWindow && !payWindow.closed) {
+				payWindow.close();
+			}
+		},
+		// 监听页面可见性变化
+		handleVisibilityChange() {
+			if (!document.hidden) {
+				this.getInfo();
+			}
+		},
+		async getInfo(payWindow) {
+			const res = await this.$API.auth.info.get();
+			if (res.code === 0 && this.balance !== res.data.cashBalance) {
+				this.balance = res.data.cashBalance;
+				this.stopPolling();
+				this.handlePaymentSuccess(payWindow || "");
+			}
+		},
 		// 提交充值
 		submitRecharge() {
 			this.rechargeLoading = true;
 			this.$API.user.recharge.post(this.rechargeForm).then((res) => {
 				if (res.code === 0 && res.data) {
+					// 监听页面可见性变化
+					document.addEventListener(
+						"visibilitychange",
+						this.handleVisibilityChange
+					);
 					// 打开新页签加载支付页面
 					const paymentWindow = window.open("", "_blank");
 					paymentWindow.document.write(res.data);
-					this.rechargeVisible = false;
-					this.fetchBalance(); // 更新余额
+					// 启动轮询
+					this.startPolling(paymentWindow);
+					paymentWindow.document.close();
+					// 监听新页签关闭事件
+					const checkClosed = setInterval(() => {
+						if (paymentWindow.closed) {
+							clearInterval(checkClosed);
+							this.getInfo(); // 检查支付状态
+						}
+					}, 1000);
 				} else {
 					this.rechargeLoading = false;
 				}
