@@ -44,4 +44,11 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	info: {
+		url: `${config.API_URL}/api/v1/sysusins/info`,
+		name: "用户信息",
+		post: async function (data = {}) {
+			return await http.post(this.url, data);
+		}
+	},
 }

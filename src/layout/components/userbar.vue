@@ -139,14 +139,34 @@
 	<!-- 充值弹窗 -->
 	<el-dialog
 		v-model="rechargeVisible"
-		:width="500"
-		title="充值"
+		:width="385"
+		title="充值中心"
 		center
 		destroy-on-close
 		:close-on-click-modal="false"
+		class="recharge-dialog"
 	>
-		<el-form ref="rechargeFormRef" :model="rechargeForm" label-width="80px">
-			<el-form-item label="金额">
+		<div class="recharge-content">
+			<!-- 选择金额 -->
+			<div class="recharge-label">选择金额</div>
+			<!-- 快捷金额选项 -->
+			<div class="amount-options">
+				<div
+					v-for="item in amountOptions"
+					:key="item.value"
+					class="amount-item"
+					:class="{
+						active:
+							rechargeForm.payAmount === item.value &&
+							!isCustomAmount,
+					}"
+					@click="handleAmountSelect(item.value)"
+				>
+					¥{{ item.label }}
+				</div>
+			</div>
+			<!-- 自定义金额输入框 -->
+			<div class="custom-amount-wrap">
 				<el-input-number
 					v-model="rechargeForm.payAmount"
 					:min="1"
@@ -154,25 +174,53 @@
 					:step="1"
 					style="width: 100%"
 					controls-position="right"
+					placeholder="请输入自定义金额"
+					@input="handleCustomAmountInput"
 				/>
-			</el-form-item>
-			<el-form-item label="支付方式">
-				<el-radio-group v-model="rechargeForm.payType">
-					<el-radio label="ALIPAY" border>支付宝</el-radio>
-					<el-radio label="WECHAT" border>微信</el-radio>
+			</div>
+			<!-- 支付方式 -->
+			<div class="payment-label">支付方式</div>
+			<div class="payment-section">
+				<el-radio-group
+					v-model="rechargeForm.payType"
+					class="payment-radio-group"
+				>
+					<!-- 微信支付选项（带图标） -->
+					<el-radio label="WECHAT" border class="payment-radio-item">
+						<div class="radio-content">
+							<img
+								src="/img/wechat.png"
+								alt="微信支付"
+								class="pay-icon"
+							/>
+						</div>
+					</el-radio>
+					<!-- 支付宝选项（带图标） -->
+					<el-radio label="ALIPAY" border class="payment-radio-item">
+						<div class="radio-content">
+							<img
+								src="/img/alipay.png"
+								alt="支付宝"
+								class="pay-icon"
+							/>
+						</div>
+					</el-radio>
 				</el-radio-group>
-			</el-form-item>
-		</el-form>
-		<template #footer>
-			<el-button @click="rechargeVisible = false">取消</el-button>
+			</div>
+
+			<!-- 确认支付按钮 -->
 			<el-button
 				type="primary"
+				class="confirm-pay-btn"
 				@click="submitRecharge"
 				:loading="rechargeLoading"
+				:disabled="
+					!rechargeForm.payAmount || rechargeForm.payAmount < 1
+				"
 			>
-				确认充值
+				确认支付
 			</el-button>
-		</template>
+		</div>
 	</el-dialog>
 </template>
 
@@ -200,6 +248,12 @@ export default {
 			rechargeLoading: false,
 			msg: false,
 			msgList: [],
+			isCustomAmount: false,
+			amountOptions: [
+				{ label: "100", value: 100 },
+				{ label: "200", value: 200 },
+				{ label: "500", value: 500 },
+			],
 		};
 	},
 	created() {
@@ -212,11 +266,24 @@ export default {
 	methods: {
 		// 获取用户余额
 		fetchBalance() {
-			this.$API.auth.info.get().then((res) => {
+			this.$API.user.info.post().then((res) => {
 				if (res.code === 0 && res.data) {
 					this.balance = res.data.cashBalance;
 				}
 			});
+		},
+		// 点击快捷金额
+		handleAmountSelect(value) {
+			this.rechargeForm.payAmount = value;
+			this.isCustomAmount = false; // 取消自定义金额标记
+		},
+		// 自定义金额输入
+		handleCustomAmountInput() {
+			// 检查输入的金额是否在快捷选项中
+			const isInOptions = this.amountOptions.some(
+				(item) => item.value === this.rechargeForm.payAmount
+			);
+			this.isCustomAmount = !isInOptions;
 		},
 		// 打开充值弹窗
 		openRecharge() {
@@ -252,7 +319,7 @@ export default {
 			}
 		},
 		async getInfo(payWindow) {
-			const res = await this.$API.auth.info.get();
+			const res = await this.$API.user.info.post();
 			if (res.code === 0 && this.balance !== res.data.cashBalance) {
 				this.balance = res.data.cashBalance;
 				this.stopPolling();
@@ -359,7 +426,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .user-bar {
 	display: flex;
 	align-items: center;
@@ -451,21 +518,107 @@ export default {
 	color: #fff;
 }
 
-/* 新增样式：充值按钮 */
-.recharge-btn {
-	margin-right: 10px;
+.recharge-dialog {
+	border-radius: 16px;
+	overflow: hidden;
+	padding: 0;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+.recharge-label {
+	font-size: 16px;
+	color: #333;
+	margin-bottom: 12px;
+	font-weight: 500;
 }
 
-/* 二维码样式 */
-.qrcode {
+.amount-options {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+
+.amount-item {
+	flex: 1;
 	text-align: center;
-	margin-top: 10px;
+	padding: 10px 0;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	font-size: 16px;
+	color: #666;
+	cursor: pointer;
+	transition: all 0.2s;
 }
 
-.qrcode img {
-	max-width: 200px;
-	max-height: 200px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
+.amount-item.active {
+	border-color: #4a9fff;
+	background-color: #f0f7ff;
+	color: #4a9fff;
+	font-weight: 500;
+}
+
+.custom-amount-wrap {
+	margin-bottom: 24px;
+}
+
+.payment-section {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	margin-bottom: 24px;
+}
+
+.payment-icon {
+	width: 24px;
+	height: 24px;
+	margin-top: 2px;
+}
+
+.payment-label {
+	font-size: 16px;
+	color: #333;
+	font-weight: 500;
+}
+
+.payment-radio-group {
+	flex: 1;
+	display: flex;
+	gap: 16px;
+}
+
+.payment-radio-group :deep(.el-radio) {
+	flex: 1;
+	margin-right: unset;
+	height: 54px;
+}
+.confirm-pay-btn {
+	width: 100%;
+	height: 48px;
+	border-radius: 24px;
+	font-size: 16px;
+	font-weight: 500;
+	background: linear-gradient(90deg, #4a9fff 0%, #63b3ff 100%);
+	border: none;
+}
+
+.confirm-pay-btn:disabled {
+	background: #ccc;
+	cursor: not-allowed;
+}
+</style>
+<style lang="scss">
+.recharge-dialog .el-dialog__header {
+	background: linear-gradient(90deg, #4a9fff 0%, #63b3ff 100%);
+	color: white;
+	text-align: center;
+	font-size: 18px;
+	font-weight: 500;
+	margin-right: 0;
+	padding-bottom: 20px;
+	.el-dialog__title {
+		color: white;
+	}
+	.el-dialog__headerbtn .el-dialog__close {
+		color: #fff;
+	}
 }
 </style>

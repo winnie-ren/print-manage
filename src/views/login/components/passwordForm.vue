@@ -131,7 +131,7 @@ export default {
 					expires: this.form.autologin ? 24 * 60 * 60 : 0,
 				});
 				// 获取用户信息
-				var res = await this.$API.auth.info.get();
+				var res = await this.$API.user.info.post();
 				this.$TOOL.data.set("USER_INFO", res.data);
 			} else {
 				this.islogin = false;
