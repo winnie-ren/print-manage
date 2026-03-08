@@ -232,6 +232,8 @@ export default {
 					paymentWindow.document.write(res.data);
 					this.rechargeVisible = false;
 					this.fetchBalance(); // 更新余额
+				} else {
+					this.rechargeLoading = false;
 				}
 			});
 		},
