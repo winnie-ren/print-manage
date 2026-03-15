@@ -3,7 +3,7 @@ const DEFAULT_CONFIG = {
 	APP_NAME: process.env.VUE_APP_TITLE,
 
 	//首页地址
-	DASHBOARD_URL: "/menuManage",
+	DASHBOARD_URL: "/platformManage/merchantManage",
 
 	//版本号
 	APP_VER: "1.0",

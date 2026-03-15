@@ -155,41 +155,22 @@ export default {
 			// 	}
 			const menuList = [
 				{
-					name: "home",
-					path: "/home",
+					name: "platformManage",
+					path: "/platformManage",
 					meta: {
-						title: "系统管理",
-						icon: "el-icon-menu",
-						type: "menu",
+						title: "平台管理",
+						icon: "el-icon-HomeFilled",
+						type: "platformManage",
 					},
 					children: [
 						{
-							name: "menuManage",
-							path: "/menuManage",
+							name: "merchantManage",
+							path: "/platformManage/merchantManage",
 							meta: {
-								title: "菜单管理",
-								icon: "el-icon-menu",
-								affix: true,
-							},
-							component: "menuManage",
-						},
-						{
-							name: "roleManage",
-							path: "/roleManage",
-							meta: {
-								title: "角色管理",
-								icon: "el-icon-Postcard",
-							},
-							component: "roleManage",
-						},
-						{
-							name: "userManage",
-							path: "/userManage",
-							meta: {
-								title: "用户管理",
+								title: "商户管理",
 								icon: "el-icon-user",
 							},
-							component: "userManage",
+							component: "platformManage/merchantManage",
 						},
 					],
 				},
@@ -236,7 +217,7 @@ export default {
 					path: "/print",
 					meta: {
 						title: "打印",
-						icon: "el-icon-files",
+						icon: "el-icon-Printer",
 						type: "menu",
 					},
 					children: [
@@ -287,7 +268,7 @@ export default {
 					path: "/order",
 					meta: {
 						title: "订单",
-						icon: "el-icon-files",
+						icon: "el-icon-Tickets",
 						type: "menu",
 					},
 					children: [
@@ -308,7 +289,7 @@ export default {
 					path: "/price",
 					meta: {
 						title: "价格",
-						icon: "el-icon-files",
+						icon: "el-icon-ShoppingBag",
 						type: "menu",
 					},
 					children: [
@@ -335,12 +316,51 @@ export default {
 					],
 				},
 				{
+					name: "home",
+					path: "/home",
+					meta: {
+						title: "系统管理",
+						icon: "el-icon-Setting",
+						type: "menu",
+					},
+					children: [
+						{
+							name: "menuManage",
+							path: "/menuManage",
+							meta: {
+								title: "菜单管理",
+								icon: "el-icon-menu",
+								affix: true,
+							},
+							component: "menuManage",
+						},
+						{
+							name: "roleManage",
+							path: "/roleManage",
+							meta: {
+								title: "角色管理",
+								icon: "el-icon-Postcard",
+							},
+							component: "roleManage",
+						},
+						{
+							name: "userManage",
+							path: "/userManage",
+							meta: {
+								title: "用户管理",
+								icon: "el-icon-user",
+							},
+							component: "userManage",
+						},
+					],
+				},
+				{
 					name: "积分设置",
 					path: "/pointsSetting",
 					component: "pointsSetting",
 					meta: {
 						title: "积分设置",
-						icon: "el-icon-files",
+						icon: "el-icon-Coin",
 						type: "menu",
 						isHide: true,
 					},

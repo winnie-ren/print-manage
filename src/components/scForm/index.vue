@@ -43,12 +43,25 @@
 						<!-- input -->
 						<template v-if="item.component == 'input'">
 							<el-input
-								v-model="form[item.name]"
+								v-model.trim="form[item.name]"
 								:placeholder="item.options.placeholder"
 								clearable
 								:maxlength="item.options.maxlength"
 								:disabled="item.options.disabled"
 								:show-password="item.options.password"
+								show-word-limit
+							></el-input>
+						</template>
+						<!-- textarea -->
+						<template v-else-if="item.component == 'textarea'">
+							<el-input
+								v-model.trim="form[item.name]"
+								:placeholder="item.options.placeholder"
+								type="textarea"
+								:rows="item.options?.rows || 2"
+								clearable
+								:maxlength="item.options.maxlength"
+								:disabled="item.options.disabled"
 								show-word-limit
 							></el-input>
 						</template>

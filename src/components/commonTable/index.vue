@@ -7,7 +7,7 @@
 					<el-form-item :label="item.label">
 						<el-input
 							v-if="item.component === 'input'"
-							v-model="searchParams[item.name]"
+							v-model.trim="searchParams[item.name]"
 							:placeholder="item.options?.placeholder || '请输入'"
 							clearable
 						></el-input>
@@ -302,7 +302,7 @@ export default {
 		// 弹窗宽度
 		dialogWidth: {
 			type: String,
-			default: "500px",
+			default: "50%",
 		},
 		// 弹窗距离顶部
 		dialogTop: {
@@ -504,7 +504,7 @@ export default {
 		const handleSubmit = async (form) => {
 			try {
 				// 如果是普通表单，需要手动验证
-				if (!props.useScForm && formRef.value) {
+				if (formRef.value) {
 					await formRef.value.validate();
 				}
 				const submitData = props.useScForm ? form : formData.value;
@@ -519,7 +519,6 @@ export default {
 				}
 			} catch (error) {
 				console.error("提交失败:", error);
-				ElMessage.error("操作失败");
 			}
 		};
 
