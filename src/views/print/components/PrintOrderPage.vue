@@ -337,17 +337,22 @@
 				<img :src="qrcodeUrl" alt="付款码" class="pay-code-img" />
 				<!-- 订单信息 -->
 				<div class="order-info">
-					请使用<span>{{
-						formDetail.paymentType === "ALIPAY" ? "支付宝" : "微信"
-					}}</span>
+					请使用
+					<span>
+						{{
+							formDetail.paymentType === "ALIPAY"
+								? "支付宝"
+								: "微信"
+						}}
+					</span>
 					扫描二维码支付
 				</div>
 				<!-- <div class="order-info">需支付金额：¥ 99.00</div> -->
-				<el-button type="primary" @click="handlePayment('success')">
-					已完成支付
-				</el-button>
+				<!-- <el-button type="primary" @click="handlePayment('success')">
+						已完成支付
+					</el-button> -->
 				<el-button @click="handlePayment('cancel')">
-					取消订单
+					取消支付
 				</el-button>
 			</div>
 		</el-dialog>
@@ -414,6 +419,7 @@ export default {
 			buyLoading: false,
 			payCodeDialogVisible: false,
 			qrcodeUrl: "",
+			pollingInterval: null,
 		};
 	},
 	computed: {
@@ -641,7 +647,7 @@ export default {
 			};
 			return typeMap[status] || "";
 		},
-		async renderQrCode(url) {
+		async renderQrCode(url, orderNo) {
 			// 生成支付二维码
 			this.payCodeDialogVisible = true;
 			const dataUrl = await QRCode.toDataURL(url, {
@@ -649,17 +655,41 @@ export default {
 				margin: 1,
 			});
 			this.qrcodeUrl = dataUrl;
+			this.startPolling(orderNo);
+		},
+		// 启动轮询
+		startPolling(orderNo) {
+			this.orderNo = orderNo;
+			this.pollingInterval = setInterval(async () => {
+				const res = await this.$API.print.singleGetById.get({
+					printNo: orderNo,
+				});
+				if (res.code === 0 && res.data.status === "SUCCESS") {
+					this.handlePayment("success");
+				}
+			}, 2000); // 每2秒查询一次
+		},
+		// 停止轮询
+		stopPolling() {
+			if (this.pollingInterval) {
+				clearInterval(this.pollingInterval);
+				this.pollingInterval = null;
+			}
 		},
 		// 处理支付成功
 		handlePayment(type) {
 			this.payCodeDialogVisible = false;
-			if (type === 'success') {
+			this.stopPolling();
+			if (type === "success") {
 				this.$message.success("支付完成");
 			}
 			this.dialogVisible = false;
 			this.$refs.table.getData();
 			this.buyLoading = false;
 		},
+	},
+	beforeUnmount() {
+		this.stopPolling(); // 清理轮询
 	},
 };
 </script>

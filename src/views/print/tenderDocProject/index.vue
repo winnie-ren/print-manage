@@ -304,8 +304,6 @@ export default {
 			formConfig,
 			defaultSearch,
 			defaultFormDetail,
-			orderNo: null,
-			pollingInterval: null,
 			buyHelpers: null,
 		};
 	},
@@ -318,10 +316,13 @@ export default {
 				if (orderNo) {
 					const payRes = await this.$API.print.payOrder.post({
 						orderNo,
-						printType: "printSinglePage",
+						printType: "printBidding",
 					});
 					if (payRes.code === 0) {
-						this.$refs.printOrderPageRef.renderQrCode(payRes.data);
+						this.$refs.printOrderPageRef.renderQrCode(
+							payRes.data,
+							orderNo
+						);
 					}
 				}
 			}

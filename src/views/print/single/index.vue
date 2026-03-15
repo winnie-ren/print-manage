@@ -290,8 +290,6 @@ export default {
 			formConfig,
 			defaultSearch,
 			defaultFormDetail,
-			orderNo: null,
-			pollingInterval: null,
 			buyHelpers: null,
 		};
 	},
@@ -307,7 +305,10 @@ export default {
 						printType: "printSinglePage",
 					});
 					if (payRes.code === 0) {
-						this.$refs.printOrderPageRef.renderQrCode(payRes.data);
+						this.$refs.printOrderPageRef.renderQrCode(
+							payRes.data,
+							orderNo
+						);
 					}
 				}
 			}

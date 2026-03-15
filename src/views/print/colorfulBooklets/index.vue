@@ -132,7 +132,7 @@ const tableHeader = [
 		options: formConfigOptions["paperType"],
 		table: true,
 		span: 6,
-		format: "80:80克双胶纸/100:100克双胶纸/128:128克铜版纸/157:157克铜版纸",
+		format: "twoSidePaper_80:80克双胶纸/twoSidePaper_100:100克双胶纸/coatedPaper_128:128克铜版纸/coatedPaper_157:157克铜版纸",
 	},
 	{
 		label: "封面印色",
@@ -275,8 +275,6 @@ export default {
 			formConfig,
 			defaultSearch,
 			defaultFormDetail,
-			orderNo: null,
-			pollingInterval: null,
 			buyHelpers: null,
 		};
 	},
@@ -289,10 +287,13 @@ export default {
 				if (orderNo) {
 					const payRes = await this.$API.print.payOrder.post({
 						orderNo,
-						printType: "printSinglePage",
+						printType: "printColor",
 					});
 					if (payRes.code === 0) {
-						this.$refs.printOrderPageRef.renderQrCode(payRes.data);
+						this.$refs.printOrderPageRef.renderQrCode(
+							payRes.data,
+							orderNo
+						);
 					}
 				}
 			}
