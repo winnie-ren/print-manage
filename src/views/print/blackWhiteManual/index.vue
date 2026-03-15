@@ -291,7 +291,16 @@ export default {
 			this.buyHelpers = helpers;
 			const res = await this.$API.print.blackSave.post(formDetail);
 			if (res.code === 0 && res.data) {
-				this.$refs.printOrderPageRef.renderQrCode(res.data);
+				const orderNo = res.data?.printNo;
+				if (orderNo) {
+					const payRes = await this.$API.print.payOrder.post({
+						orderNo,
+						printType: "printSinglePage",
+					});
+					if (payRes.code === 0) {
+						this.$refs.printOrderPageRef.renderQrCode(payRes.data);
+					}
+				}
 			}
 			helpers.setLoading(false);
 		},

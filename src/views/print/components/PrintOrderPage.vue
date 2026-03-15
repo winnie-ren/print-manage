@@ -343,12 +343,12 @@
 					扫描二维码支付
 				</div>
 				<!-- <div class="order-info">需支付金额：¥ 99.00</div> -->
-				<el-button type="primary" @click="handlePaymentSuccess">
+				<el-button type="primary" @click="handlePayment('success')">
 					已完成支付
 				</el-button>
-				<el-button @click="payCodeDialogVisible = false"
-					>取消支付</el-button
-				>
+				<el-button @click="handlePayment('cancel')">
+					取消订单
+				</el-button>
 			</div>
 		</el-dialog>
 	</el-container>
@@ -651,9 +651,11 @@ export default {
 			this.qrcodeUrl = dataUrl;
 		},
 		// 处理支付成功
-		handlePaymentSuccess() {
+		handlePayment(type) {
 			this.payCodeDialogVisible = false;
-			this.$message.success("支付完成");
+			if (type === 'success') {
+				this.$message.success("支付完成");
+			}
 			this.dialogVisible = false;
 			this.$refs.table.getData();
 			this.buyLoading = false;
