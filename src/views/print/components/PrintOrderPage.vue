@@ -351,9 +351,7 @@
 				<!-- <el-button type="primary" @click="handlePayment('success')">
 						已完成支付
 					</el-button> -->
-				<el-button @click="handlePayment('cancel')">
-					取消支付
-				</el-button>
+				<el-button @click="cancelPayment"> 取消支付 </el-button>
 			</div>
 		</el-dialog>
 	</el-container>
@@ -664,8 +662,16 @@ export default {
 				const res = await this.$API.print.singleGetById.get({
 					printNo: orderNo,
 				});
-				if (res.code === 0 && res.data.status === "SUCCESS") {
-					this.handlePayment("success");
+				if (res.code === 0 && res.data?.status) {
+					if (res.data.status === "SUCCESS") {
+						this.handlePayment("success");
+					} else if (res.data.status === "CLOSED") {
+						// ElMessage.warning("订单已关闭");
+						this.$alert("订单已关闭", "提示", {
+							confirmButtonText: "确定",
+						});
+						this.handlePayment("cancel");
+					}
 				}
 			}, 2000); // 每2秒查询一次
 		},
@@ -676,13 +682,24 @@ export default {
 				this.pollingInterval = null;
 			}
 		},
+		cancelPayment() {
+			this.$confirm(`确定取消支付吗？`, "提示", { type: "warning" })
+				.then(() => {
+					this.handlePayment("cancel");
+				})
+				.catch(() => {});
+		},
 		// 处理支付成功
 		handlePayment(type) {
 			this.payCodeDialogVisible = false;
 			this.stopPolling();
 			if (type === "success") {
-				this.$message.success("支付完成");
+				this.$alert("支付成功", "提示", {
+					confirmButtonText: "确定",
+				});
+				// this.$message.success("支付成功");
 			}
+			this.$refs.uploadRef?.clearFiles();
 			this.dialogVisible = false;
 			this.$refs.table.getData();
 			this.buyLoading = false;
