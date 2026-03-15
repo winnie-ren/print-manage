@@ -1,5 +1,6 @@
 <template>
 	<PrintOrderPage
+		ref="printOrderPageRef"
 		:apiList="$API.print.blackPage"
 		:apiGetById="$API.print.blackGetById"
 		:apiDelete="$API.print.blackDelete"
@@ -161,7 +162,7 @@ const tableHeader = [
 		table: true,
 		span: 6,
 		format: "self:自取/delivery:送货上门/cashOnDelivery:快递到付/express:快递寄件/pickupStore:到店取货",
-	},	
+	},
 	{
 		label: "创建时间",
 		name: "createTime",
@@ -290,92 +291,10 @@ export default {
 			this.buyHelpers = helpers;
 			const res = await this.$API.print.blackSave.post(formDetail);
 			if (res.code === 0 && res.data) {
-				const orderNo = res.data?.printNo;
-				if (orderNo) {
-					const payRes = await this.$API.print.payOrder.post({
-						orderNo,
-						printType: "printSinglePage",
-					});
-					if (payRes.code === 0) {
-						if (formDetail.paymentType === "ALIPAY") {
-							document.addEventListener(
-								"visibilitychange",
-								this.handleVisibilityChange
-							);
-							const paymentWindow = window.open("", "_blank");
-							if (paymentWindow) {
-								paymentWindow.document.write(payRes.data);
-								this.startPolling(orderNo, paymentWindow);
-								paymentWindow.document.close();
-								const checkClosed = setInterval(() => {
-									if (paymentWindow.closed) {
-										clearInterval(checkClosed);
-										this.checkOrderStatusOnReturn();
-									}
-								}, 1000);
-								return;
-							}
-						}
-					}
-				}
+				this.$refs.printOrderPageRef.renderQrCode(res.data);
 			}
 			helpers.setLoading(false);
 		},
-		// 启动轮询
-		startPolling(orderNo, payWindow) {
-			this.orderNo = orderNo;
-			this.pollingInterval = setInterval(async () => {
-				const res = await this.$API.print.blackGetById.get({
-					printNo: orderNo,
-				});
-				if (res.code === 0 && res.data.status === "SUCCESS") {
-					this.stopPolling();
-					this.handlePaymentSuccess(payWindow);
-				}
-			}, 2000); // 每2秒查询一次
-		},
-		// 停止轮询
-		stopPolling() {
-			if (this.pollingInterval) {
-				clearInterval(this.pollingInterval);
-				this.pollingInterval = null;
-			}
-		},
-		// 处理支付成功
-		handlePaymentSuccess(payWindow) {
-			this.$message.success("支付成功");
-			this.buyHelpers?.close();
-			this.buyHelpers?.refresh();
-			this.buyHelpers?.setLoading(false);
-			if (payWindow && !payWindow.closed) {
-				payWindow.close();
-			}
-		},
-		// 监听页面可见性变化
-		handleVisibilityChange() {
-			if (!document.hidden) {
-				this.checkOrderStatusOnReturn();
-			}
-		},
-		// 页面返回时检查订单状态
-		async checkOrderStatusOnReturn() {
-			if (this.orderNo) {
-				const res = await this.$API.print.blackGetById.get({
-					printNo: this.orderNo,
-				});
-				if (res.code === 0 && res.data.status === "SUCCESS") {
-					this.stopPolling();
-					this.handlePaymentSuccess();
-				}
-			}
-		},
-	},
-	beforeUnmount() {
-		this.stopPolling(); // 清理轮询
-		document.removeEventListener(
-			"visibilitychange",
-			this.handleVisibilityChange
-		); // 移除事件监听
 	},
 };
 </script>

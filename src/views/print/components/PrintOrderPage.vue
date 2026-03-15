@@ -324,6 +324,33 @@
 				</div>
 			</div>
 		</el-dialog>
+		<!-- 付款码弹窗 -->
+		<el-dialog
+			title="请完成支付"
+			v-model="payCodeDialogVisible"
+			width="400px"
+			:close-on-click-modal="false"
+			:show-close="false"
+		>
+			<div class="pay-code-container">
+				<!-- 付款码图片 -->
+				<img :src="qrcodeUrl" alt="付款码" class="pay-code-img" />
+				<!-- 订单信息 -->
+				<div class="order-info">
+					请使用<span>{{
+						formDetail.paymentType === "ALIPAY" ? "支付宝" : "微信"
+					}}</span>
+					扫描二维码支付
+				</div>
+				<!-- <div class="order-info">需支付金额：¥ 99.00</div> -->
+				<el-button type="primary" @click="handlePaymentSuccess">
+					已完成支付
+				</el-button>
+				<el-button @click="payCodeDialogVisible = false"
+					>取消支付</el-button
+				>
+			</div>
+		</el-dialog>
 	</el-container>
 </template>
 
@@ -335,7 +362,7 @@ import {
 	Document,
 } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-
+import QRCode from "qrcode";
 export default {
 	name: "PrintOrderPage",
 	components: {
@@ -385,6 +412,8 @@ export default {
 			uploadDisabled: false,
 			buyDisabled: false,
 			buyLoading: false,
+			payCodeDialogVisible: false,
+			qrcodeUrl: "",
 		};
 	},
 	computed: {
@@ -612,6 +641,23 @@ export default {
 			};
 			return typeMap[status] || "";
 		},
+		async renderQrCode(url) {
+			// 生成支付二维码
+			this.payCodeDialogVisible = true;
+			const dataUrl = await QRCode.toDataURL(url, {
+				width: 200,
+				margin: 1,
+			});
+			this.qrcodeUrl = dataUrl;
+		},
+		// 处理支付成功
+		handlePaymentSuccess() {
+			this.payCodeDialogVisible = false;
+			this.$message.success("支付完成");
+			this.dialogVisible = false;
+			this.$refs.table.getData();
+			this.buyLoading = false;
+		},
 	},
 };
 </script>
@@ -707,5 +753,31 @@ export default {
 			}
 		}
 	}
+}
+/* 付款码弹窗内部样式 */
+.pay-code-container {
+	text-align: center;
+	padding: 20px 0;
+}
+.pay-code-img {
+	width: 220px;
+	height: 220px;
+	border: 1px solid #e6e6e6;
+	padding: 10px;
+	margin: 0 auto 15px;
+}
+.order-info {
+	color: #666;
+	font-size: 14px;
+	margin-bottom: 10px;
+	span {
+		color: #0f81f5;
+		font-weight: bold;
+	}
+}
+.countdown {
+	color: #e64340;
+	font-weight: bold;
+	margin-bottom: 20px;
 }
 </style>

@@ -18,6 +18,7 @@
 		"echarts": "5.4.1",
 		"element-plus": "2.2.32",
 		"nprogress": "0.2.0",
+		"qrcode": "^1.5.4",
 		"qrcodejs2": "0.0.2",
 		"sortablejs": "1.15.0",
 		"spark-md5": "^3.0.2",

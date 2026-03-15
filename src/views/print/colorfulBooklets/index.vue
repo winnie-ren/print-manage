@@ -1,5 +1,6 @@
 <template>
 	<PrintOrderPage
+		ref="printOrderPageRef"
 		:apiList="$API.print.colorPage"
 		:apiGetById="$API.print.colorGetById"
 		:apiDelete="$API.print.colorDelete"
@@ -284,92 +285,10 @@ export default {
 			this.buyHelpers = helpers;
 			const res = await this.$API.print.colorSave.post(formDetail);
 			if (res.code === 0 && res.data) {
-				const orderNo = res.data?.printNo;
-				if (orderNo) {
-					const payRes = await this.$API.print.payOrder.post({
-						orderNo,
-						printType: "printSinglePage",
-					});
-					if (payRes.code === 0) {
-						if (formDetail.paymentType === "ALIPAY") {
-							document.addEventListener(
-								"visibilitychange",
-								this.handleVisibilityChange
-							);
-							const paymentWindow = window.open("", "_blank");
-							if (paymentWindow) {
-								paymentWindow.document.write(payRes.data);
-								this.startPolling(orderNo, paymentWindow);
-								paymentWindow.document.close();
-								const checkClosed = setInterval(() => {
-									if (paymentWindow.closed) {
-										clearInterval(checkClosed);
-										this.checkOrderStatusOnReturn();
-									}
-								}, 1000);
-								return;
-							}
-						}
-					}
-				}
+				this.$refs.printOrderPageRef.renderQrCode(res.data);
 			}
 			helpers.setLoading(false);
 		},
-		// 启动轮询
-		startPolling(orderNo, payWindow) {
-			this.orderNo = orderNo;
-			this.pollingInterval = setInterval(async () => {
-				const res = await this.$API.print.colorGetById.get({
-					printNo: orderNo,
-				});
-				if (res.code === 0 && res.data.status === "SUCCESS") {
-					this.stopPolling();
-					this.handlePaymentSuccess(payWindow);
-				}
-			}, 2000); // 每2秒查询一次
-		},
-		// 停止轮询
-		stopPolling() {
-			if (this.pollingInterval) {
-				clearInterval(this.pollingInterval);
-				this.pollingInterval = null;
-			}
-		},
-		// 处理支付成功
-		handlePaymentSuccess(payWindow) {
-			this.$message.success("支付成功");
-			this.buyHelpers?.close();
-			this.buyHelpers?.refresh();
-			this.buyHelpers?.setLoading(false);
-			if (payWindow && !payWindow.closed) {
-				payWindow.close();
-			}
-		},
-		// 监听页面可见性变化
-		handleVisibilityChange() {
-			if (!document.hidden) {
-				this.checkOrderStatusOnReturn();
-			}
-		},
-		// 页面返回时检查订单状态
-		async checkOrderStatusOnReturn() {
-			if (this.orderNo) {
-				const res = await this.$API.print.colorGetById.get({
-					printNo: this.orderNo,
-				});
-				if (res.code === 0 && res.data.status === "SUCCESS") {
-					this.stopPolling();
-					this.handlePaymentSuccess();
-				}
-			}
-		},
-	},
-	beforeUnmount() {
-		this.stopPolling(); // 清理轮询
-		document.removeEventListener(
-			"visibilitychange",
-			this.handleVisibilityChange
-		); // 移除事件监听
 	},
 };
 </script>
