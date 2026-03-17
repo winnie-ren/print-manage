@@ -3,6 +3,7 @@
 		ref="printOrderPageRef"
 		:apiList="$API.print.blackPage"
 		:apiGetById="$API.print.blackGetById"
+		:apiGetByStatus="$API.print.blackGetByStatus"
 		:apiDelete="$API.print.blackDelete"
 		:apiBatchDelete="$API.print.blackDelete"
 		:apiSave="$API.print.blackSave"
@@ -21,6 +22,7 @@
 		:buyWhenAddOnly="true"
 		:disableFormOnView="true"
 		:onBuy="handleBuy"
+		printType="printBlackBook"
 	/>
 </template>
 
@@ -96,6 +98,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
+		width: 120
 	},
 	{
 		label: "订单金额(元)",
@@ -103,6 +106,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
+		width: 100
 	},
 	{
 		label: "状态",
@@ -110,7 +114,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
-		format: "INIT:已创建/PAYING:已下单等待支付/SUCCESS:支付成功/FAIL:支付失败/CLOSED:已关闭或超时",
+		format: "INIT:待支付/PAYING:已下单等待支付/SUCCESS:支付成功/FAIL:支付失败/CLOSED:已关闭或超时",
 	},
 	{
 		label: "成品规格",

@@ -40,6 +40,13 @@ export default {
 			return await http.get(this.url, data);
 		}
 	},
+	singleGetByStatus: {
+		url: `${config.API_URL}${singleApi}/getByStatus`,
+		name: "单张获取状态",
+		get: async function (data = {}) {
+			return await http.get(this.url, data);
+		}
+	},
 	blackPage: {
 		url: `${config.API_URL}${blackApi}/page`,
 		name: "黑白分页查询",
@@ -64,6 +71,13 @@ export default {
 	blackGetById: {
 		url: `${config.API_URL}${blackApi}/getById`,
 		name: "黑白获取",
+		get: async function (data = {}) {
+			return await http.get(this.url, data);
+		}
+	},
+	blackGetByStatus: {
+		url: `${config.API_URL}${blackApi}/getByStatus`,
+		name: "黑白获取状态",
 		get: async function (data = {}) {
 			return await http.get(this.url, data);
 		}
@@ -96,6 +110,13 @@ export default {
 			return await http.get(this.url, data);
 		}
 	},
+	colorGetByStatus: {
+		url: `${config.API_URL}${colorApi}/getByStatus`,
+		name: "彩色获取状态",
+		get: async function (data = {}) {
+			return await http.get(this.url, data);
+		}
+	},
 	biddingPage: {
 		url: `${config.API_URL}${biddingApi}/page`,
 		name: "标书分页查询",
@@ -120,6 +141,13 @@ export default {
 	biddingGetById: {
 		url: `${config.API_URL}${biddingApi}/getById`,
 		name: "标书获取",
+		get: async function (data = {}) {
+			return await http.get(this.url, data);
+		}
+	},
+	biddingGetByStatus: {
+		url: `${config.API_URL}${biddingApi}/getByStatus`,
+		name: "标书获取状态",
 		get: async function (data = {}) {
 			return await http.get(this.url, data);
 		}

@@ -225,12 +225,34 @@
 			</el-button>
 		</div>
 	</el-dialog>
+	<!-- 付款码弹窗 -->
+	<el-dialog
+		title="请完成支付"
+		v-model="payCodeDialogVisible"
+		width="400px"
+		:close-on-click-modal="false"
+		:show-close="false"
+	>
+		<div class="pay-code-container">
+			<!-- 付款码图片 -->
+			<img :src="qrcodeUrl" alt="付款码" class="pay-code-img" />
+			<!-- 订单信息 -->
+			<div class="order-info">
+				请使用
+				<span>
+					{{ rechargeForm.payType === "ALIPAY" ? "支付宝" : "微信" }}
+				</span>
+				扫描二维码支付
+			</div>
+			<el-button @click="cancelPayment"> 取消支付 </el-button>
+		</div>
+	</el-dialog>
 </template>
 
 <script>
 import search from "./search.vue";
 import tasks from "./tasks.vue";
-
+import QRCode from "qrcode";
 export default {
 	components: {
 		search,
@@ -257,6 +279,8 @@ export default {
 				{ label: "200", value: 200 },
 				{ label: "500", value: 500 },
 			],
+			payCodeDialogVisible: false,
+			qrcodeUrl: "",
 		};
 	},
 	created() {
@@ -291,12 +315,17 @@ export default {
 			this.rechargeLoading = false;
 			// 获取用户余额
 			this.fetchBalance();
+			this.rechargeForm = {
+				payAmount: 100,
+				payType: "ALIPAY",
+			};
+			this.handleAmountSelect(100)
 			this.rechargeVisible = true;
 		},
 		// 启动轮询
-		startPolling(payWindow) {
+		startPolling() {
 			this.pollingInterval = setInterval(async () => {
-				this.getInfo(payWindow);
+				this.getInfo();
 			}, 2000); // 每2秒查询一次
 		},
 		// 停止轮询
@@ -307,13 +336,11 @@ export default {
 			}
 		},
 		// 处理支付成功
-		handlePaymentSuccess(payWindow) {
+		handlePaymentSuccess() {
 			this.$message.success("支付成功");
+			this.payCodeDialogVisible = false;
 			this.rechargeVisible = false;
 			this.rechargeLoading = false;
-			if (payWindow && !payWindow.closed) {
-				payWindow.close();
-			}
 		},
 		// 监听页面可见性变化
 		handleVisibilityChange() {
@@ -321,12 +348,12 @@ export default {
 				this.getInfo();
 			}
 		},
-		async getInfo(payWindow) {
+		async getInfo() {
 			const res = await this.$API.user.info.post();
 			if (res.code === 0 && this.balance !== res.data.cashBalance) {
 				this.balance = res.data.cashBalance;
 				this.stopPolling();
-				this.handlePaymentSuccess(payWindow || "");
+				this.handlePaymentSuccess();
 			}
 		},
 		// 提交充值
@@ -334,29 +361,31 @@ export default {
 			this.rechargeLoading = true;
 			const res = await this.$API.user.recharge.post(this.rechargeForm);
 			if (res.code === 0 && res.data) {
-				// // 监听页面可见性变化
-				// document.addEventListener(
-				// 	"visibilitychange",
-				// 	this.handleVisibilityChange
-				// );
-				// 打开新页签加载支付页面
-				const paymentWindow = window.open("", "_blank");
-				paymentWindow.document.write(res.data);
-				this.rechargeVisible = false;
-				this.rechargeLoading = false;
-				// // 启动轮询
-				// this.startPolling(paymentWindow);
-				// paymentWindow.document.close();
-				// // 监听新页签关闭事件
-				// const checkClosed = setInterval(() => {
-				// 	if (paymentWindow.closed) {
-				// 		clearInterval(checkClosed);
-				// 		this.getInfo(); // 检查支付状态
-				// 	}
-				// }, 1000);
+				this.renderQrCode(res.data);
 			} else {
 				this.rechargeLoading = false;
 			}
+		},
+		async renderQrCode(url) {
+			// 生成支付二维码
+			this.payCodeDialogVisible = true;
+			const dataUrl = await QRCode.toDataURL(url, {
+				width: 200,
+				margin: 1,
+			});
+			this.qrcodeUrl = dataUrl;
+			this.startPolling();
+		},
+		cancelPayment() {
+			this.$confirm(`确定取消支付吗？`, "提示", { type: "warning" })
+				.then(() => {
+					this.stopPolling();
+					this.payCodeDialogVisible = false;
+					this.rechargeVisible = false;
+					this.rechargeLoading = false;
+					this.$message("支付取消");
+				})
+				.catch(() => {});
 		},
 		// 个人信息处理
 		handleUser(command) {
@@ -610,6 +639,27 @@ export default {
 	}
 	.el-dialog__headerbtn .el-dialog__close {
 		color: #fff;
+	}
+}
+/* 付款码弹窗内部样式 */
+.pay-code-container {
+	text-align: center;
+	padding: 20px 0;
+}
+.pay-code-img {
+	width: 220px;
+	height: 220px;
+	border: 1px solid #e6e6e6;
+	padding: 10px;
+	margin: 0 auto 15px;
+}
+.order-info {
+	color: #666;
+	font-size: 14px;
+	margin-bottom: 10px;
+	span {
+		color: #0f81f5;
+		font-weight: bold;
 	}
 }
 </style>

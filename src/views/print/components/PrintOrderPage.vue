@@ -123,7 +123,7 @@
 						v-if="actionColumn === 'file'"
 						:label="actionLabelText"
 						fixed="right"
-						width="80"
+						width="120"
 					>
 						<template #default="scope">
 							<el-button-group>
@@ -133,6 +133,14 @@
 									@click="table_show(scope.row)"
 								>
 									查看
+								</el-button>
+								<el-button
+									type="success"
+									size="small"
+									:disabled="scope.row.status !== 'INIT'"
+									@click="handlePay(scope.row)"
+								>
+									支付
 								</el-button>
 							</el-button-group>
 						</template>
@@ -377,6 +385,7 @@ export default {
 	props: {
 		apiList: { type: Object, required: true },
 		apiGetById: { type: Object, required: true },
+		apiGetByStatus: { type: Object, required: true },
 		apiDelete: { type: Object, default: null },
 		apiBatchDelete: { type: Object, default: null },
 		apiSave: { type: Object, default: null },
@@ -404,6 +413,7 @@ export default {
 		buyWhenAddOnly: { type: Boolean, default: false },
 		showRemarks: { type: Boolean, default: true },
 		onBuy: { type: Function, default: null },
+		printType: { type: String, default: "" },
 	},
 	data() {
 		return {
@@ -659,7 +669,7 @@ export default {
 		startPolling(orderNo) {
 			this.orderNo = orderNo;
 			this.pollingInterval = setInterval(async () => {
-				const res = await this.$API.print.singleGetById.get({
+				const res = await this.apiGetByStatus.get({
 					printNo: orderNo,
 				});
 				if (res.code === 0 && res.data?.status) {
@@ -669,7 +679,7 @@ export default {
 						// ElMessage.warning("订单已关闭");
 						this.$alert("订单已关闭", "提示", {
 							confirmButtonText: "确定",
-						});
+						}).catch(() => {});
 						this.handlePayment("cancel");
 					}
 				}
@@ -696,13 +706,29 @@ export default {
 			if (type === "success") {
 				this.$alert("支付成功", "提示", {
 					confirmButtonText: "确定",
-				});
+				}).catch(() => {});
 				// this.$message.success("支付成功");
 			}
 			this.$refs.uploadRef?.clearFiles();
 			this.dialogVisible = false;
 			this.$refs.table.getData();
 			this.buyLoading = false;
+		},
+		handlePay(row) {
+			this.$confirm(`是否确认支付？`, "提示", { type: "warning" })
+				.then(async () => {
+					const payRes = await this.$API.print.payOrder.post({
+						orderNo: row.printNo,
+						printType: this.printType,
+					});
+					if (payRes.code === 0) {
+						this.renderQrCode(
+							payRes.data,
+							row.printNo
+						);
+					}
+				})
+				.catch(() => {});
 		},
 	},
 	beforeUnmount() {

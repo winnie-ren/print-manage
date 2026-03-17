@@ -3,6 +3,7 @@
 		ref="printOrderPageRef"
 		:apiList="$API.print.singlePage"
 		:apiGetById="$API.print.singleGetById"
+		:apiGetByStatus="$API.print.singleGetByStatus"
 		:apiDelete="$API.print.singleDelete"
 		:apiBatchDelete="$API.print.singleDelete"
 		:apiSave="$API.print.singleSave"
@@ -21,6 +22,7 @@
 		:buyWhenAddOnly="true"
 		:disableFormOnView="true"
 		:onBuy="handleBuy"
+		printType="printSinglePage"
 	/>
 </template>
 
@@ -87,6 +89,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
+		width: 120
 	},
 	{
 		label: "订单金额(元)",
@@ -94,6 +97,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
+		width: 100
 	},
 	{
 		label: "状态",
@@ -101,7 +105,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
-		format: "INIT:已创建/PAYING:已下单等待支付/SUCCESS:支付成功/FAIL:支付失败/CLOSED:已关闭或超时",
+		format: "INIT:待支付/PAYING:已下单等待支付/SUCCESS:支付成功/FAIL:支付失败/CLOSED:已关闭或超时",
 	},
 	{
 		label: "张数",
