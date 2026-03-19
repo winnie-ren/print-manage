@@ -79,6 +79,7 @@
 					:row-key="rowKey"
 					stripe
 					@selectionChange="selectionChange"
+					@dataChange="handleTableDataChange"
 				>
 					<el-table-column type="selection" width="50" />
 					<template v-for="item in tableHeader" :key="item.name">
@@ -123,7 +124,7 @@
 						v-if="actionColumn === 'file'"
 						:label="actionLabelText"
 						fixed="right"
-						width="120"
+						width="160"
 					>
 						<template #default="scope">
 							<el-button-group>
@@ -137,10 +138,15 @@
 								<el-button
 									type="success"
 									size="small"
-									:disabled="scope.row.status !== 'INIT'"
+									v-if="scope.row.status !== 'INIT' && scope.row.remainSeconds > 0"
 									@click="handlePay(scope.row)"
 								>
 									支付
+									{{
+										formatRemainSeconds(
+											scope.row._remainSeconds
+										)
+									}}
 								</el-button>
 							</el-button-group>
 						</template>
@@ -433,6 +439,7 @@ export default {
 			pollingInterval: null,
 			price: "",
 			calcPriceTimer: null,
+			countdownTimers: {},
 		};
 	},
 	computed: {
@@ -757,9 +764,62 @@ export default {
 				})
 				.catch(() => {});
 		},
+		formatRemainSeconds(seconds) {
+			if (seconds == null || seconds <= 0) return "00:00";
+			const m = Math.floor(seconds / 60);
+			const s = seconds % 60;
+			return (
+				String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0")
+			);
+		},
+		// 每行启动倒计时
+		startRowCountdown(row) {
+			const rowId = this.getRowId(row);
+			const seconds = Number(row.remainSeconds);
+			if (!rowId || !seconds || seconds <= 0) return;
+			// 先清旧的
+			this.clearRowCountdown(row);
+			// 用展示字段，不污染原字段
+			row._remainSeconds = seconds;
+			const timer = setInterval(() => {
+				if (row._remainSeconds <= 1) {
+					row._remainSeconds = 0;
+					this.clearRowCountdown(row);
+					return;
+				}
+				row._remainSeconds -= 1;
+			}, 1000);
+			this.countdownTimers[rowId] = timer;
+		},
+		// 清理单行计时器
+		clearRowCountdown(row) {
+			const rowId = this.getRowId(row);
+			const timer = this.countdownTimers?.[rowId];
+			if (timer) {
+				clearInterval(timer);
+				delete this.countdownTimers[rowId];
+			}
+		},
+		// 清理全部计时器
+		clearAllCountdowns() {
+			Object.keys(this.countdownTimers || {}).forEach((key) => {
+				clearInterval(this.countdownTimers[key]);
+			});
+			this.countdownTimers = {};
+		},
+		// 列表刷新后重建倒计时
+		resetAllCountdowns(rows) {
+			this.clearAllCountdowns();
+			(rows || []).forEach((row) => this.startRowCountdown(row));
+		},
+		// 供 scTable dataChange 调用
+		handleTableDataChange(res, tableData) {
+			this.resetAllCountdowns(tableData);
+		},
 	},
 	beforeUnmount() {
 		this.stopPolling(); // 清理轮询
+		this.clearAllCountdowns();
 	},
 };
 </script>

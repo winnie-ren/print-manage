@@ -323,9 +323,9 @@ export default {
 			this.rechargeVisible = true;
 		},
 		// 启动轮询
-		startPolling(orderNo) {
+		startPolling(rechargeNo) {
 			this.pollingInterval = setInterval(async () => {
-				this.getInfo(orderNo);
+				this.getInfo(rechargeNo);
 			}, 2000); // 每2秒查询一次
 		},
 		// 停止轮询
@@ -342,9 +342,9 @@ export default {
 			this.rechargeVisible = false;
 			this.rechargeLoading = false;
 		},
-		async getInfo(orderNo) {
+		async getInfo(rechargeNo) {
 			const res = await this.$API.user.rechargeGetByStatus.post({
-				orderNo
+				rechargeNo
 			});
 			if (res.code === 0 && res.data.status === "SUCCESS") {
 				this.balance = res.data.cashBalance;
@@ -359,19 +359,19 @@ export default {
 			const res = await this.$API.user.rechargeSave.post(
 				this.rechargeForm
 			);
-			if (res.code === 0 && res.data?.orderNo) {
+			if (res.code === 0 && res.data?.rechargeNo) {
 				// 获取支付码
 				const orderRes = await this.$API.user.recharge.post({
-					orderNo: res.data.orderNo,
+					rechargeNo: res.data.rechargeNo,
 				});
 				if (orderRes.code === 0 && orderRes.data) {
-					this.renderQrCode(orderRes.data, res.data.orderNo);
+					this.renderQrCode(orderRes.data, res.data.rechargeNo);
 				} else {
 					this.rechargeLoading = false;
 				}
 			}
 		},
-		async renderQrCode(url, orderNo) {
+		async renderQrCode(url, rechargeNo) {
 			// 生成支付二维码
 			this.payCodeDialogVisible = true;
 			const dataUrl = await QRCode.toDataURL(url, {
@@ -379,7 +379,7 @@ export default {
 				margin: 1,
 			});
 			this.qrcodeUrl = dataUrl;
-			this.startPolling(orderNo);
+			this.startPolling(rechargeNo);
 		},
 		cancelPayment() {
 			this.$confirm(`确定取消支付吗？`, "提示", { type: "warning" })

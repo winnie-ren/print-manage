@@ -203,8 +203,8 @@ const formConfig = [
 		prop: "workflow",
 		type: "radio",
 		options: [
-			{ label: "先印正本", value: "先印正本" },
-			{ label: "直接打印装订", value: "直接打印装订" },
+			{ label: "先印正本", value: "firstPrintCopy" },
+			{ label: "直接打印装订", value: "printBindDirect" },
 		],
 	},
 	{ label: "正本份数", prop: "originalCount", type: "input-number" },
