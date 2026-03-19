@@ -343,7 +343,7 @@ export default {
 			this.rechargeLoading = false;
 		},
 		async getInfo(rechargeNo) {
-			const res = await this.$API.user.rechargeGetByStatus.post({
+			const res = await this.$API.user.rechargeGetByStatus.get({
 				rechargeNo
 			});
 			if (res.code === 0 && res.data.status === "SUCCESS") {

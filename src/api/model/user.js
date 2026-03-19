@@ -54,8 +54,8 @@ export default {
 	rechargeGetByStatus: {
 		url: `${config.API_URL}/api/v1/trechargeorder/getByStatus`,
 		name: "充值状态查询",
-		post: async function (data = {}) {
-			return await http.post(this.url, data);
+		get: async function (data = {}) {
+			return await http.get(this.url, data);
 		}
 	},
 	info: {
