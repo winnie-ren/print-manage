@@ -8,6 +8,7 @@
 		:apiBatchDelete="$API.print.biddingDelete"
 		:apiSave="$API.print.biddingSave"
 		:apiPay="$API.print.payOrder"
+		:apiCalcPrice="$API.print.biddingCalcPrice"
 		:getByIdParams="(row) => ({ printNo: row.printNo })"
 		:searchConfig="searchConfig"
 		:tableHeader="tableHeader"

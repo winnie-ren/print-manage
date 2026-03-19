@@ -319,13 +319,13 @@ export default {
 				payAmount: 100,
 				payType: "ALIPAY",
 			};
-			this.handleAmountSelect(100)
+			this.handleAmountSelect(100);
 			this.rechargeVisible = true;
 		},
 		// 启动轮询
-		startPolling() {
+		startPolling(orderNo) {
 			this.pollingInterval = setInterval(async () => {
-				this.getInfo();
+				this.getInfo(orderNo);
 			}, 2000); // 每2秒查询一次
 		},
 		// 停止轮询
@@ -342,15 +342,11 @@ export default {
 			this.rechargeVisible = false;
 			this.rechargeLoading = false;
 		},
-		// 监听页面可见性变化
-		handleVisibilityChange() {
-			if (!document.hidden) {
-				this.getInfo();
-			}
-		},
-		async getInfo() {
-			const res = await this.$API.user.info.post();
-			if (res.code === 0 && this.balance !== res.data.cashBalance) {
+		async getInfo(orderNo) {
+			const res = await this.$API.user.rechargeGetByStatus.post({
+				orderNo
+			});
+			if (res.code === 0 && res.data.status === "SUCCESS") {
 				this.balance = res.data.cashBalance;
 				this.stopPolling();
 				this.handlePaymentSuccess();
@@ -359,14 +355,23 @@ export default {
 		// 提交充值
 		async submitRecharge() {
 			this.rechargeLoading = true;
-			const res = await this.$API.user.recharge.post(this.rechargeForm);
-			if (res.code === 0 && res.data) {
-				this.renderQrCode(res.data);
-			} else {
-				this.rechargeLoading = false;
+			// 提交充值订单
+			const res = await this.$API.user.rechargeSave.post(
+				this.rechargeForm
+			);
+			if (res.code === 0 && res.data?.orderNo) {
+				// 获取支付码
+				const orderRes = await this.$API.user.recharge.post({
+					orderNo: res.data.orderNo,
+				});
+				if (orderRes.code === 0 && orderRes.data) {
+					this.renderQrCode(orderRes.data, res.data.orderNo);
+				} else {
+					this.rechargeLoading = false;
+				}
 			}
 		},
-		async renderQrCode(url) {
+		async renderQrCode(url, orderNo) {
 			// 生成支付二维码
 			this.payCodeDialogVisible = true;
 			const dataUrl = await QRCode.toDataURL(url, {
@@ -374,7 +379,7 @@ export default {
 				margin: 1,
 			});
 			this.qrcodeUrl = dataUrl;
-			this.startPolling();
+			this.startPolling(orderNo);
 		},
 		cancelPayment() {
 			this.$confirm(`确定取消支付吗？`, "提示", { type: "warning" })

@@ -316,7 +316,9 @@
 				</el-main>
 
 				<div class="bottom-shop">
-					<div class="order-content"></div>
+					<div class="order-content">
+						<span class="price"> 价格￥{{ price }} </span>
+					</div>
 					<el-button-group>
 						<el-button
 							v-if="showBuyButton"
@@ -390,6 +392,7 @@ export default {
 		apiBatchDelete: { type: Object, default: null },
 		apiSave: { type: Object, default: null },
 		apiPay: { type: Object, default: null },
+		apiCalcPrice: { type: Object, default: null },
 		getByIdParams: { type: Function, default: null },
 		searchConfig: { type: Array, required: true },
 		tableHeader: { type: Array, required: true },
@@ -428,6 +431,8 @@ export default {
 			payCodeDialogVisible: false,
 			qrcodeUrl: "",
 			pollingInterval: null,
+			price: "",
+			calcPriceTimer: null,
 		};
 	},
 	computed: {
@@ -445,7 +450,32 @@ export default {
 			return this.formDetail?.[this.fileListKey] || [];
 		},
 	},
+	watch: {
+		formDetail: {
+			deep: true,
+			handler() {
+				this.scheduleCalcPrice();
+			},
+		},
+	},
 	methods: {
+		scheduleCalcPrice() {
+			if (!this.apiCalcPrice?.post) return;
+			if (this.isView) return;
+
+			clearTimeout(this.calcPriceTimer);
+			this.calcPriceTimer = setTimeout(() => {
+				this.calcPrice();
+			}, 400);
+		},
+		async calcPrice() {
+			if (!this.apiCalcPrice?.post) return;
+			const res = await this.apiCalcPrice.post(this.formDetail);
+			if (res.code === 0) {
+				// 根据后端结构调整
+				this.price = res.data?.totalPrice ?? res.data;
+			}
+		},
 		clone(obj) {
 			return JSON.parse(JSON.stringify(obj || {}));
 		},
@@ -722,10 +752,7 @@ export default {
 						printType: this.printType,
 					});
 					if (payRes.code === 0) {
-						this.renderQrCode(
-							payRes.data,
-							row.printNo
-						);
+						this.renderQrCode(payRes.data, row.printNo);
 					}
 				})
 				.catch(() => {});

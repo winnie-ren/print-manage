@@ -7,6 +7,7 @@
 		:apiDelete="$API.print.colorDelete"
 		:apiBatchDelete="$API.print.colorDelete"
 		:apiPay="$API.print.payOrder"
+		:apiCalcPrice="$API.print.colorCalcPrice"
 		:getByIdParams="(row) => ({ printNo: row.printNo })"
 		:searchConfig="searchConfig"
 		:tableHeader="tableHeader"

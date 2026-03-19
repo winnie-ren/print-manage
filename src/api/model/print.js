@@ -12,6 +12,13 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	singleCalcPrice: {
+		url: `${config.API_URL}${singleApi}/calcPrice`,
+		name: "单张价格计算",
+		post: async function (data = {}) {
+			return await http.post(this.url, data);
+		}
+	},
 	singleDelete: {
 		url: `${config.API_URL}${singleApi}/delete`,
 		name: "单张删除",
@@ -61,6 +68,13 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	blackCalcPrice: {
+		url: `${config.API_URL}${blackApi}/calcPrice`,
+		name: "黑白价格计算",
+		post: async function (data = {}) {
+			return await http.post(this.url, data);
+		}
+	},
 	blackDelete: {
 		url: `${config.API_URL}${blackApi}/delete`,
 		name: "黑白删除",
@@ -96,6 +110,13 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	colorCalcPrice: {
+		url: `${config.API_URL}${colorApi}/calcPrice`,
+		name: "彩色价格计算",
+		post: async function (data = {}) {
+			return await http.post(this.url, data);
+		}
+	},
 	colorDelete: {
 		url: `${config.API_URL}${colorApi}/delete`,
 		name: "彩色删除",
@@ -127,6 +148,13 @@ export default {
 	biddingSave: {
 		url: `${config.API_URL}${biddingApi}/save`,
 		name: "标书保存",
+		post: async function (data = {}) {
+			return await http.post(this.url, data);
+		}
+	},
+	biddingCalcPrice: {
+		url: `${config.API_URL}${biddingApi}/calcPrice`,
+		name: "标书价格计算",
 		post: async function (data = {}) {
 			return await http.post(this.url, data);
 		}

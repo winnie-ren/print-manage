@@ -44,6 +44,20 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	rechargeSave: {
+		url: `${config.API_URL}/api/v1/trechargeorder/save`,
+		name: "充值订单保存",
+		post: async function (data = {}) {
+			return await http.post(this.url, data);
+		}
+	},
+	rechargeGetByStatus: {
+		url: `${config.API_URL}/api/v1/trechargeorder/getByStatus`,
+		name: "充值状态查询",
+		post: async function (data = {}) {
+			return await http.post(this.url, data);
+		}
+	},
 	info: {
 		url: `${config.API_URL}${api}/info`,
 		name: "用户信息",
