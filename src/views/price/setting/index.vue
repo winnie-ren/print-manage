@@ -139,7 +139,7 @@
 										<el-input-number
 											v-model.number="
 												blackForm[
-													`${item.value}_${sItem.value}`
+													item.value === 'paperType' ? `${sItem.value}` : `${item.value}_${sItem.value}`
 												]
 											"
 											:min="0"
@@ -181,7 +181,7 @@
 										<el-input-number
 											v-model.number="
 												colorForm[
-													`${item.value}_${sItem.value}`
+													item.value === 'paperType' ? `${sItem.value}` : `${item.value}_${sItem.value}`
 												]
 											"
 											:min="0"
@@ -417,10 +417,10 @@ export default {
 		const blackForm = ref({
 			spec_A4: 1,
 			spec_B5: 0.85,
-			paperType_twoSidePaper_80: 0.1,
-			paperType_twoSidePaper_100: 0.2,
-			paperType_coatedPaper_128: 0.5,
-			paperType_coatedPaper_157: 0.6,
+			twoSidePaper_80: 0.1,
+			twoSidePaper_100: 0.2,
+			coatedPaper_128: 0.5,
+			coatedPaper_157: 0.6,
 			coverColor_black: 2,
 			coverColor_color: 3,
 			innerColor_black: 1,
@@ -441,10 +441,10 @@ export default {
 		const colorForm = ref({
 			spec_A4: 1,
 			spec_B5: 0.85,
-			paperType_twoSidePaper_80: 0.1,
-			paperType_twoSidePaper_100: 0.2,
-			paperType_coatedPaper_128: 0.5,
-			paperType_coatedPaper_157: 0.6,
+			twoSidePaper_80: 0.1,
+			twoSidePaper_100: 0.2,
+			coatedPaper_128: 0.5,
+			coatedPaper_157: 0.6,
 			coverColor_black: 2,
 			coverColor_color: 3,
 			innerColor_black: 1,
