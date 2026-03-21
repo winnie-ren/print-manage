@@ -105,7 +105,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
-		width: 120
+		width: 120,
 	},
 	{
 		label: "订单金额(元)",
@@ -113,7 +113,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
-		width: 100
+		width: 100,
 	},
 	{
 		label: "状态",
@@ -155,13 +155,31 @@ const tableHeader = [
 		format: "yes:是/no:否",
 	},
 	{
+		label: "正本印面",
+		name: "originalSide",
+		component: "select",
+		options: formConfigOptions["originalSide"],
+		table: true,
+		span: 6,
+		format: "single:单面/double:双面",
+	},
+	{
 		label: "正本印色",
 		name: "originalColor",
 		component: "select",
 		options: formConfigOptions["originalColor"],
 		table: true,
 		span: 6,
-		format: "black:黑白/color:彩色/single:单面/double:双面",
+		format: "black:黑白/color:彩色",
+	},
+	{
+		label: "副本印面",
+		name: "copySide",
+		component: "select",
+		options: formConfigOptions["copySide"],
+		table: true,
+		span: 6,
+		format: "single:单面/double:双面",
 	},
 	{
 		label: "副本印色",
@@ -170,7 +188,7 @@ const tableHeader = [
 		options: formConfigOptions["copyColor"],
 		table: true,
 		span: 6,
-		format: "black:黑白/color:彩色/single:单面/double:双面",
+		format: "black:黑白/color:彩色",
 	},
 	{
 		label: "交付方式",
@@ -222,10 +240,22 @@ const formConfig = [
 		options: formConfigOptions["scanFile"],
 	},
 	{
+		label: "正本印面",
+		prop: "originalSide",
+		type: "radio",
+		options: formConfigOptions["originalSide"],
+	},
+	{
 		label: "正本印色",
 		prop: "originalColor",
 		type: "radio",
 		options: formConfigOptions["originalColor"],
+	},
+	{
+		label: "副本印面",
+		prop: "copySide",
+		type: "radio",
+		options: formConfigOptions["copySide"],
 	},
 	{
 		label: "副本印色",
@@ -278,19 +308,23 @@ const defaultSearch = {
 	copyCopies: "",
 	isScan: "",
 	originalColor: "",
+	originalSide: "",
 	copyColor: "",
+	copySide: "",
 	deliveryMethod: "",
 };
 
 const defaultFormDetail = {
 	spec: "A4",
-	workflow: "先印正本",
+	workflow: "firstPrintCopy",
 	originalCount: 1,
 	copyCopies: 1,
 	isScan: "yes",
 	scanFile: "send",
 	originalColor: "black",
+	originalSide: "single",
 	copyColor: "black",
+	copySide: "single",
 	coverColor: "white",
 	bindingMethod: "glue",
 	deliveryTime: "1",

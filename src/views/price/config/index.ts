@@ -54,15 +54,19 @@ export const formConfigOptions = {
   { label: "是", value: "yes" },
   { label: "否", value: "no" },
  ],
+ originalSide: [
+  { label: "单面", value: "single" },
+  { label: "双面", value: "double" },
+ ],
  originalColor: [
   { label: "黑白", value: "black" },
   { label: "彩色", value: "color" },
-  { label: "单面", value: "single" },
-  { label: "双面", value: "double" },
  ],
  copyColor: [
   { label: "黑白", value: "black" },
   { label: "彩色", value: "color" },
+ ],
+ copySide: [
   { label: "单面", value: "single" },
   { label: "双面", value: "double" },
  ],
