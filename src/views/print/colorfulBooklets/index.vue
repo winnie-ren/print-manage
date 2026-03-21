@@ -97,7 +97,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
-		width: 120
+		width: 120,
 	},
 	{
 		label: "订单金额(元)",
@@ -105,7 +105,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
-		width: 100
+		width: 100,
 	},
 	{
 		label: "状态",
@@ -186,8 +186,8 @@ const formConfig = [
 	{
 		label: "文件页数",
 		prop: "pageCount",
-		type: "radio",
-		options: [{ label: "100", value: 1 }],
+		type: "input-number",
+		options: { placeholder: "请输入文件页数" },
 	},
 	{
 		label: "份数",

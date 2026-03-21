@@ -187,9 +187,9 @@ const formConfig = [
 	},
 	{
 		label: "文件页数",
-		prop: "printArea",
-		type: "radio",
-		options: [{ label: "100", value: 1 }],
+		prop: "pageCount",
+		type: "input-number",
+		options: { placeholder: "请输入文件页数" },
 	},
 	{
 		label: "份数",
@@ -262,7 +262,7 @@ const defaultSearch = {
 
 const defaultFormDetail = {
 	spec: "A4",
-	printArea: 1,
+	pageCount: 1,
 	quantity: 1,
 	paperType: "twoSidePaper_80",
 	coverColor: "black",
