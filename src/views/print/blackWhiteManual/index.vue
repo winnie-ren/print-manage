@@ -197,9 +197,9 @@ const formConfig = [
 		type: "radio",
 		options: [
 			{ label: "1", value: 1 },
-			{ label: "10", value: 2 },
-			{ label: "50", value: 3 },
-			{ label: "100", value: 4 },
+			{ label: "10", value: 10 },
+			{ label: "50", value: 50 },
+			{ label: "100", value: 100 },
 		],
 	},
 	{
