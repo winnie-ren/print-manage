@@ -144,6 +144,7 @@
 		center
 		destroy-on-close
 		:close-on-click-modal="false"
+		:close-on-press-escape="false"
 		class="recharge-dialog"
 	>
 		<div class="recharge-content">
@@ -231,6 +232,7 @@
 		v-model="payCodeDialogVisible"
 		width="400px"
 		:close-on-click-modal="false"
+		:close-on-press-escape="false"
 		:show-close="false"
 	>
 		<div class="pay-code-container">
@@ -344,7 +346,7 @@ export default {
 		},
 		async getInfo(rechargeNo) {
 			const res = await this.$API.user.rechargeGetByStatus.get({
-				rechargeNo
+				rechargeNo,
 			});
 			if (res.code === 0 && res.data.status === "SUCCESS") {
 				this.balance = res.data.cashBalance;
@@ -460,6 +462,9 @@ export default {
 		pointsSetting() {
 			this.$router.push({ path: "/pointsSetting" });
 		},
+	},
+	beforeUnmount() {
+		this.stopPolling(); // 清理轮询
 	},
 };
 </script>

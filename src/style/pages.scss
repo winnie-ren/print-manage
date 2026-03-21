@@ -217,16 +217,5 @@
 		justify-content: end;
 		border-top: 1px solid #ccc;
 		padding: 8px;
-
-		.order-content {
-			display: flex;
-			flex-direction: column;
-			padding-right: 10px;
-
-			.price {
-				font-size: 18px;
-				color: #ffaf58;
-			}
-		}
 	}
 }

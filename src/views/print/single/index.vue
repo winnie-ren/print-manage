@@ -17,7 +17,7 @@
 		:defaultFormDetail="defaultFormDetail"
 		:customInputProps="['size', 'weight', 'styleCount', 'sheetCount']"
 		actionColumn="file"
-		actionLabel="文件"
+		actionLabel="操作"
 		:enableUpload="true"
 		:uploadLimit="0"
 		:buyWhenAddOnly="true"

@@ -124,30 +124,47 @@
 						v-if="actionColumn === 'file'"
 						:label="actionLabelText"
 						fixed="right"
-						width="160"
+						width="180"
 					>
 						<template #default="scope">
 							<el-button-group>
-								<el-button
-									type="primary"
-									size="small"
-									@click="table_show(scope.row)"
+								<el-tooltip
+									class="item"
+									effect="dark"
+									content="查看文件"
+									placement="top"
 								>
-									查看
-								</el-button>
-								<el-button
-									type="success"
-									size="small"
-									v-if="scope.row.status !== 'INIT' && scope.row.remainSeconds > 0"
-									@click="handlePay(scope.row)"
+									<el-button
+										type="primary"
+										size="small"
+										@click="table_show(scope.row)"
+									>
+										查看
+									</el-button>
+								</el-tooltip>
+								<el-tooltip
+									class="item"
+									effect="dark"
+									content="点击支付"
+									placement="top"
 								>
-									支付
-									{{
-										formatRemainSeconds(
-											scope.row._remainSeconds
-										)
-									}}
-								</el-button>
+									<el-button
+										type="success"
+										size="small"
+										v-if="
+											scope.row.status === 'INIT' &&
+											scope.row.remainSeconds > 0
+										"
+										@click="handlePay(scope.row)"
+									>
+										支付剩余
+										{{
+											formatRemainSeconds(
+												scope.row._remainSeconds
+											)
+										}}
+									</el-button>
+								</el-tooltip>
 							</el-button-group>
 						</template>
 					</el-table-column>
@@ -323,7 +340,10 @@
 
 				<div class="bottom-shop">
 					<div class="order-content">
-						<span class="price"> 价格￥{{ price }} </span>
+						<span
+							>价格:
+							<span class="price">￥{{ price }}</span></span
+						>
 					</div>
 					<el-button-group>
 						<el-button
@@ -346,6 +366,7 @@
 			v-model="payCodeDialogVisible"
 			width="400px"
 			:close-on-click-modal="false"
+			:close-on-press-escape="false"
 			:show-close="false"
 		>
 			<div class="pay-code-container">
@@ -876,8 +897,16 @@ export default {
 
 .order-content {
 	flex: 1;
-	font-size: 16px;
+	font-size: 20px;
 	font-weight: bold;
+	display: flex;
+	flex-direction: column;
+	padding-right: 10px;
+	.price {
+		font-size: 24px;
+		// color: #ffaf58;
+		color: #cc0e1d;
+	}
 }
 
 .file-list {
