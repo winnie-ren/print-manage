@@ -21,10 +21,7 @@
 				修改
 			</el-button>
 		</template>
-		<el-tabs
-			v-model="activeName"
-			class="tab-container"
-		>
+		<el-tabs v-model="activeName" class="tab-container">
 			<el-tab-pane label="单张" name="first">
 				<div class="config-container">
 					<el-form
@@ -139,7 +136,9 @@
 										<el-input-number
 											v-model.number="
 												blackForm[
-													item.value === 'paperType' ? `${sItem.value}` : `${item.value}_${sItem.value}`
+													item.value === 'paperType'
+														? `${sItem.value}`
+														: `${item.value}_${sItem.value}`
 												]
 											"
 											:min="0"
@@ -181,7 +180,9 @@
 										<el-input-number
 											v-model.number="
 												colorForm[
-													item.value === 'paperType' ? `${sItem.value}` : `${item.value}_${sItem.value}`
+													item.value === 'paperType'
+														? `${sItem.value}`
+														: `${item.value}_${sItem.value}`
 												]
 											"
 											:min="0"
@@ -242,7 +243,13 @@
 			</el-tab-pane>
 		</el-tabs>
 		<div class="footer-btn">
-			<el-button type="primary" @click="handleSubmit()" :loading="submitLoading"> {{ submitLoading ? '提交中' : '提交' }} </el-button>
+			<el-button
+				type="primary"
+				@click="handleSubmit()"
+				:loading="submitLoading"
+			>
+				{{ submitLoading ? "提交中" : "提交" }}
+			</el-button>
 		</div>
 	</common-list-page>
 </template>
@@ -338,6 +345,7 @@ export default {
 				format: "0:无效/1:有效",
 			},
 		];
+		const submitLoading = ref(false);
 		// API 方法
 		const deleteMenu = async (ids) => {
 			return await $API.price.priceDelete.delete(ids);
@@ -346,6 +354,7 @@ export default {
 		// 修改价格
 		const handleEdit = async () => {
 			activeName.value = "first";
+			submitLoading.value = false;
 			// 打开弹窗
 			commonListPage.value.handleEdit();
 			// 获取配置
@@ -494,7 +503,6 @@ export default {
 			deliveryMethod_cashOnDelivery: 0,
 			deliveryMethod_express: 0,
 		});
-		const submitLoading = ref(false);
 		// 保存价格配置
 		const handleSubmit = async () => {
 			submitLoading.value = true;
@@ -512,7 +520,7 @@ export default {
 				// 刷新数据
 				commonListPage.value.handleSearch();
 			}
-			submitLoading.value = false
+			submitLoading.value = false;
 		};
 		return {
 			searchConfig,
