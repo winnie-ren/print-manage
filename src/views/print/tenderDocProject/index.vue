@@ -217,6 +217,12 @@ const formConfig = [
 		options: formConfigOptions["spec"],
 	},
 	{
+		label: "文件页数",
+		prop: "pageCount",
+		type: "input-number",
+		options: { placeholder: "请输入文件页数" },
+	},
+	{
 		label: "工作流程",
 		prop: "workflow",
 		type: "radio",
@@ -299,6 +305,15 @@ const formConfig = [
 		type: "radio",
 		options: formConfigOptions["deliveryMethod"],
 	},
+	{
+		label: "支付方式",
+		prop: "paymentType",
+		type: "radio",
+		options: [
+			{ label: "微信", value: "WXPAY" },
+			{ label: "支付宝", value: "ALIPAY" },
+		],
+	},
 ];
 
 const defaultSearch = {
@@ -319,6 +334,7 @@ const defaultFormDetail = {
 	workflow: "firstPrintCopy",
 	originalCount: 1,
 	copyCopies: 1,
+	pageCount: 100,
 	isScan: "yes",
 	scanFile: "send",
 	originalColor: "black",
@@ -329,6 +345,7 @@ const defaultFormDetail = {
 	bindingMethod: "glue",
 	deliveryTime: "1",
 	deliveryMethod: "self",
+	paymentType: "ALIPAY",
 	remarks: "",
 	fileId: "",
 };

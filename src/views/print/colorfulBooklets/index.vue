@@ -242,6 +242,15 @@ const formConfig = [
 		type: "radio",
 		options: formConfigOptions["deliveryMethod"],
 	},
+	{
+		label: "支付方式",
+		prop: "paymentType",
+		type: "radio",
+		options: [
+			{ label: "微信", value: "WXPAY" },
+			{ label: "支付宝", value: "ALIPAY" },
+		],
+	},
 ];
 
 const defaultSearch = {
@@ -256,7 +265,7 @@ const defaultSearch = {
 
 const defaultFormDetail = {
 	spec: "A4",
-	pageCount: 1,
+	pageCount: 100,
 	quantity: 1,
 	paperType: "twoSidePaper_80",
 	coverColor: "black",
@@ -265,6 +274,7 @@ const defaultFormDetail = {
 	coverProcess: "no",
 	bindingMethod: "mount",
 	deliveryMethod: "self",
+	paymentType: "ALIPAY",
 	remarks: "",
 	customSize: "",
 	fileId: "",
