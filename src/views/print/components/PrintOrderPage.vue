@@ -512,6 +512,7 @@ export default {
 		},
 		add() {
 			this.dialogTitle = this.dialogTitleAdd;
+			this.price = ''
 			this.resetForm();
 			this.dialogVisible = true;
 			this.uploadDisabled = false;
@@ -540,6 +541,7 @@ export default {
 			const res = await this.apiGetById.get(params);
 			if (res.code === 0) {
 				this.formDetail = res.data;
+				this.price = res.data.totalFee || ''
 			} else {
 				this.$nextTick(() => {
 					this.formDetail = { ...row };
