@@ -265,7 +265,7 @@ const defaultSearch = {
 
 const defaultFormDetail = {
 	spec: "A4",
-	pageCount: 100,
+	pageCount: 1,
 	quantity: 1,
 	paperType: "twoSidePaper_80",
 	coverColor: "black",

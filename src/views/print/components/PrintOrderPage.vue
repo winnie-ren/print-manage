@@ -512,7 +512,7 @@ export default {
 		},
 		add() {
 			this.dialogTitle = this.dialogTitleAdd;
-			this.price = ''
+			this.price = "";
 			this.resetForm();
 			this.dialogVisible = true;
 			this.uploadDisabled = false;
@@ -541,7 +541,7 @@ export default {
 			const res = await this.apiGetById.get(params);
 			if (res.code === 0) {
 				this.formDetail = res.data;
-				this.price = res.data.totalFee || ''
+				this.price = res.data.totalFee || "";
 			} else {
 				this.$nextTick(() => {
 					this.formDetail = { ...row };
@@ -625,6 +625,10 @@ export default {
 			);
 		},
 		async buyNow() {
+			if (!this.formDetail.fieldId) {
+				ElMessage.warning("请先上传文件");
+				return;
+			}
 			this.buyLoading = true;
 			const helpers = {
 				close: () => (this.dialogVisible = false),
@@ -643,7 +647,6 @@ export default {
 				this.buyLoading = false;
 				return;
 			}
-
 			const res = await this.apiSave.post(this.formDetail);
 			if (res.code === 0) {
 				helpers.close();
