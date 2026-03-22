@@ -8,6 +8,8 @@
 		:edit-disabled-fields="['serialNumber']"
 		:delete-api="deleteRecharge"
 		:save-api="saveRecharge"
+		:hiddenHeader="true"
+		:showOperationColumn="false"
 		@add="handleAdd"
 		@edit="handleEdit"
 		@view="handleView"
@@ -31,22 +33,16 @@ export default {
 		// 搜索配置
 		const searchConfig = [
 			{
-				label: "序号",
-				name: "sort",
+				label: "充值单号",
+				name: "rechargeNo",
 				component: "input",
-				options: { placeholder: "请输入序号" },
+				options: { placeholder: "请输入充值单号" },
 			},
 			{
 				label: "账号",
-				name: "account",
+				name: "accountNo",
 				component: "input",
 				options: { placeholder: "请输入账号" },
-			},
-			{
-				label: "支付单号",
-				name: "paymentOrderNo",
-				component: "input",
-				options: { placeholder: "请输入支付单号" },
 			},
 			{
 				label: "状态",
@@ -55,8 +51,11 @@ export default {
 				options: {
 					placeholder: "请选择状态",
 					items: [
-						{ value: "1", label: "成功" },
-						{ value: "0", label: "失败" },
+						{ value: "NO_PAY", label: "未支付" },
+						{ value: "PAYING", label: "已下单等待支付" },
+						{ value: "SUCCESS", label: "支付成功" },
+						{ value: "FAIL", label: "支付失败" },
+						{ value: "CLOSED", label: "已关闭或超时" },
 					],
 				},
 			},
@@ -65,45 +64,49 @@ export default {
 		// 表格列配置
 		const tableColumns = [
 			{
-				label: "序号",
-				name: "sort",
-				width: 80,
-			},
-			{
-				label: "账号",
-				name: "account",
-				width: 150,
-			},
-			{
-				label: "支付单号",
-				name: "paymentOrderNo",
+				label: "充值单号",
+				name: "rechargeNo",
 				width: 180,
 			},
 			{
-				label: "支付金额",
-				name: "paymentAmount",
-				width: 120,
+				label: "用户编码",
+				name: "userId",
+				width: 150,
+			},
+			{
+				label: "账号",
+				name: "accountNo",
+				width: 150,
+			},
+			{
+				label: "实际支付金额",
+				name: "payAmount",
 				formatter: (row) => {
-					return `${row.paymentAmount}元`;
+					return `${row.payAmount}元`;
 				},
 			},
 			{
-				label: "账户余额",
-				name: "balance",
-				width: 120,
+				label: "赠送金额",
+				name: "giftAmount",
 				formatter: (row) => {
-					return `${row.balance}元`;
+					return `${row.giftAmount}元`;
+				},
+			},
+			{
+				label: "到账总额",
+				name: "totalAmount",
+				formatter: (row) => {
+					return `${row.totalAmount}元`;
 				},
 			},
 			{
 				label: "状态",
 				name: "status",
-				width: 100,
-				format: "0:失败/1:成功",
+				format: "NO_PAY:未支付/PAYING:已下单等待支付/SUCCESS:支付成功/FAIL:支付失败/CLOSED:已关闭或超时",
 			},
 			{
 				label: "充值时间",
-				name: "rechargeTime",
+				name: "createTime",
 				width: 160,
 			},
 		];
@@ -114,105 +117,40 @@ export default {
 			labelPosition: "right",
 			formItems: [
 				{
-					label: "序号",
-					name: "sort",
+					label: "充值单号",
+					name: "rechargeNo",
 					component: "input",
-					options: { placeholder: "请输入序号" },
+					options: { placeholder: "请输入充值单号" },
 					rules: [
 						{
 							required: true,
-							message: "请输入序号",
+							message: "请输入充值单号",
+							trigger: "blur",
+						},
+					],
+				},
+				{
+					label: "用户编码",
+					name: "userId",
+					component: "input",
+					options: { placeholder: "请输入用户编码" },
+					rules: [
+						{
+							required: true,
+							message: "请输入用户编码",
 							trigger: "blur",
 						},
 					],
 				},
 				{
 					label: "账号",
-					name: "account",
+					name: "accountNo",
 					component: "input",
 					options: { placeholder: "请输入账号" },
 					rules: [
 						{
 							required: true,
 							message: "请输入账号",
-							trigger: "blur",
-						},
-					],
-				},
-				{
-					label: "支付单号",
-					name: "paymentOrderNo",
-					component: "input",
-					options: { placeholder: "请输入支付单号" },
-					rules: [
-						{
-							required: true,
-							message: "请输入支付单号",
-							trigger: "blur",
-						},
-					],
-				},
-				{
-					label: "支付金额",
-					name: "paymentAmount",
-					component: "input-number",
-					options: {
-						min: 0,
-						precision: 2,
-						controls: false,
-						placeholder: "请输入支付金额",
-					},
-					rules: [
-						{
-							required: true,
-							message: "请输入支付金额",
-							trigger: "blur",
-						},
-					],
-				},
-				{
-					label: "账户余额",
-					name: "balance",
-					component: "input-number",
-					options: {
-						min: 0,
-						precision: 2,
-						controls: false,
-						placeholder: "请输入账户余额",
-					},
-					rules: [
-						{
-							required: true,
-							message: "请输入账户余额",
-							trigger: "blur",
-						},
-					],
-				},
-				{
-					label: "状态",
-					name: "status",
-					component: "radio",
-					options: {
-						items: [
-							{ value: "1", label: "成功" },
-							{ value: "0", label: "失败" },
-						],
-					},
-					defaultValue: "1",
-				},
-				{
-					label: "充值时间",
-					name: "rechargeTime",
-					component: "date-picker",
-					options: {
-						type: "datetime",
-						placeholder: "选择充值时间",
-						valueFormat: "YYYY-MM-DD HH:mm:ss",
-					},
-					rules: [
-						{
-							required: true,
-							message: "请选择充值时间",
 							trigger: "blur",
 						},
 					],

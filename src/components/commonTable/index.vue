@@ -62,7 +62,7 @@
 
 		<!-- 主体内容 -->
 		<el-container>
-			<el-header>
+			<el-header v-if="!hiddenHeader">
 				<div class="left-panel">
 					<slot name="header-buttons" :selected-rows="selectedRows">
 						<el-button
@@ -238,6 +238,11 @@ export default {
 		showOperationColumn: {
 			type: Boolean,
 			default: true,
+		},
+		// 是否隐藏头部
+		hiddenHeader: {
+			type: Boolean,
+			default: false,
 		},
 		// 操作列对齐方式
 		operationAlign: {
