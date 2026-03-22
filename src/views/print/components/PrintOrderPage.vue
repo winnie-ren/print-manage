@@ -625,7 +625,7 @@ export default {
 			);
 		},
 		async buyNow() {
-			if (!this.formDetail.fieldId) {
+			if (!this.formDetail.fileId) {
 				ElMessage.warning("请先上传文件");
 				return;
 			}
