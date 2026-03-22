@@ -1,6 +1,6 @@
 <template>
 	<common-list-page
-		ref="commonListPage"
+		ref="commonListPageRef"
 		:api-obj="$API.user.userPage"
 		:search-config="searchConfig"
 		:table-columns="tableColumns"
@@ -16,7 +16,7 @@
 
 <script>
 import CommonListPage from "@/components/commonTable/index.vue";
-import { getCurrentInstance } from "vue";
+import { getCurrentInstance, ref } from "vue";
 
 export default {
 	name: "userManage",
@@ -26,7 +26,7 @@ export default {
 	setup() {
 		const instance = getCurrentInstance();
 		const $API = instance.proxy.$API;
-
+		const commonListPageRef = ref(null);
 		// 搜索配置
 		const searchConfig = [
 			{
@@ -110,31 +110,35 @@ export default {
 					name: "usid",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "用户名称",
 					name: "usna",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "密码",
 					name: "pwd",
 					component: "input",
-					props: { type: "password" },
-					options: { placeholder: "请输入" },
+					options: { placeholder: "请输入", password: true },
+					span: 8,
 				},
 				{
 					label: "联系电话",
 					name: "tel",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "邮件",
 					name: "email",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "状态",
@@ -143,64 +147,74 @@ export default {
 					options: {
 						placeholder: "请选择",
 						items: [
-							{ label: "无效", value: 0 },
-							{ label: "有效", value: 1 },
+							{ label: "无效", value: "0" },
+							{ label: "有效", value: "1" },
 						],
 					},
+					span: 8,
 				},
 				{
 					label: "最新登录时间",
 					name: "lidt",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "账号到期时间",
 					name: "exdt",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "登录失败次数",
 					name: "loginFailCount",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "google密钥",
 					name: "googleSecret",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "账号指纹",
 					name: "accountFingerprint",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "用户环境",
 					name: "userEnv",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "自定义类型",
 					name: "gwfType",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "微信用户",
 					name: "wxUserid",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 				{
 					label: "微信openid",
 					name: "openid",
 					component: "input",
 					options: { placeholder: "请输入" },
+					span: 8,
 				},
 			],
 		};
@@ -219,8 +233,10 @@ export default {
 			console.log("新增用户");
 		};
 
-		const handleEdit = (row) => {
+		const handleEdit = async (row) => {
 			console.log("编辑用户", row);
+			const user = await $API.user.userGetById.get({ usid: row.usid });
+			commonListPageRef.value.formData = user.data;
 		};
 
 		const handleView = (row) => {
@@ -241,6 +257,7 @@ export default {
 			handleEdit,
 			handleView,
 			handleSubmit,
+			commonListPageRef,
 		};
 	},
 };

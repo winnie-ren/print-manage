@@ -439,7 +439,7 @@ export default {
 
 		const handleView = (row, index) => {
 			dialogTitle.value = "查看";
-			formData.value = { ...row };
+			// formData.value = { ...row };
 			dialogVisible.value = true;
 			emit("view", row, index);
 		};
@@ -571,6 +571,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+:deep(.el-drawer__body){
+	padding-top: 10px;
+}
 .el-header {
 	--el-header-height: 40px;
 }

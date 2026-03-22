@@ -28,7 +28,7 @@ export default {
  },
  // 获取充值记录列表
  rechargePage: {
-  url: `${config.API_URL}/member/recharge/page`,
+  url: `${config.API_URL}/api/v1/trechargeorder/page`,
   name: "获取充值记录列表",
   post: async function (data = {}) {
    return await http.post(this.url, data);

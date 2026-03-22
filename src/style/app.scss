@@ -59,6 +59,7 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 .adminui-side-top {border-bottom: 1px solid #ebeef5;height:50px;line-height: 50px;}
 .adminui-side-top h2 {padding:0 20px;font-size: 17px;color: #3c4a54;}
 .adminui-side-scroll {overflow: auto;overflow-x:hidden;flex: 1;}
+.adminui-side-search{padding: 10px 12px 0px 12px;}
 .adminui-side-bottom {border-top: 1px solid #ebeef5;height:51px;cursor: pointer;display: flex;align-items: center;justify-content: center;}
 .adminui-side-bottom i {font-size: 16px;}
 .adminui-side-bottom:hover {color: var(--el-color-primary);}

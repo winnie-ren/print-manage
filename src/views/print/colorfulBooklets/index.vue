@@ -311,6 +311,8 @@ export default {
 							payRes.data,
 							orderNo
 						);
+					} else {
+						this.$refs.printOrderPageRef.dialogVisible = false
 					}
 				}
 			}
