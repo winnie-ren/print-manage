@@ -6,6 +6,7 @@
 		:apiGetByStatus="$API.print.colorGetByStatus"
 		:apiDelete="$API.print.colorDelete"
 		:apiBatchDelete="$API.print.colorDelete"
+		:apiSave="$API.print.colorSave"
 		:apiPay="$API.print.payOrder"
 		:apiCalcPrice="$API.print.colorCalcPrice"
 		:getByIdParams="(row) => ({ printNo: row.printNo })"
@@ -21,6 +22,7 @@
 		:uploadLimit="0"
 		:buyWhenAddOnly="true"
 		:disableFormOnView="true"
+		:onBuy="handleBuy"
 		printType="printColor"
 	/>
 </template>
