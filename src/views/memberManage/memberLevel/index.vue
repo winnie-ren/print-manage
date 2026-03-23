@@ -11,7 +11,7 @@
 		:delete-api="deleteLevel"
 		:save-api="saveLevel"
 		:update-api="updateLevel"
-		:operationWidth="200"
+		:operationWidth="260"
 		@add="handleAdd"
 		@edit="handleEdit"
 		@view="handleEdit"
@@ -22,34 +22,52 @@
 				text
 				type="primary"
 				size="small"
-				@click="openUserDialog(row)"
+				@click="openUserDialog(row, 'add')"
 			>
-				添加用户
+				添加人员
+			</el-button>
+			<el-button
+				text
+				type="primary"
+				size="small"
+				@click="openUserDialog(row, 'view')"
+			>
+				查看人员
 			</el-button>
 		</template>
 	</common-list-page>
-
 	<el-dialog
 		v-model="userDialogVisible"
-		title="选择用户"
+		:title="dialogType === 'add' ? '添加人员' : '查看人员'"
 		width="50%"
 		@close="handleUserDialogClose"
 		class="user-dialog"
+		:close-on-click-modal="false"
+		:close-on-press-escape="false"
 	>
 		<scTable
 			ref="userTableRef"
-			:apiObj="$API.user.userPage"
+			v-if="userDialogVisible"
+			:apiObj="
+				dialogType === 'add'
+					? $API.member.unsignPage
+					: $API.member.tmemberuserPage
+			"
+			:params="{ levelId: currentLevel.levelId }"
 			row-key="id"
 			stripe
 			:height="400"
 			@selection-change="handleUserSelectionChange"
 		>
 			<el-table-column type="selection" width="50" />
-			<el-table-column label="用户编码" prop="usid" />
+			<el-table-column
+				label="用户编码"
+				:prop="dialogType === 'add' ? 'usid' : 'userId'"
+			/>
 			<el-table-column label="用户名称" prop="usna" />
 		</scTable>
 
-		<template #footer>
+		<template #footer v-if="dialogType === 'add'">
 			<el-button @click="userDialogVisible = false">取消</el-button>
 			<el-button
 				type="primary"
@@ -83,7 +101,7 @@ export default {
 
 		const instance = getCurrentInstance();
 		const $API = instance.proxy.$API;
-
+		const dialogType = ref("add");
 		// 搜索配置
 		const searchConfig = [
 			{
@@ -95,15 +113,27 @@ export default {
 			{
 				label: "会员等级名称",
 				name: "levelName",
-				component: "input",
-				options: { placeholder: "请输入会员等级名称" },
+				component: "select",
+				options: {
+					placeholder: "请输入会员等级名称",
+					items: [
+						{ value: "1", label: "青铜" },
+						{ value: "2", label: "黄金" },
+						{ value: "3", label: "铂金" },
+						{ value: "4", label: "钻石" },
+					],
+				},
 			},
 		];
 
 		// 表格列配置
 		const tableColumns = [
 			{ label: "会员等级ID", name: "levelId" },
-			{ label: "会员等级名称", name: "levelName" },
+			{
+				label: "会员等级名称",
+				name: "levelName",
+				format: "1:青铜/2:黄金/3:铂金/4:钻石",
+			},
 			{
 				label: "折扣率",
 				name: "discountRate",
@@ -146,12 +176,27 @@ export default {
 					name: "levelId",
 					component: "input",
 					options: { placeholder: "请输入会员等级ID" },
+					rules: [
+						{
+							required: true,
+							message: "请输入会员等级ID",
+							trigger: "blur",
+						},
+					],
 				},
 				{
 					label: "会员等级名称",
 					name: "levelName",
-					component: "input",
-					options: { placeholder: "请输入会员等级名称" },
+					component: "select",
+					options: {
+						placeholder: "请输入会员等级名称",
+						items: [
+							{ value: "1", label: "青铜" },
+							{ value: "2", label: "黄金" },
+							{ value: "3", label: "铂金" },
+							{ value: "4", label: "钻石" },
+						],
+					},
 					rules: [
 						{
 							required: true,
@@ -220,20 +265,17 @@ export default {
 		};
 
 		// 添加用户弹窗相关
-		const openUserDialog = (row) => {
+		const openUserDialog = (row, type) => {
+			dialogType.value = type;
 			currentLevel.value = row;
 			userDialogVisible.value = true;
-			nextTick(() => {
-				userTableRef.value?.getData?.();
-			});
 		};
 
 		const handleUserSelectionChange = (selection) => {
 			userSelection.value = selection || [];
 		};
 
-		const resolveUserId = (row) =>
-			row.usid ?? row.id;
+		const resolveUserId = (row) => row.usid ?? row.id;
 
 		const handleBatchAddUsers = async () => {
 			if (!currentLevel.value?.levelId) {
@@ -282,7 +324,9 @@ export default {
 		// 事件处理
 		const handleAdd = () => {};
 		const handleEdit = async (row) => {
-			const res = await $API.member.levelGetById.get({ id: row.id });
+			const res = await $API.member.levelGetById.get({
+				levelId: row.levelId,
+			});
 			if (res.code === 0 && res.data) {
 				nextTick(() => {
 					commonListPageRef.value.formData = res.data;
@@ -311,14 +355,16 @@ export default {
 			handleUserSelectionChange,
 			handleBatchAddUsers,
 			handleUserDialogClose,
+			dialogType,
+			currentLevel,
 		};
 	},
 };
 </script>
 
 <style lang="scss">
-.user-dialog{
-	.el-dialog__body{
+.user-dialog {
+	.el-dialog__body {
 		padding: 0 10px;
 	}
 }

@@ -51,6 +51,22 @@ export default {
    return await http.post(this.url, data);
   }
  },
+ // 获取会员用户列表
+ unsignPage: {
+  url: `${config.API_URL}/api/v1/sysusins/unsignpage`,
+  name: "获取会员用户列表",
+  post: async function (data = {}) {
+   return await http.post(this.url, data);
+  }
+ },
+ // 获取会员用户列表
+ tmemberuserPage: {
+  url: `${config.API_URL}/api/v1/tmemberuser/page`,
+  name: "获取会员用户列表",
+  post: async function (data = {}) {
+   return await http.post(this.url, data);
+  }
+ },
  // 保存会员用户
  userSave: {
   url: `${config.API_URL}${userApi}/save`,
