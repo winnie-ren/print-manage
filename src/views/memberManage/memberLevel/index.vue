@@ -261,7 +261,7 @@ export default {
 			return await $API.member.levelSave.post(data);
 		};
 		const updateLevel = async (data) => {
-			return await $API.member.levelUpdate.post(data);
+			return await $API.member.levelUpdate.put(data);
 		};
 
 		// 添加用户弹窗相关

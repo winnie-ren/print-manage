@@ -23,8 +23,8 @@ export default {
  levelUpdate: {
   url: `${config.API_URL}${levelApi}/update`,
   name: "更新会员等级",
-  post: async function (data = {}) {
-   return await http.post(this.url, data);
+  put: async function (data = {}) {
+   return await http.put(this.url, data);
   }
  },
  // 获取会员等级
@@ -87,8 +87,8 @@ export default {
  userUpdate: {
   url: `${config.API_URL}${userApi}/update`,
   name: "更新会员用户",
-  post: async function (data = {}) {
-   return await http.post(this.url, data);
+  put: async function (data = {}) {
+   return await http.put(this.url, data);
   }
  },
  // 获取会员用户
