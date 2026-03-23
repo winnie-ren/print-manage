@@ -255,6 +255,7 @@ const formConfig = [
 		options: [
 			{ label: "微信", value: "WXPAY" },
 			{ label: "支付宝", value: "ALIPAY" },
+			{ label: "账户余额", value: "ACCOUNT" },
 		],
 	},
 ];

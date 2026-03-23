@@ -59,6 +59,14 @@ export default {
    return await http.post(this.url, data);
   }
  },
+ // 批量保存会员用户
+ userBatchSave: {
+  url: `${config.API_URL}${userApi}/batchSave`,
+  name: "批量保存会员用户",
+  post: async function (data = {}) {
+   return await http.post(this.url, data);
+  }
+ },
  // 更新会员用户
  userUpdate: {
   url: `${config.API_URL}${userApi}/update`,

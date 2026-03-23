@@ -17,15 +17,56 @@
 		@view="handleEdit"
 		@submit="handleSubmit"
 	>
-		<template #operation-buttons>
-			<el-button text type="primary" size="small"> 添加用户 </el-button>
+		<template #operation-buttons="{ row }">
+			<el-button
+				text
+				type="primary"
+				size="small"
+				@click="openUserDialog(row)"
+			>
+				添加用户
+			</el-button>
 		</template>
 	</common-list-page>
+
+	<el-dialog
+		v-model="userDialogVisible"
+		title="选择用户"
+		width="50%"
+		@close="handleUserDialogClose"
+		class="user-dialog"
+	>
+		<scTable
+			ref="userTableRef"
+			:apiObj="$API.user.userPage"
+			row-key="id"
+			stripe
+			:height="400"
+			@selection-change="handleUserSelectionChange"
+		>
+			<el-table-column type="selection" width="50" />
+			<el-table-column label="用户编码" prop="usid" />
+			<el-table-column label="用户名称" prop="usna" />
+		</scTable>
+
+		<template #footer>
+			<el-button @click="userDialogVisible = false">取消</el-button>
+			<el-button
+				type="primary"
+				:loading="saveUserLoading"
+				:disabled="userSelection.length === 0"
+				@click="handleBatchAddUsers"
+			>
+				保存
+			</el-button>
+		</template>
+	</el-dialog>
 </template>
 
 <script>
 import CommonListPage from "@/components/commonTable/index.vue";
 import { getCurrentInstance, ref, nextTick } from "vue";
+import { ElMessage } from "element-plus";
 
 export default {
 	name: "memberLevel",
@@ -34,9 +75,15 @@ export default {
 	},
 	setup() {
 		const commonListPageRef = ref();
+		const userTableRef = ref();
+		const userDialogVisible = ref(false);
+		const userSelection = ref([]);
+		const saveUserLoading = ref(false);
+		const currentLevel = ref(null);
+
 		const instance = getCurrentInstance();
 		const $API = instance.proxy.$API;
-		const isEdit = ref(false);
+
 		// 搜索配置
 		const searchConfig = [
 			{
@@ -172,13 +219,69 @@ export default {
 			return await $API.member.levelUpdate.post(data);
 		};
 
-		// 事件处理
-		const handleAdd = () => {
-			isEdit.value = false;
+		// 添加用户弹窗相关
+		const openUserDialog = (row) => {
+			currentLevel.value = row;
+			userDialogVisible.value = true;
+			nextTick(() => {
+				userTableRef.value?.getData?.();
+			});
 		};
 
+		const handleUserSelectionChange = (selection) => {
+			userSelection.value = selection || [];
+		};
+
+		const resolveUserId = (row) =>
+			row.usid ?? row.id;
+
+		const handleBatchAddUsers = async () => {
+			if (!currentLevel.value?.levelId) {
+				ElMessage.warning("请先选择会员等级");
+				return;
+			}
+			if (userSelection.value.length === 0) {
+				ElMessage.warning("请先勾选用户");
+				return;
+			}
+
+			const userList = userSelection.value
+				.map(resolveUserId)
+				.filter((id) => id !== undefined && id !== null && id !== "");
+
+			if (userList.length === 0) {
+				ElMessage.warning("未找到用户ID字段，请检查列表字段");
+				return;
+			}
+
+			const payload = {
+				levelId: currentLevel.value.levelId,
+				userList,
+			};
+
+			saveUserLoading.value = true;
+			try {
+				const res = await $API.member.userBatchSave.post(payload);
+				if (res.code === 0) {
+					ElMessage.success("保存成功");
+					userDialogVisible.value = false;
+					userSelection.value = [];
+					commonListPageRef.value?.refresh?.();
+				} else {
+					ElMessage.error(res.message || "保存失败");
+				}
+			} finally {
+				saveUserLoading.value = false;
+			}
+		};
+
+		const handleUserDialogClose = () => {
+			userSelection.value = [];
+		};
+
+		// 事件处理
+		const handleAdd = () => {};
 		const handleEdit = async (row) => {
-			isEdit.value = true;
 			const res = await $API.member.levelGetById.get({ id: row.id });
 			if (res.code === 0 && res.data) {
 				nextTick(() => {
@@ -187,9 +290,7 @@ export default {
 			}
 		};
 
-		const handleSubmit = () => {
-			console.log("提交成功");
-		};
+		const handleSubmit = () => {};
 
 		return {
 			searchConfig,
@@ -202,12 +303,23 @@ export default {
 			handleEdit,
 			handleSubmit,
 			commonListPageRef,
-			isEdit,
+			userTableRef,
+			userDialogVisible,
+			userSelection,
+			saveUserLoading,
+			openUserDialog,
+			handleUserSelectionChange,
+			handleBatchAddUsers,
+			handleUserDialogClose,
 		};
 	},
 };
 </script>
 
-<style scoped>
-/* 可添加特定样式 */
+<style lang="scss">
+.user-dialog{
+	.el-dialog__body{
+		padding: 0 10px;
+	}
+}
 </style>

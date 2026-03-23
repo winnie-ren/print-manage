@@ -74,7 +74,7 @@ export default {
 				options: {
 					placeholder: "请选择支付渠道",
 					items: [
-						{ value: "WECHAT", label: "微信" },
+						{ value: "WXPAY", label: "微信" },
 						{ value: "ALIPAY", label: "支付宝" },
 					],
 				},
@@ -104,7 +104,7 @@ export default {
 			{
 				label: "支付渠道",
 				name: "paymentType",
-				format: "WECHAT:微信/ALIPAY:支付宝",
+				format: "WXPAY:微信/ALIPAY:支付宝/ACCOUNT:账户余额",
 			},
 			{ label: "客户端IP", name: "clientIp", width: 140 },
 			// { label: "请求参数", name: "sendParams", width: 220 },

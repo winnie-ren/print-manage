@@ -201,7 +201,7 @@
 						</div>
 					</el-radio>
 					<!-- 微信支付选项（带图标） -->
-					<el-radio label="WECHAT" border class="payment-radio-item">
+					<el-radio label="WXPAY" border class="payment-radio-item">
 						<div class="radio-content">
 							<img
 								src="/img/wechat.png"

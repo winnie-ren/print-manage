@@ -90,7 +90,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
-		width: 120
+		width: 120,
 	},
 	{
 		label: "订单金额(元)",
@@ -98,7 +98,7 @@ const tableHeader = [
 		component: "input",
 		table: true,
 		span: 6,
-		width: 100
+		width: 100,
 	},
 	{
 		label: "状态",
@@ -257,6 +257,7 @@ const formConfig = [
 		options: [
 			{ label: "微信", value: "WXPAY" },
 			{ label: "支付宝", value: "ALIPAY" },
+			{ label: "账户余额", value: "ACCOUNT" },
 		],
 	},
 ];
@@ -315,7 +316,7 @@ export default {
 							orderNo
 						);
 					} else {
-						this.$refs.printOrderPageRef.dialogVisible = false
+						this.$refs.printOrderPageRef.dialogVisible = false;
 					}
 				}
 			}
