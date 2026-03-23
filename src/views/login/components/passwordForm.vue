@@ -183,15 +183,15 @@ export default {
 						type: "memberManage",
 					},
 					children: [
-						{
-							name: "memberList",
-							path: "/memberManage/memberList",
-							meta: {
-								title: "会员管理",
-								icon: "el-icon-user",
-							},
-							component: "memberManage/memberList",
-						},
+						// {
+						// 	name: "memberList",
+						// 	path: "/memberManage/memberList",
+						// 	meta: {
+						// 		title: "会员管理",
+						// 		icon: "el-icon-user",
+						// 	},
+						// 	component: "memberManage/memberList",
+						// },
 						{
 							name: "rechargeRecord",
 							path: "/memberManage/rechargeRecord",
@@ -200,6 +200,15 @@ export default {
 								icon: "el-icon-coin",
 							},
 							component: "memberManage/rechargeRecord",
+						},
+						{
+							name: "redPacketRecord",
+							path: "/memberManage/redPacketRecord",
+							meta: {
+								title: "红包记录",
+								icon: "el-icon-present",
+							},
+							component: "memberManage/redPacketRecord",
 						},
 						{
 							name: "memberLevel",

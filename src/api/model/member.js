@@ -1,6 +1,7 @@
 import config from "@/config"
 import http from "@/utils/request"
-const levelApi = '/api/v1/member/level'
+const levelApi = '/api/v1/tmemberlevel'
+const userApi = '/api/v1/tmemberuser'
 export default {
  // 获取会员等级列表
  levelPage: {
@@ -18,12 +19,68 @@ export default {
    return await http.post(this.url, data);
   }
  },
+ // 更新会员等级
+ levelUpdate: {
+  url: `${config.API_URL}${levelApi}/update`,
+  name: "更新会员等级",
+  post: async function (data = {}) {
+   return await http.post(this.url, data);
+  }
+ },
+ // 获取会员等级
+ levelGetById: {
+  url: `${config.API_URL}${levelApi}/getById`,
+  name: "获取会员等级",
+  get: async function (data = {}) {
+   return await http.get(this.url, data);
+  }
+ },
  // 删除会员等级
  levelDelete: {
   url: `${config.API_URL}${levelApi}/delete`,
   name: "删除会员等级",
   delete: async function (ids) {
-   return await http.delete(`${this.url}?ids=${ids.join(',')}`);
+   return await http.delete(this.url, ids);
+  }
+ },
+ // 获取会员用户列表
+ userPage: {
+  url: `${config.API_URL}${userApi}/page`,
+  name: "获取会员用户列表",
+  post: async function (data = {}) {
+   return await http.post(this.url, data);
+  }
+ },
+ // 保存会员用户
+ userSave: {
+  url: `${config.API_URL}${userApi}/save`,
+  name: "保存会员用户",
+  post: async function (data = {}) {
+   return await http.post(this.url, data);
+  }
+ },
+ // 更新会员用户
+ userUpdate: {
+  url: `${config.API_URL}${userApi}/update`,
+  name: "更新会员用户",
+  post: async function (data = {}) {
+   return await http.post(this.url, data);
+  }
+ },
+ // 获取会员用户
+ userGetById: {
+  url: `${config.API_URL}${userApi}/getById`,
+  name: "获取会员用户",
+  get: async function (data = {}) {
+   return await http.get(this.url, data);
+  }
+ },
+ // 删除会员用户
+ userDelete: {
+  url: `${config.API_URL}${userApi}/delete`,
+  name: "删除会员用户",
+  delete: async function (ids) {
+   return await http.delete(this.url, ids);
   }
  },
  // 获取充值记录列表
@@ -49,5 +106,13 @@ export default {
   delete: async function (ids) {
    return await http.delete(`${this.url}?ids=${ids.join(',')}`);
   }
- }
+ },
+  // 获取红包记录列表
+ redPacketPage: {
+  url: `${config.API_URL}/api/v1/redpackorder/page`,
+  name: "获取红包记录列表",
+  post: async function (data = {}) {
+   return await http.post(this.url, data);
+  }
+ },
 }

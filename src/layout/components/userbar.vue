@@ -338,8 +338,8 @@ export default {
 			}
 		},
 		// 处理支付成功
-		handlePaymentSuccess() {
-			this.$message.success("支付成功");
+		handlePaymentSuccess(type) {
+			this.$message.success(type === "SUCCESS" ? "支付成功" : "支付超时");
 			this.payCodeDialogVisible = false;
 			this.rechargeVisible = false;
 			this.rechargeLoading = false;
@@ -348,10 +348,13 @@ export default {
 			const res = await this.$API.user.rechargeGetByStatus.get({
 				rechargeNo,
 			});
-			if (res.code === 0 && res.data.status === "SUCCESS") {
+			if (
+				res.code === 0 &&
+				["SUCCESS", "CLOSED"].includes(res.data.status)
+			) {
 				this.balance = res.data.cashBalance;
 				this.stopPolling();
-				this.handlePaymentSuccess();
+				this.handlePaymentSuccess(res.data.status);
 			}
 		},
 		// 提交充值

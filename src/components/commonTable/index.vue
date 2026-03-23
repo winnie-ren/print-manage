@@ -166,7 +166,7 @@
 										<el-button
 											v-if="showDeleteButton"
 											text
-											type="primary"
+											type="danger"
 											size="small"
 										>
 											删除
@@ -308,7 +308,7 @@ export default {
 		dialogWidth: {
 			type: String,
 			default: "50%",
-		},
+		}	,
 		// 弹窗距离顶部
 		dialogTop: {
 			type: String,
@@ -324,11 +324,20 @@ export default {
 			type: Function,
 			required: true,
 		},
+		// 更新API
+		updateApi: {
+			type: Function,
+			required: true,
+		},
 		// 编辑模式下禁用的字段配置
 		editDisabledFields: {
 			type: Array,
 			default: () => [],
 		},
+		deleteField: {
+			type: String,
+			default: "id",
+		}
 	},
 	emits: [
 		"add",
@@ -444,7 +453,7 @@ export default {
 
 		const handleView = (row, index) => {
 			dialogTitle.value = "查看";
-			// formData.value = { ...row };
+			formData.value = { ...row };
 			dialogVisible.value = true;
 			emit("view", row, index);
 		};
@@ -455,11 +464,11 @@ export default {
 				acc[key.trim()] = label.trim();
 				return acc;
 			}, {});
-			return map[String(row[item.name])] || "";
+			return map[String(row[item.name])] || row[item.name];
 		}
 		const handleDelete = async (row, index) => {
 			try {
-				const res = await props.deleteApi([row.id]);
+				const res = await props.deleteApi([row[props.deleteField]]);
 				if (res.code === 0) {
 					ElMessage.success("删除成功");
 					tableRef.value.getData(); // 刷新表格
@@ -486,7 +495,7 @@ export default {
 					{ type: "warning" }
 				);
 
-				const ids = selectedRows.value.map((item) => item.id);
+				const ids = selectedRows.value.map((item) => item[props.deleteField]);
 				const res = await props.deleteApi(ids);
 
 				if (res.code === 0) {
@@ -513,7 +522,9 @@ export default {
 					await formRef.value.validate();
 				}
 				const submitData = props.useScForm ? form : formData.value;
-				const res = await props.saveApi(submitData);
+				const res = await props[
+					dialogTitle.value === "编辑" ? "updateApi" : "saveApi"
+				](submitData);
 				if (res.code === 0) {
 					ElMessage.success("操作成功");
 					dialogVisible.value = false;
@@ -576,7 +587,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-:deep(.el-drawer__body){
+:deep(.el-drawer__body) {
 	padding-top: 10px;
 }
 .el-header {
