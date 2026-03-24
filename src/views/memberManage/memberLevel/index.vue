@@ -67,15 +67,30 @@
 			<el-table-column label="用户名称" prop="usna" />
 		</scTable>
 
-		<template #footer v-if="dialogType === 'add'">
-			<el-button @click="userDialogVisible = false">取消</el-button>
+		<template #footer>
 			<el-button
+				v-if="dialogType === 'add'"
+				@click="userDialogVisible = false"
+			>
+				取消
+			</el-button>
+			<el-button
+				v-if="dialogType === 'add'"
 				type="primary"
 				:loading="saveUserLoading"
 				:disabled="userSelection.length === 0"
 				@click="handleBatchAddUsers"
 			>
 				保存
+			</el-button>
+			<el-button
+				v-if="dialogType === 'view'"
+				type="danger"
+				:loading="deleteUserLoading"
+				:disabled="userSelection.length === 0"
+				@click="handleBatchDeleteUsers"
+			>
+				删除
 			</el-button>
 		</template>
 	</el-dialog>
@@ -84,7 +99,7 @@
 <script>
 import CommonListPage from "@/components/commonTable/index.vue";
 import { getCurrentInstance, ref, nextTick } from "vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 export default {
 	name: "memberLevel",
@@ -161,7 +176,7 @@ export default {
 						: "",
 			},
 			{
-				label: "最低充值金额(分)",
+				label: "最低充值金额(元)",
 				name: "minRechargeAmount",
 			},
 		];
@@ -175,14 +190,7 @@ export default {
 					label: "会员等级ID",
 					name: "levelId",
 					component: "input",
-					options: { placeholder: "请输入会员等级ID" },
-					rules: [
-						{
-							required: true,
-							message: "请输入会员等级ID",
-							trigger: "blur",
-						},
-					],
+					options: { placeholder: "自动生成", disabled: true },
 				},
 				{
 					label: "会员等级名称",
@@ -239,7 +247,7 @@ export default {
 					},
 				},
 				{
-					label: "最低充值金额(分)",
+					label: "最低充值金额(元)",
 					name: "minRechargeAmount",
 					component: "number",
 					options: {
@@ -274,8 +282,7 @@ export default {
 		const handleUserSelectionChange = (selection) => {
 			userSelection.value = selection || [];
 		};
-
-		const resolveUserId = (row) => row.usid ?? row.id;
+		const resolveUserId = (row) => row.usid ?? row.userId ?? row.id;
 
 		const handleBatchAddUsers = async () => {
 			if (!currentLevel.value?.levelId) {
@@ -333,7 +340,56 @@ export default {
 				});
 			}
 		};
+		const deleteUserLoading = ref(false);
+		const handleBatchDeleteUsers = async () => {
+			if (!currentLevel.value?.levelId) {
+				ElMessage.warning("请先选择会员等级");
+				return;
+			}
+			if (userSelection.value.length === 0) {
+				ElMessage.warning("请先勾选人员");
+				return;
+			}
 
+			const ids = userSelection.value
+				.map(resolveUserId)
+				.filter((id) => id !== undefined && id !== null && id !== "");
+
+			if (ids.length === 0) {
+				ElMessage.warning("未找到可删除的人员ID字段");
+				return;
+			}
+
+			try {
+				await ElMessageBox.confirm(
+					`确定删除已选中的 ${ids.length} 人吗？`,
+					"删除确认",
+					{
+						type: "warning",
+						confirmButtonText: "确定",
+						cancelButtonText: "取消",
+						closeOnClickModal: false,
+						closeOnPressEscape: false,
+					}
+				);
+			} catch {
+				return;
+			}
+
+			deleteUserLoading.value = true;
+			try {
+				const res = await $API.member.userDelete.delete(ids);
+				if (res.code === 0) {
+					ElMessage.success("删除成功");
+					userSelection.value = [];
+					userTableRef.value?.refresh?.();
+				} else {
+					ElMessage.error(res.message || "删除失败");
+				}
+			} finally {
+				deleteUserLoading.value = false;
+			}
+		};
 		const handleSubmit = () => {};
 
 		return {
@@ -357,6 +413,8 @@ export default {
 			handleUserDialogClose,
 			dialogType,
 			currentLevel,
+			deleteUserLoading,
+			handleBatchDeleteUsers,
 		};
 	},
 };

@@ -79,22 +79,25 @@ export default {
 				width: 150,
 			},
 			{
-				label: "实际支付金额",
+				label: "实际支付金额(元)",
 				name: "payAmount",
+				width: 150,
 				formatter: (row) => {
 					return `${row.payAmount}元`;
 				},
 			},
 			{
-				label: "赠送金额",
+				label: "赠送金额(元)",
 				name: "giftAmount",
+				width: 150,
 				formatter: (row) => {
 					return `${row.giftAmount}元`;
 				},
 			},
 			{
-				label: "到账总额",
+				label: "到账总额(元)",
 				name: "totalAmount",
+				width: 150,
 				formatter: (row) => {
 					return `${row.totalAmount}元`;
 				},
