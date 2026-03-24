@@ -369,8 +369,12 @@ export default {
 			}
 
 			deleteUserLoading.value = true;
+			const payload = {
+				levelId: currentLevel.value.levelId,
+				userList: ids,
+			};
 			try {
-				const res = await $API.member.userDelete.delete(ids);
+				const res = await $API.member.userBatchDelete.delete(payload);
 				if (res.code === 0) {
 					ElMessage.success("删除成功");
 					userSelection.value = [];

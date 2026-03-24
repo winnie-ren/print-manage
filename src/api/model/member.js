@@ -83,6 +83,14 @@ export default {
    return await http.post(this.url, data);
   }
  },
+ // 批量删除会员用户
+ userBatchDelete: {
+  url: `${config.API_URL}${userApi}/batchDelete`,
+  name: "批量删除会员用户",
+  delete: async function (data = {}) {
+   return await http.delete(this.url, data);
+  }
+ },
  // 更新会员用户
  userUpdate: {
   url: `${config.API_URL}${userApi}/update`,
