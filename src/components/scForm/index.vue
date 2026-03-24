@@ -159,6 +159,7 @@
 							<el-input-number
 								v-model="form[item.name]"
 								controls-position="right"
+								:placeholder="item.options.placeholder"
 								style="width: 100%"
 							></el-input-number>
 						</template>

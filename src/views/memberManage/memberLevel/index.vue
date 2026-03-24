@@ -120,22 +120,16 @@ export default {
 		// 搜索配置
 		const searchConfig = [
 			{
-				label: "会员等级ID",
-				name: "levelId",
-				component: "input",
-				options: { placeholder: "请输入会员等级ID" },
-			},
-			{
 				label: "会员等级名称",
 				name: "levelName",
 				component: "select",
 				options: {
 					placeholder: "请输入会员等级名称",
 					items: [
-						{ value: "1", label: "青铜" },
-						{ value: "2", label: "黄金" },
-						{ value: "3", label: "铂金" },
-						{ value: "4", label: "钻石" },
+						{ value: "青铜", label: "青铜" },
+						{ value: "黄金", label: "黄金" },
+						{ value: "铂金", label: "铂金" },
+						{ value: "钻石", label: "钻石" },
 					],
 				},
 			},
@@ -143,11 +137,9 @@ export default {
 
 		// 表格列配置
 		const tableColumns = [
-			{ label: "会员等级ID", name: "levelId" },
 			{
 				label: "会员等级名称",
 				name: "levelName",
-				format: "1:青铜/2:黄金/3:铂金/4:钻石",
 			},
 			{
 				label: "折扣率",
@@ -199,10 +191,10 @@ export default {
 					options: {
 						placeholder: "请输入会员等级名称",
 						items: [
-							{ value: "1", label: "青铜" },
-							{ value: "2", label: "黄金" },
-							{ value: "3", label: "铂金" },
-							{ value: "4", label: "钻石" },
+							{ value: "青铜", label: "青铜" },
+							{ value: "黄金", label: "黄金" },
+							{ value: "铂金", label: "铂金" },
+							{ value: "钻石", label: "钻石" },
 						],
 					},
 					rules: [
@@ -221,7 +213,7 @@ export default {
 						min: 0,
 						precision: 2,
 						controls: false,
-						placeholder: "例如 90=9折，100=不打折",
+						placeholder: "折扣率，例如 90=9折，100=不打折",
 					},
 				},
 				{
@@ -232,7 +224,7 @@ export default {
 						min: 0,
 						precision: 2,
 						controls: false,
-						placeholder: "例如 20=充100送20",
+						placeholder: "充值赠送比例，例如 20=充100送20",
 					},
 				},
 				{
@@ -243,7 +235,7 @@ export default {
 						min: 0,
 						precision: 2,
 						controls: false,
-						placeholder: "例如 5=返5%",
+						placeholder: "消费返红包比例，例如 5=返5%",
 					},
 				},
 				{
@@ -254,7 +246,7 @@ export default {
 						min: 0,
 						precision: 0,
 						controls: false,
-						placeholder: "达到才享受赠送",
+						placeholder: "低充值金额(元)，达到才享受赠送",
 					},
 				},
 			],

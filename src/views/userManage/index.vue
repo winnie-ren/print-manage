@@ -7,6 +7,9 @@
 		:form-config="formConfig"
 		:delete-api="deleteUser"
 		:save-api="saveUser"
+		delete-field="usid"
+		:update-api="updateUser"
+		:showViewButton="false"
 		@add="handleAdd"
 		@edit="handleEdit"
 		@view="handleView"
@@ -60,27 +63,25 @@ export default {
 			{
 				label: "用户编码",
 				name: "usid",
-				width: 120,
+				width: 140,
 			},
 			{
 				label: "用户名称",
 				name: "usna",
-				width: 120,
+				width: 140,
 			},
 			{
 				label: "联系电话",
 				name: "tel",
-				width: 120,
+				width: 140,
 			},
 			{
 				label: "邮件",
 				name: "email",
-				width: 180,
 			},
 			{
 				label: "状态",
 				name: "status",
-				width: 80,
 				format: "0:无效/1:有效",
 			},
 			{
@@ -227,6 +228,9 @@ export default {
 		const saveUser = async (data) => {
 			return await $API.user.userSave.post(data);
 		};
+		const updateUser = async (data) => {
+			return await $API.user.userUpdate.put(data);
+		};
 
 		// 事件处理
 		const handleAdd = () => {
@@ -253,6 +257,7 @@ export default {
 			formConfig,
 			deleteUser,
 			saveUser,
+			updateUser,
 			handleAdd,
 			handleEdit,
 			handleView,
