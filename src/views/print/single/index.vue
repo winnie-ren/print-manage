@@ -311,6 +311,10 @@ export default {
 						printType: "printSinglePage",
 					});
 					if (payRes.code === 0) {
+						if (formDetail.paymentType === "ACCOUNT") {
+							this.$refs.printOrderPageRef.handlePayment("success");
+							return;
+						}
 						this.$refs.printOrderPageRef.renderQrCode(
 							payRes.data,
 							orderNo

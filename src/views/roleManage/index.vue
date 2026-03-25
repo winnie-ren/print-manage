@@ -262,8 +262,6 @@ export default {
 					ElMessage.success("保存成功");
 					userSelection.value = [];
 					userTableRef.value?.refresh?.();
-				} else {
-					ElMessage.error(res.message || "保存失败");
 				}
 			} finally {
 				saveUserLoading.value = false;
@@ -316,8 +314,6 @@ export default {
 					ElMessage.success("删除成功");
 					userSelection.value = [];
 					userTableRef.value?.refresh?.();
-				} else {
-					ElMessage.error(res.message || "删除失败");
 				}
 			} finally {
 				deleteUserLoading.value = false;

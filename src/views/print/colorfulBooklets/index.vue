@@ -308,12 +308,18 @@ export default {
 						printType: "printColor",
 					});
 					if (payRes.code === 0) {
+						if (formDetail.paymentType === "ACCOUNT") {
+							this.$refs.printOrderPageRef.handlePayment(
+								"success"
+							);
+							return;
+						}
 						this.$refs.printOrderPageRef.renderQrCode(
 							payRes.data,
 							orderNo
 						);
 					} else {
-						this.$refs.printOrderPageRef.dialogVisible = false
+						this.$refs.printOrderPageRef.dialogVisible = false;
 					}
 				}
 			}
