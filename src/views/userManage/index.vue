@@ -63,17 +63,14 @@ export default {
 			{
 				label: "用户编码",
 				name: "usid",
-				width: 140,
 			},
 			{
 				label: "用户名称",
 				name: "usna",
-				width: 140,
 			},
 			{
 				label: "联系电话",
 				name: "tel",
-				width: 140,
 			},
 			{
 				label: "邮件",
@@ -84,21 +81,20 @@ export default {
 				name: "status",
 				format: "0:无效/1:有效",
 			},
-			{
-				label: "最新登录时间",
-				name: "lidt",
-				width: 140,
-			},
+			// {
+			// 	label: "最新登录时间",
+			// 	name: "lidt",
+			// 	width: 140,
+			// },
 			{
 				label: "账号到期时间",
 				name: "exdt",
-				width: 140,
 			},
-			{
-				label: "登录失败次数",
-				name: "loginFailCount",
-				width: 120,
-			},
+			// {
+			// 	label: "登录失败次数",
+			// 	name: "loginFailCount",
+			// 	width: 120,
+			// },
 		];
 
 		// 表单配置
@@ -111,35 +107,70 @@ export default {
 					name: "usid",
 					component: "input",
 					options: { placeholder: "请输入" },
-					span: 8,
+					// span: 8,
+					rules: [
+						{
+							required: true,
+							message: "请输入用户编码",
+							trigger: "blur",
+						},
+					],
 				},
 				{
 					label: "用户名称",
 					name: "usna",
 					component: "input",
 					options: { placeholder: "请输入" },
-					span: 8,
+					// span: 8,
+					rules: [
+						{
+							required: true,
+							message: "请输入用户名称",
+							trigger: "blur",
+						},
+					],
 				},
 				{
 					label: "密码",
 					name: "pwd",
 					component: "input",
 					options: { placeholder: "请输入", password: true },
-					span: 8,
+					// span: 8,
+					rules: [
+						{
+							required: true,
+							message: "请输入密码",
+							trigger: "blur",
+						},
+					],
 				},
 				{
 					label: "联系电话",
 					name: "tel",
 					component: "input",
 					options: { placeholder: "请输入" },
-					span: 8,
+					// span: 8,
+					rules: [
+						{
+							required: true,
+							message: "请输入联系电话",
+							trigger: "blur",
+						},
+					],
 				},
 				{
 					label: "邮件",
 					name: "email",
 					component: "input",
 					options: { placeholder: "请输入" },
-					span: 8,
+					// span: 8,
+					rules: [
+						{
+							required: true,
+							message: "请输入邮件",
+							trigger: "blur",
+						},
+					],
 				},
 				{
 					label: "状态",
@@ -152,71 +183,78 @@ export default {
 							{ label: "有效", value: "1" },
 						],
 					},
-					span: 8,
+					rules: [
+						{
+							required: true,
+							message: "请选择状态",
+							trigger: "change",
+						},
+					],
+					// span: 8,
 				},
-				{
-					label: "最新登录时间",
-					name: "lidt",
-					component: "input",
-					options: { placeholder: "请输入" },
-					span: 8,
-				},
-				{
-					label: "账号到期时间",
-					name: "exdt",
-					component: "input",
-					options: { placeholder: "请输入" },
-					span: 8,
-				},
-				{
-					label: "登录失败次数",
-					name: "loginFailCount",
-					component: "input",
-					options: { placeholder: "请输入" },
-					span: 8,
-				},
-				{
-					label: "google密钥",
-					name: "googleSecret",
-					component: "input",
-					options: { placeholder: "请输入" },
-					span: 8,
-				},
-				{
-					label: "账号指纹",
-					name: "accountFingerprint",
-					component: "input",
-					options: { placeholder: "请输入" },
-					span: 8,
-				},
-				{
-					label: "用户环境",
-					name: "userEnv",
-					component: "input",
-					options: { placeholder: "请输入" },
-					span: 8,
-				},
-				{
-					label: "自定义类型",
-					name: "gwfType",
-					component: "input",
-					options: { placeholder: "请输入" },
-					span: 8,
-				},
-				{
-					label: "微信用户",
-					name: "wxUserid",
-					component: "input",
-					options: { placeholder: "请输入" },
-					span: 8,
-				},
-				{
-					label: "微信openid",
-					name: "openid",
-					component: "input",
-					options: { placeholder: "请输入" },
-					span: 8,
-				},
+				// {
+				// 	label: "最新登录时间",
+				// 	name: "lidt",
+				// 	component: "input",
+				// 	options: { placeholder: "请输入" },
+				// 	span: 8,
+				// },
+				// {
+				// 	label: "账号到期时间",
+				// 	name: "exdt",
+				// 	component: "input",
+				// 	options: { placeholder: "请输入" },
+				// 	span: 8,
+				// },
+				// {
+				// 	label: "登录失败次数",
+				// 	name: "loginFailCount",
+				// 	component: "input",
+				// 	options: { placeholder: "请输入" },
+				// 	span: 8,
+				// },
+				// {
+				// 	label: "google密钥",
+				// 	name: "googleSecret",
+				// 	component: "input",
+				// 	options: { placeholder: "请输入" },
+				// 	span: 8,
+				// },
+				// {
+				// 	label: "账号指纹",
+				// 	name: "accountFingerprint",
+				// 	component: "input",
+				// 	options: { placeholder: "请输入" },
+				// 	span: 8,
+				// },
+				// {
+				// 	label: "用户环境",
+				// 	name: "userEnv",
+				// 	component: "input",
+				// 	options: { placeholder: "请输入" },
+				// 	span: 8,
+				// },
+				// {
+				// 	label: "自定义类型",
+				// 	name: "gwfType",
+				// 	component: "input",
+				// 	options: { placeholder: "请输入" },
+				// 	span: 8,
+				// },
+				// {
+				// 	label: "微信用户",
+				// 	name: "wxUserid",
+				// 	component: "input",
+				// 	options: { placeholder: "请输入" },
+				// 	span: 8,
+				// },
+				// {
+				// 	label: "微信openid",
+				// 	name: "openid",
+				// 	component: "input",
+				// 	options: { placeholder: "请输入" },
+				// 	span: 8,
+				// },
 			],
 		};
 
@@ -234,11 +272,10 @@ export default {
 
 		// 事件处理
 		const handleAdd = () => {
-			console.log("新增用户");
+			commonListPageRef.value.formData = { status: "1" };
 		};
 
 		const handleEdit = async (row) => {
-			console.log("编辑用户", row);
 			const user = await $API.user.userGetById.get({ usid: row.usid });
 			commonListPageRef.value.formData = user.data;
 		};

@@ -122,6 +122,16 @@ const tableHeader = [
 		table: true,
 		span: 6,
 		format: "INIT:待支付/PAYING:已下单等待支付/SUCCESS:支付成功/FAIL:支付失败/CLOSED:已关闭或超时",
+		width: 120,
+	},
+	{
+		label: "支付方式",
+		name: "paymentType",
+		component: "input",
+		table: true,
+		span: 6,
+		format: "WXPAY:微信/ALIPAY:支付宝/ACCOUNT:账户余额",
+		width: 100,
 	},
 	{
 		label: "规格",
@@ -205,7 +215,7 @@ const tableHeader = [
 		component: "date",
 		table: true,
 		span: 6,
-		width: "140px",
+		width: "150px",
 	},
 ];
 
