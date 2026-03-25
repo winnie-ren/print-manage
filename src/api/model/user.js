@@ -23,6 +23,13 @@ export default {
 			return await http.post(this.url, data);
 		}
 	},
+	unsignRolePage: {
+		url: `${config.API_URL}${api}/unsignRolePage`,
+		name: "分页角色人员查询",
+		post: async function (data = {}) {
+			return await http.post(this.url, data);
+		}
+	},
 	userGetById: {
 		url: `${config.API_URL}${api}/getById`,
 		name: "用户详情",

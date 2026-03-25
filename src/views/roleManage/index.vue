@@ -51,7 +51,7 @@
 			v-if="userDialogVisible"
 			:apiObj="
 				dialogType === 'add'
-					? $API.user.userPage
+					? $API.user.unsignRolePage
 					: $API.role.roleUserPage
 			"
 			:params="{
