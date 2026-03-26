@@ -189,6 +189,7 @@ export default {
 							text: true,
 							type: "primary",
 							size: "small",
+							class: "table-button",
 							onClick: () => openPermDialog(props.row),
 						},
 						() => "角色权限"
@@ -207,6 +208,7 @@ export default {
 							text: true,
 							type: "primary",
 							size: "small",
+							class: "table-button",
 							onClick: () => openUserDialog(props.row, "add"),
 						},
 						() => "添加用户"
@@ -225,6 +227,7 @@ export default {
 							text: true,
 							type: "primary",
 							size: "small",
+							class: "table-button",
 							onClick: () => openUserDialog(props.row, "view"),
 						},
 						() => "查看用户"
@@ -616,5 +619,11 @@ export default {
 		max-height: 420px;
 		overflow: auto;
 	}
+}
+.scTable-table .table-button.is-text {
+	border: none !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+	min-height: auto !important;
 }
 </style>
