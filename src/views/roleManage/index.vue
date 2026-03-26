@@ -16,26 +16,7 @@
 		@edit="handleEdit"
 		@view="handleView"
 		@submit="handleSubmit"
-	>
-		<template #operation-buttons="{ row }">
-			<el-button
-				text
-				type="primary"
-				size="small"
-				@click="openUserDialog(row, 'add')"
-			>
-				添加用户
-			</el-button>
-			<el-button
-				text
-				type="primary"
-				size="small"
-				@click="openUserDialog(row, 'view')"
-			>
-				查看用户
-			</el-button>
-		</template>
-	</common-list-page>
+	/>
 
 	<el-dialog
 		v-model="userDialogVisible"
@@ -95,12 +76,59 @@
 			</el-button>
 		</template>
 	</el-dialog>
+	<!-- 角色权限弹窗 -->
+	<el-dialog
+		v-model="permDialogVisible"
+		title="角色权限配置"
+		width="680px"
+		:close-on-click-modal="false"
+		:close-on-press-escape="false"
+		class="perm-dialog"
+	>
+		<div class="perm-body">
+			<el-input
+				v-model="permFilter"
+				clearable
+				placeholder="输入菜单名称过滤"
+			/>
+			<el-tree
+				ref="permTreeRef"
+				:data="permTreeData"
+				node-key="id"
+				:props="permTreeProps"
+				show-checkbox
+				default-expand-all
+				highlight-current
+				:filter-node-method="filterPermNode"
+			/>
+		</div>
+
+		<template #footer>
+			<el-button @click="permDialogVisible = false">取消</el-button>
+			<el-button
+				type="primary"
+				:loading="permSaving"
+				:disabled="!currentRoleId"
+				@click="handleSavePerms"
+			>
+				保存
+			</el-button>
+		</template>
+	</el-dialog>
 </template>
 
 <script>
 import CommonListPage from "@/components/commonTable/index.vue";
-import { getCurrentInstance, ref, nextTick, computed } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import {
+	getCurrentInstance,
+	ref,
+	nextTick,
+	computed,
+	watch,
+	defineComponent,
+	h,
+} from "vue";
+import { ElMessage, ElMessageBox, ElButton } from "element-plus";
 
 export default {
 	name: "roleManage",
@@ -150,12 +178,85 @@ export default {
 				},
 			},
 		];
+		const RolePermCell = defineComponent({
+			name: "RolePermCell",
+			props: { row: { type: Object, required: true } },
+			setup(props) {
+				return () =>
+					h(
+						ElButton,
+						{
+							text: true,
+							type: "primary",
+							size: "small",
+							onClick: () => openPermDialog(props.row),
+						},
+						() => "角色权限"
+					);
+			},
+		});
 
+		const AddUserCell = defineComponent({
+			name: "AddUserCell",
+			props: { row: { type: Object, required: true } },
+			setup(props) {
+				return () =>
+					h(
+						ElButton,
+						{
+							text: true,
+							type: "primary",
+							size: "small",
+							onClick: () => openUserDialog(props.row, "add"),
+						},
+						() => "添加用户"
+					);
+			},
+		});
+
+		const ViewUserCell = defineComponent({
+			name: "ViewUserCell",
+			props: { row: { type: Object, required: true } },
+			setup(props) {
+				return () =>
+					h(
+						ElButton,
+						{
+							text: true,
+							type: "primary",
+							size: "small",
+							onClick: () => openUserDialog(props.row, "view"),
+						},
+						() => "查看用户"
+					);
+			},
+		});
 		// 表格列配置
 		const tableColumns = [
 			{ label: "角色编码", name: "gco" },
 			{ label: "角色名称", name: "gna" },
 			{ label: "状态", name: "status", format: "0:无效/1:有效" },
+			{
+				label: "角色用户",
+				name: "addUserAction",
+				width: 110,
+				showOverflowTooltip: false,
+				renderCell: AddUserCell,
+			},
+			{
+				label: "查看用户",
+				name: "viewUserAction",
+				width: 110,
+				showOverflowTooltip: false,
+				renderCell: ViewUserCell,
+			},
+			{
+				label: "角色权限",
+				name: "rolePermAction",
+				width: 110,
+				showOverflowTooltip: false,
+				renderCell: RolePermCell,
+			},
 		];
 
 		// 表单配置
@@ -355,6 +456,106 @@ export default {
 
 		const handleSubmit = () => {};
 
+		// 权限树相关状态
+		const permDialogVisible = ref(false);
+		const permTreeRef = ref(null);
+		const permTreeData = ref([]);
+		const permFilter = ref("");
+		const permSaving = ref(false);
+
+		const permTreeProps = {
+			label: "name",
+			children: "children",
+		};
+
+		// 过滤
+		const filterPermNode = (value, data) => {
+			if (!value) return true;
+			return (data.name || "").includes(value);
+		};
+
+		watch(permFilter, (val) => {
+			permTreeRef.value?.filter(val);
+		});
+
+		// 打开权限弹窗并加载树
+		const openPermDialog = async (row) => {
+			currentRole.value = row;
+			permDialogVisible.value = true;
+			const res = await $API.role.roleGetTree.get({ gco: row.gco });
+			if (res.code === 0) {
+				const tree = res.data || [];
+				permTreeData.value = tree;
+				await nextTick();
+				const checkedKeys = collectCheckedKeys(tree);
+				permTreeRef.value?.setCheckedKeys(checkedKeys, false);
+			}
+		};
+
+		// 从树里提取默认勾选
+		const collectCheckedKeys = (list = []) => {
+			const keys = [];
+			const walk = (arr) => {
+				arr.forEach((n) => {
+					if (n.checked) keys.push(n.id);
+					if (n.children && n.children.length) walk(n.children);
+				});
+			};
+			walk(list);
+			return keys;
+		};
+
+		// 组装 SysRoleTreeList 结构，包含 children
+		const buildParams = (list, checkedSet, halfCheckedSet) => {
+			return (list || []).map((n) => {
+				const checked =
+					checkedSet.has(n.id) || halfCheckedSet.has(n.id); // 如不想半选算勾选可去掉半选逻辑
+				return {
+					id: n.id,
+					parentId: n.parentId,
+					name: n.name,
+					checked,
+					children: buildParams(
+						n.children || [],
+						checkedSet,
+						halfCheckedSet
+					),
+				};
+			});
+		};
+
+		// 保存权限
+		const handleSavePerms = async () => {
+			if (!currentRoleId.value) {
+				ElMessage.warning("请先选择角色");
+				return;
+			}
+
+			const tree = permTreeRef.value;
+			const checkedKeys = new Set(tree.getCheckedKeys());
+			const halfCheckedKeys = new Set(tree.getHalfCheckedKeys());
+
+			const payload = {
+				gco: currentRole.value?.gco,
+				params: buildParams(
+					permTreeData.value,
+					checkedKeys,
+					halfCheckedKeys
+				),
+			};
+
+			permSaving.value = true;
+			try {
+				const res = await $API.role.roleSaveTree.post(payload);
+				if (res.code === 0) {
+					ElMessage.success("保存成功");
+					permDialogVisible.value = false;
+				}
+			} finally {
+				permSaving.value = false;
+			}
+		};
+
 		return {
 			searchConfig,
 			tableColumns,
@@ -380,6 +581,15 @@ export default {
 			dialogType,
 			currentRole,
 			currentRoleId,
+			permDialogVisible,
+			permTreeRef,
+			permTreeData,
+			permTreeProps,
+			permFilter,
+			permSaving,
+			filterPermNode,
+			openPermDialog,
+			handleSavePerms,
 		};
 	},
 };
@@ -389,6 +599,22 @@ export default {
 .user-dialog {
 	.el-dialog__body {
 		padding: 0 10px;
+	}
+}
+.perm-dialog {
+	.el-dialog__body {
+		padding: 12px 16px 4px;
+	}
+	.perm-body {
+		display: grid;
+		gap: 12px;
+	}
+	.el-tree {
+		border: 1px solid #eee;
+		border-radius: 6px;
+		padding: 8px 12px;
+		max-height: 420px;
+		overflow: auto;
 	}
 }
 </style>

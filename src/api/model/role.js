@@ -62,5 +62,20 @@ export default {
 			return await http.delete(this.url, data);
 		}
 	},
-
+	// 获取角色树
+	roleGetTree: {
+		url: `${config.API_URL}${api}/getTree`,
+		name: "获取角色树",
+		get: async function (data = {}) {
+			return await http.get(this.url, data);
+		}
+	},
+	// 保存角色树
+	roleSaveTree: {
+		url: `${config.API_URL}${api}/saveTree`,
+		name: "保存角色树",
+		post: async function (data = {}) {
+			return await http.post(this.url, data);
+		}
+	},
 }

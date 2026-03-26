@@ -23,6 +23,13 @@ export default {
 			return await http.post(this.url, data);
 		}
  },
+ getTree: {
+		url: `${config.API_URL}${api}/getTree`,
+		name: "获取菜单树",
+		post: async function(data={}){
+			return await http.post(this.url, data);
+		}
+ },
  userGetById: {
 		url: `${config.API_URL}${api}/getById`,
 		name: "菜单详情",
