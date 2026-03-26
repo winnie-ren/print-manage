@@ -652,8 +652,6 @@ export default {
 				helpers.close();
 				helpers.refresh();
 				ElMessage.success("操作成功");
-			} else {
-				ElMessage.error(res.message || "操作失败");
 			}
 			this.buyLoading = false;
 		},

@@ -530,8 +530,6 @@ export default {
 					dialogVisible.value = false;
 					tableRef.value.getData(); // 刷新表格
 					emit("submit", submitData);
-				} else {
-					ElMessage.error(res.message || "操作失败");
 				}
 			} catch (error) {
 				console.error("提交失败:", error);
