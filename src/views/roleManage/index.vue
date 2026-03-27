@@ -129,7 +129,6 @@ import {
 	h,
 } from "vue";
 import { ElMessage, ElMessageBox, ElButton } from "element-plus";
-
 export default {
 	name: "roleManage",
 	components: {
@@ -465,12 +464,10 @@ export default {
 		const permTreeData = ref([]);
 		const permFilter = ref("");
 		const permSaving = ref(false);
-
 		const permTreeProps = {
 			label: "name",
 			children: "children",
 		};
-
 		// 过滤
 		const filterPermNode = (value, data) => {
 			if (!value) return true;
@@ -481,7 +478,7 @@ export default {
 			permTreeRef.value?.filter(val);
 		});
 
-		// 打开权限弹窗并加载树
+		// 打开权限弹窗
 		const openPermDialog = async (row) => {
 			currentRole.value = row;
 			permDialogVisible.value = true;
@@ -495,38 +492,39 @@ export default {
 			}
 		};
 
-		// 从树里提取默认勾选
+		// 提取默认勾选
 		const collectCheckedKeys = (list = []) => {
 			const keys = [];
-			const walk = (arr) => {
-				arr.forEach((n) => {
-					if (n.checked) keys.push(n.id);
-					if (n.children && n.children.length) walk(n.children);
+			const walk = (arr = []) => {
+				arr.forEach((item) => {
+					if (item.checked) keys.push(item.id);
+					if (item.children?.length) walk(item.children);
 				});
 			};
 			walk(list);
 			return keys;
 		};
+		// 扁平化保存参数
+		const buildSaveParams = (list = [], checkedSet = new Set()) => {
+			const result = [];
 
-		// 组装 SysRoleTreeList 结构，包含 children
-		const buildParams = (list, checkedSet, halfCheckedSet) => {
-			return (list || []).map((n) => {
-				const checked =
-					checkedSet.has(n.id) || halfCheckedSet.has(n.id); // 如不想半选算勾选可去掉半选逻辑
-				return {
-					id: n.id,
-					parentId: n.parentId,
-					name: n.name,
-					checked,
-					children: buildParams(
-						n.children || [],
-						checkedSet,
-						halfCheckedSet
-					),
-				};
-			});
+			const walk = (arr = []) => {
+				arr.forEach((item) => {
+					result.push({
+						id: item.id,
+						parentId: item.parentId,
+						checked: checkedSet.has(item.id) ? "true" : "false",
+					});
+
+					if (item.children?.length) {
+						walk(item.children);
+					}
+				});
+			};
+
+			walk(list);
+			return result;
 		};
-
 		// 保存权限
 		const handleSavePerms = async () => {
 			if (!currentRoleId.value) {
@@ -534,17 +532,15 @@ export default {
 				return;
 			}
 
-			const tree = permTreeRef.value;
-			const checkedKeys = new Set(tree.getCheckedKeys());
-			const halfCheckedKeys = new Set(tree.getHalfCheckedKeys());
+			const treeRef = permTreeRef.value;
+			const checkedSet = new Set([
+				...(treeRef?.getCheckedKeys?.() || []),
+				...(treeRef?.getHalfCheckedKeys?.() || []),
+			]);
 
 			const payload = {
 				gco: currentRole.value?.gco,
-				params: buildParams(
-					permTreeData.value,
-					checkedKeys,
-					halfCheckedKeys
-				),
+				params: buildSaveParams(permTreeData.value, checkedSet),
 			};
 
 			permSaving.value = true;
